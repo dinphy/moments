@@ -130,7 +130,7 @@ const submitComment = async (token?: string) => {
 onMounted(async () => {
 
   if (props.reply) {
-    placeholder.value = "回复给@" + props.reply
+    placeholder.value = "回复@" + props.reply
   }
 })
 </script>
