@@ -26,7 +26,7 @@
               </template>
               <div class="text-sm my-1" v-if="externalPending">获取信息中...</div>
               <Button size="sm" @click="addLink">确定</Button>
-              <Button size="sm" class="ml-2" variant="secondary" @click="clearExternalUrl()">清空</Button>
+              <Button size="sm" variant="secondary" @click="clearExternalUrl()">清空</Button>
             </div>
           </PopoverContent>
         </Popover>
@@ -259,7 +259,7 @@
       </div>
       <label class="text-sm" :class="[showType?'text-lime-600' : 'text-stone-400']">{{ showType ?'公开':'私密' }}</label>
       <Switch id="showType" v-model:checked="showType"></Switch>
-      <Button @click="submitMemo">发布</Button>
+      <Button size="sm" @click="submitMemo">发布</Button>
     </div>
   </div>
 </template>
@@ -290,7 +290,7 @@ const fmtLocation = computed(() => {
   if (location.value) {
     return location.value.split(' ').join(' · ')
   }
-  return '🏳️当前位置'
+  return '📡 自定义位置'
 })
 const content = ref('')
 const id = ref(-1)

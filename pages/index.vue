@@ -13,7 +13,7 @@
         :show-more="true" @memo-update="loadData(Math.ceil((index + 1) / state.size), 'edit')" />
     </div>
     <div class="cursor-pointer text-center text-sm opacity-70  my-4" @click="loadData(state.page + 1, 'more')"
-      v-if="state.hasNext">加载更多...
+      v-if="state.hasNext">- 加载更多 -
     </div>
   </div>
 </template>
