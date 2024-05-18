@@ -14,10 +14,10 @@
   },
   "dependencies": {
     "@alicloud/pop-core": "^1.7.13",
-    "@aws-sdk/client-s3": "^3.550.0",
+    "@aws-sdk/client-s3": "^3.577.0",
     "@aws-sdk/s3-request-presigner": "^3.550.0",
     "@fancyapps/ui": "^5.0.36",
-    "@prisma/client": "^5.12.1",
+    "@prisma/client": "^5.14.0",
     "@radix-icons/vue": "^1.0.0",
     "@vueuse/core": "^10.9.0",
     "bcrypt": "^5.1.1",
@@ -30,14 +30,15 @@
     "lucide-vue-next": "^0.378.0",
     "nodemailer": "^6.9.13",
     "nuxt": "^3.11.1",
-    "radix-vue": "^1.7.0",
+    "radix-vue": "^1.8.0",
     "reflect-metadata": "^0.2.2",
     "short-uuid": "^5.2.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "vue": "^3.4.23",
+    "vue": "^3.4.27",
     "vue-router": "^4.3.2",
-    "vue-sonner": "^1.1.2"
+    "vue-sonner": "^1.1.2",
+    "vuedraggable": "^2.24.3"
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^3.4.1",
@@ -46,8 +47,8 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/nodemailer": "^6.4.15",
     "all-contributors-cli": "^6.26.1",
-    "prisma": "^5.13.0",
-    "sass": "^1.77.1",
+    "prisma": "^5.14.0",
+    "sass": "^1.77.2",
     "shadcn-nuxt": "^0.10.4",
     "typescript": "^5.4.5"
   },
