@@ -247,7 +247,7 @@
       <div class="text-sm flex flex-row gap-1 flex-1 items-center">
         <Popover>
           <PopoverTrigger>
-            <div class="flex flex-row gap-1 text-[#576b95] text-sm cursor-pointer"><MapPin :size=14 />{{ fmtLocation }}</div>
+            <div class="flex flex-row gap-1 items-center text-[#576b95] text-sm cursor-pointer"><MapPin :size=14 />{{ fmtLocation }}</div>
           </PopoverTrigger>
           <PopoverContent class="w-80">
             <div class="flex flex-row gap-2 text-sm">
