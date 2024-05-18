@@ -247,7 +247,7 @@
       <div class="text-sm flex flex-row gap-1 flex-1 items-center">
         <Popover>
           <PopoverTrigger>
-            <div class="text-[#576b95] text-sm cursor-pointer">{{ fmtLocation }}</div>
+            <div class="text-[#576b95] text-sm cursor-pointer"><MapPin :size=14 /> {{ fmtLocation }}</div>
           </PopoverTrigger>
           <PopoverContent class="w-80">
             <div class="flex flex-row gap-2 text-sm">
@@ -272,7 +272,7 @@ import { toast } from 'vue-sonner'
 import { memoUpdateEvent } from '@/lib/event'
 import type { DoubanBook, DoubanMovie, Memo, MemoExt, PrivateConfig } from '~/lib/types';
 import { useAnimate } from '@vueuse/core';
-import { Image, Music4, Settings, Trash2, LogOut, Link, Youtube, CircleX, Check, Loader2 } from 'lucide-vue-next'
+import { Image, Music4, Settings, Trash2, LogOut, Link, Youtube, CircleX, Check, Loader2, MapPin } from 'lucide-vue-next'
 
 const privateConfig = useState<PrivateConfig>('privateConfig')
 
@@ -290,7 +290,7 @@ const fmtLocation = computed(() => {
   if (location.value) {
     return location.value.split(' ').join(' · ')
   }
-  return '📡 自定义位置'
+  return '自定义位置'
 })
 const content = ref('')
 const id = ref(-1)
