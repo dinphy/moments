@@ -63,7 +63,7 @@
           class="toolbar-icon px-2 py-1 bg-[#f7f7f7] dark:bg-slate-700 hover:bg-[#dedede] cursor-pointer rounded flex items-center justify-center">
           <img src="~/assets/img/dian.svg" class="w-3 h-3" />
         </div>
-        <div class="text-xs absolute top-[-8px] right-[30px] bg-[#4c4c4c] rounded text-white p-2" v-if="showToolbar"
+        <div class="absolute top-[-8px] right-[32px] bg-[#4c4c4c] rounded text-white p-2 px-4" v-if="showToolbar"
           ref="toolbarRef">
           <div class="flex flex-row gap-4">
             <div class="flex flex-row gap-2 cursor-pointer items-center" v-if="token"
@@ -100,14 +100,13 @@
             <div class="flex flex-row gap-2 cursor-pointer items-center" @click="like">
               <Heart :size=14 v-if="likeList.findIndex((id) => id === props.memo.id) < 0" />
               <HeartCrack :size=14 v-else />
-              <div class="hidden md:block">{{ likeList.findIndex((id) => id === props.memo.id) >= 0 ? '取消' : '赞' }}
-              </div>
+              <div>{{ likeList.findIndex((id) => id === props.memo.id) >= 0 ? '取消' : '赞' }}</div>
             </div>
-
+            <span class="bg-[#6b7280] h-[20px] w-[1px]" v-if="!token"></span>
             <div class="flex flex-row gap-2 cursor-pointer items-center" v-if="publicConfig.enableComment"
               @click="momentsShowCommentInput = !momentsShowCommentInput; showUserCommentArray = []; showToolbar = false">
               <MessageSquareMore :size=14 />
-              <div class="hidden md:block">评论</div>
+              <div>评论</div>
             </div>
           </div>
         </div>
