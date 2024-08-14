@@ -4,7 +4,7 @@
     <div :key="img" v-for="img in images" class="relative">
       <img :src="getImageUrl(img)" alt="" class="cursor-move rounded relative"
            :class="images.length === 1 ? 'full-cover-image-single' : 'full-cover-image-mult'">
-      <div class="absolute right-0 top-0 px-1 bg-white m-2 rounded hover:text-red-500 cursor-pointer"
+      <div class="absolute right-6 top-0 px-1 bg-white m-2 rounded hover:text-red-500 cursor-pointer"
            @click="removeImage(img)">
         <UIcon name="i-carbon-trash-can" class=""/>
       </div>
@@ -15,7 +15,7 @@
   <MyFancyBox v-else :style="gridStyle" v-if="images.length>0">
     <img class="cursor-zoom-in rounded"
          :class="images.length === 1 ? 'full-cover-image-single' : 'full-cover-image-mult'"
-         :src="img" alt="" :key="z" v-for="(img,z) in images">
+         :src="getImageUrl(img)" alt="" :key="z" v-for="(img,z) in images">
   </MyFancyBox>
 
 </template>
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import {useSortable} from '@vueuse/integrations/useSortable'
 import type {SysConfigVO} from "~/types";
+
 
 const sysConfig = useState<SysConfigVO>('sysConfig')
 const route = useRoute()
@@ -39,6 +40,7 @@ watch(props, () => {
 })
 
 const getImageUrl = (src: string) => {
+  console.log(sysConfig.value.s3.thumbnailSuffix,src)
   if (src.startsWith("/")) {
     return src
   }
@@ -60,12 +62,6 @@ const getImageUrl = (src: string) => {
 watch(images, () => {
   emit('dragImage', images.value)
 })
-// const images = computed(() => {
-//   if (!props.imgs || props.imgs === ',') {
-//     return []
-//   }
-//   return props.imgs.split(",")
-// })
 
 const removeImage = async (img: string) => {
   await useMyFetch('/memo/removeImage', {

@@ -149,6 +149,12 @@ const save = async () => {
 }
 
 const uploadFavicon = async (files: FileList) => {
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].type.indexOf("image") < 0){
+      toast.error("只能上传图片");
+      return
+    }
+  }
   const result = await useUpload(files)
   toast.success("上传成功")
   if (result) {

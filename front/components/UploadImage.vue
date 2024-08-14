@@ -30,6 +30,12 @@ const filename = ref('')
 const total = ref(0)
 const current = ref(0)
 const upload = async (files: FileList) => {
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].type.indexOf("image") < 0){
+      toast.error("只能上传图片");
+      return
+    }
+  }
   const result = await useUpload(files, (totalSize: number, index: number, name: string, p: number) => {
     progress.value = Math.round(p * 100)
     filename.value = name
@@ -38,7 +44,9 @@ const upload = async (files: FileList) => {
   }) as string[]
   toast.success("上传成功")
   if (result) {
-    imgs.value = (imgs.value ? imgs.value + ',' : '') + result.join(",")
+    setTimeout(()=>{
+      imgs.value = (imgs.value ? imgs.value + ',' : '') + result.join(",")
+    },200)
   }
 }
 

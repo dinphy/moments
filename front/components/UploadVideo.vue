@@ -83,6 +83,12 @@ watch(props, () => {
 })
 
 const handleUploadVideo = async (files: FileList) => {
+  for (let i = 0; i < files.length; i++) {
+    if (files[i].type.indexOf("video") < 0){
+      toast.error("只能上传视频文件");
+      return
+    }
+  }
   const result = await useUpload(files, (totalSize: number, index: number, name: string, p: number) => {
     progress.value = Math.round(p * 100)
     filename.value = name
