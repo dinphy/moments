@@ -139,7 +139,7 @@ export const md = markdownit({
     breaks: true,
 })
 
-const highlighter = await createHighlighterCore({
+createHighlighterCore({
     themes: [
         import('shiki/themes/github-dark.mjs')
     ],
@@ -158,11 +158,13 @@ const highlighter = await createHighlighterCore({
         import('shiki/langs/go.mjs'),
     ],
     loadWasm: import('shiki/wasm')
+}).then((highlighter)=>{
+    //@ts-ignore
+    md.use(fromHighlighter(highlighter, {
+        themes: {
+            light: 'github-dark',
+            dark: 'github-dark',
+        }
+    }))
 })
-//@ts-ignore
-md.use(fromHighlighter(highlighter, {
-    themes: {
-        light: 'github-dark',
-        dark: 'github-dark',
-    }
-}))
+

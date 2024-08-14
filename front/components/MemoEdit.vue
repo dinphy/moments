@@ -126,15 +126,12 @@ const selectedTags = ref<Array<string>>([])
 const selectedLabel = computed({
   get:()=>selectedTags.value,
   set:(labels:Array<string>)=>{
-    console.log('set labels',labels)
     const tempLabels = Array<string>()
     labels.map(label=>{
       // @ts-ignore
       if(typeof  label !== 'string'){
-        console.log('label is not string',label.label)
         // @ts-ignore
         label = label.label
-
       }
       tempLabels.push(label)
       if(!existTags.value.includes(label)){
@@ -207,7 +204,7 @@ const loadTags = async () => {
   const res = await useMyFetch<{
     tags: string[]
   }>("/tag/list")
-  existTags.value = res.tags
+  existTags.value = res.tags || []
 }
 
 
