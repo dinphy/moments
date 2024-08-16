@@ -31,11 +31,11 @@
          v-if="!global.userinfo.token && $route.path === '/'">
       <div class="flex flex-col items-center gap-2">
         <div v-if="y>300" @click="y=0"
-             class="mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
+             class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
           <UIcon name="i-carbon-up-to-top" class="w-6 h-6 text-[#9fc84a] cursor-pointer"></UIcon>
         </div>
         <NuxtLink to="/user/login"
-                  class="mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
+                  class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
           <UIcon name="i-carbon-login" class="w-6 h-6 text-[#9fc84a]"></UIcon>
         </NuxtLink>
       </div>
