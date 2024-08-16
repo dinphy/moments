@@ -6,7 +6,7 @@
 
   <div title="到顶部" v-if="y>200 && $route.path === '/'"
        class="hidden sm:block bottom-[20%] sm:right-[20%] md:right-[10%] lg:right-[15%] xl:right-[20%] 2xl:right-[28%] fixed  flex items-center justify-center">
-    <UIcon name="i-carbon-up-to-top" class="w-12 h-12 text-gray-500 cursor-pointer" @click="y=0"></UIcon>
+    <UIcon name="i-carbon-up-to-top" class="w-10 h-10 text-gray-500 cursor-pointer" @click="y=0"></UIcon>
   </div>
 
 
@@ -15,14 +15,14 @@
          v-if="global.userinfo.token && $route.path === '/'">
       <div class="flex flex-col items-center gap-2">
         <div v-if="y>300" @click="y=0"
-             class="mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
+             class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
           <UIcon name="i-carbon-up-to-top" class="w-6 h-6 text-[#9fc84a] cursor-pointer"></UIcon>
         </div>
-        <NuxtLink to="/new" class="mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
+        <NuxtLink to="/new" class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
           <UIcon name="i-carbon-edit" class="w-6 h-6 text-[#9fc84a]"></UIcon>
         </NuxtLink>
-        <div class="mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl" @click="open = true">
-          <UIcon name="i-carbon-overflow-menu-horizontal" class="w-5 h-5 text-[#9fc84a] cursor-pointer"></UIcon>
+        <div class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl" @click="open = true">
+          <UIcon name="i-carbon-overflow-menu-horizontal" class="w-6 h-6 text-[#9fc84a] cursor-pointer"></UIcon>
         </div>
       </div>
     </div>
