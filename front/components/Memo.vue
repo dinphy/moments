@@ -94,7 +94,7 @@
                 <template v-if="global.userinfo.id === 1">
                   <div class="flex flex-col gap-1 cursor-pointer items-center" @click="setPinned(item.id)">
                     <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-pin"/>
-                    <div>{{ item.pinned ? '取消' : '置顶' }}</div>
+                    <div>{{ item.pinned ? '取消' : '' }}置顶</div>
                   </div>
                 </template>
                 <template v-if="global&&global.userinfo.id === item.userId">
@@ -104,7 +104,7 @@
                   </div>
                 </template>
                 <template v-if="(global.userinfo.id === 1 || global.userinfo.id === item.userId) ">
-                  <Confirm @ok="removeMemo(item.id)" @cancel="showToolbar = false">
+                  <Confirm @ok="removeMemo(item.id)" @cancel="moreToolbar = false">
                     <div class="flex flex-col gap-1 cursor-pointer items-center">
                       <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-trash-can"/>
                       <div>删除</div>
@@ -147,7 +147,6 @@ import {useGlobalState} from "~/store";
 import {md} from "~/utils"
 
 const showMore = ref(false)
-const moreToolbar = ref(false)
 const showMoreClicked = ref(false)
 const isDetailPage = computed(() => {
   return route.path.startsWith("/memo/")
@@ -177,6 +176,8 @@ const item = computed(() => {
 })
 
 const global = useGlobalState()
+
+const moreToolbar = ref(false)
 
 const showToolbar = ref(false)
 const toolbarRef = ref(null)
@@ -225,15 +226,18 @@ const removeMemo = async (id: number) => {
   } else {
     memoReloadEvent.emit()
   }
-  showToolbar.value = false
+  moreToolbar.value = false
 }
 const setPinned = async (id: number) => {
   await useMyFetch('/memo/setPinned?id=' + id)
   toast.success("操作成功!")
-  showToolbar.value = false
-  memoReloadEvent.emit()
+  if (isDetailPage.value) {
+    await navigateTo('/')
+  } else {
+    memoReloadEvent.emit()
+  }
+  moreToolbar.value = false
 }
-
 
 const doLike = async (id: number, token: string = '') => {
   const likes = JSON.parse(localStorage.getItem('likeMemos') || '[]') as Array<number>
