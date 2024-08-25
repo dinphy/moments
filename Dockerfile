@@ -4,10 +4,6 @@ COPY front/package*.json ./
 RUN npm install
 COPY front/. .
 RUN npm run generate
-COPY front/replace_underscore.sh ./
-RUN chmod +x /app/replace_underscore.sh
-RUN apk add --no-cache dos2unix && dos2unix /app/replace_underscore.sh
-RUN /app/replace_underscore.sh
 
 FROM golang:1.22.5-alpine as backend
 ENV CGO_ENABLED 1

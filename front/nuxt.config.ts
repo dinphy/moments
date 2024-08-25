@@ -48,5 +48,12 @@ export default defineNuxtConfig({
                 }
             },
         },
+        build: {
+            rollupOptions: {
+                output: {
+                    hashCharacters: 'base36'
+                }
+            }
+        }
     }
 })
