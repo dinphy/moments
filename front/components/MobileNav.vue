@@ -1,9 +1,16 @@
 <template>
-  <USlideover v-model="open" side="left" class="w-1/3">
-    <div class="flex flex-col gap-4 p-4 text-sm text-gray-500 dark:text-white">
-
-      <div class="flex items-center gap-2">
-        <svg @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" v-if="mode==='light'"
+  <USlideover v-model="open" side="bottom" :ui="{ width: 'w-screen max-w-md', height: 'h-screen max-h-40'}">
+    <div @click="navigate('/new')" v-if="global.userinfo.token " title="发表" class="flex flex-col items-center p-4 text-gray-500 dark:text-white">
+      <UIcon name="i-carbon-camera" class="text-[#9fc84a] w-7 h-7 cursor-pointer"/>
+      <span>发表</span>
+    </div>
+    <div class="flex items-center justify-between gap-4 p-4 pt-2 text-gray-500 dark:text-white">
+      <div @click="navigate('/')" v-if="$route.path !== '/'" title="主页" class="flex flex-col items-center">
+        <UIcon name="i-carbon-home" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
+        <span>主页</span>
+      </div>
+      <div class="flex flex-col items-center gap-1">
+        <svg @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="22" height="22" v-if="mode==='light'"
              viewBox="0 0 24 24" fill="none"
              stroke="#FDE047"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -13,7 +20,7 @@
           <path d="M22 5h-4"></path>
         </svg>
 
-        <svg @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" v-else
+        <svg @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" v-else
              fill="none"
              stroke="#FDE047" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
              class="lucide lucide-sun-icon cursor-pointer">
@@ -27,31 +34,19 @@
           <path d="m6.34 17.66-1.41 1.41"></path>
           <path d="m19.07 4.93-1.41 1.41"></path>
         </svg>
+        <span @click="toggleMode">{{mode==='light' ? '暗色' : '亮色'}}</span>
       </div>
-      <div @click="navigate('/')" v-if="$route.path !== '/'" title="去首页" class="flex items-center gap-1">
-        <UIcon name="i-carbon-arrow-left" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
-        <span>去首页</span>
-      </div>
-      <div @click="navigate('/new')" v-if="global.userinfo.token " title="发言" class="flex gap-1">
-        <UIcon name="i-carbon-edit" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
-        <span>发言</span>
-      </div>
-      <div @click="navigate('/user/calendar')" v-if="global.userinfo.token" title="日历" class="flex gap-1">
-        <UIcon name="i-carbon-calendar" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
+      <div @click="navigate('/user/calendar')" v-if="global.userinfo.token" title="日历" class="flex flex-col items-center">
+        <UIcon name="i-carbon-calendar" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
         <span>日历</span>
       </div>
-
-      <div @click="navigate('/sys/settings')" v-if="global.userinfo.id === 1" title="系统设置" class="flex gap-1">
-        <UIcon name="i-carbon-settings" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
-        <span>系统设置</span>
+      <div @click="navigate('/sys/settings')" v-if="global.userinfo.id === 1" title="系统设置" class="flex flex-col items-center">
+        <UIcon name="i-carbon-settings" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
+        <span>系统</span>
       </div>
-      <div @click="navigate('/user/settings')" v-if="global.userinfo.token" title="用户设置" class="flex gap-1">
-        <UIcon name="i-carbon-user-profile" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
-        <span>用户设置</span>
-      </div>
-      <div @click="navigate('/user/login')" v-if="!global.userinfo.token" title="登录" class="flex gap-1">
-        <UIcon name="i-carbon-login" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
-        <span>登录</span>
+      <div @click="navigate('/user/settings')" v-if="global.userinfo.token" title="用户中心" class="flex flex-col items-center">
+        <UIcon name="i-carbon-user-avatar" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
+        <span>用户</span>
       </div>
     </div>
   </USlideover>

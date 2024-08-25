@@ -3,7 +3,7 @@
 
     <div
         class="dark:bg-neutral-800 hidden sm:flex sm:absolute sm:-right-10 sm:rounded sm:p-2 sm:flex-col sm:w-fit justify-end shadow w-full flex-row  top-0  p-1 flex  gap-2 bg-white ">
-      <NuxtLink to="/" v-if="$route.path !== '/'" title="去首页">
+      <NuxtLink to="/" v-if="$route.path !== '/'" title="返回主页">
         <UIcon name="i-carbon-arrow-left" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
       <svg v-if="mode==='light'" @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -32,7 +32,7 @@
       </svg>
 
 
-      <NuxtLink to="/new" v-if="global.userinfo.token " title="发言">
+      <NuxtLink to="/new" v-if="global.userinfo.token " title="发表">
         <UIcon name="i-carbon-edit" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
       <NuxtLink to="/user/calendar" v-if="global.userinfo.token" title="日历">
@@ -42,13 +42,12 @@
       <NuxtLink to="/sys/settings" v-if="global.userinfo.id === 1" title="系统设置">
         <UIcon name="i-carbon-settings" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
-      <NuxtLink to="/user/settings" v-if="global.userinfo.token" title="用户设置">
-        <UIcon name="i-carbon-user-profile" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
+      <NuxtLink to="/user/settings" v-if="global.userinfo.token" title="用户中心">
+        <UIcon name="i-carbon-user-avatar" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
       <NuxtLink to="/user/login" v-if="!global.userinfo.token" title="登录">
         <UIcon name="i-carbon-login" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
-
     </div>
 
     <img class="header-img w-full" :src="props.user.coverUrl"

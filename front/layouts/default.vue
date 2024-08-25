@@ -12,14 +12,14 @@
 
   <div class="sm:hidden relative">
     <div class="left-0 bottom-10 w-full fixed  flex items-center justify-end"
-         v-if="global.userinfo.token && $route.path === '/'">
+         v-if="global.userinfo.token">
       <div class="flex flex-col items-center gap-2">
         <div v-if="y>300" @click="y=0"
              class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
           <UIcon name="i-carbon-up-to-top" class="w-6 h-6 text-[#9fc84a] cursor-pointer"></UIcon>
         </div>
-        <NuxtLink to="/new" class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
-          <UIcon name="i-carbon-edit" class="w-6 h-6 text-[#9fc84a]"></UIcon>
+        <NuxtLink to="/new" v-if="$route.path === '/'" class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl">
+          <UIcon name="i-carbon-camera" class="w-6 h-6 text-[#9fc84a]"></UIcon>
         </NuxtLink>
         <div class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl" @click="open = true">
           <UIcon name="i-carbon-overflow-menu-horizontal" class="w-6 h-6 text-[#9fc84a] cursor-pointer"></UIcon>
