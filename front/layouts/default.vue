@@ -11,7 +11,7 @@
 
 
   <div class="sm:hidden relative">
-    <div class="left-0 bottom-10 w-full fixed  flex items-center justify-end"
+    <div class="right-0 bottom-10 fixed flex items-center justify-end"
          v-if="global.userinfo.token">
       <div class="flex flex-col items-center gap-2">
         <div v-if="y>300" @click="y=0"
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <div class="left-0 bottom-10 w-full fixed  flex items-center justify-end"
+    <div class="right-0 bottom-10 fixed flex items-center justify-end"
          v-if="!global.userinfo.token && $route.path === '/'">
       <div class="flex flex-col items-center gap-2">
         <div v-if="y>300" @click="y=0"
