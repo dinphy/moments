@@ -16,7 +16,7 @@
           <div>
             <UIcon v-if="item.pinned" name="i-carbon-pin"/>
             <UIcon v-if="item.showType === 0" name="i-carbon-locked" class="text-red-500 ml-2 dark:text-white"/>
-            <UIcon @click="moreToolbar = true" v-if="global.userinfo.token && $route.path === `/memo/${item.id}`" name="i-carbon-overflow-menu-vertical" class="text-red-500 ml-2 dark:text-white cursor-pointer"/>
+            <UIcon v-if="($route.path === `/memo/${item.id}` && (global.userinfo.id === 1 || global.userinfo.id === item.userId))" name="i-carbon-overflow-menu-vertical" class="text-red-500 ml-2 dark:text-white cursor-pointer" @click="moreToolbar = true" />
           </div>
         </div>
         <div class="mb-2">
