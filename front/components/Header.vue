@@ -33,10 +33,10 @@
 
 
       <NuxtLink to="/new" v-if="global.userinfo.token " title="发表">
-        <UIcon name="i-carbon-edit" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
+        <UIcon name="i-mage-edit" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
-      <NuxtLink to="/user/calendar" v-if="global.userinfo.token" title="日历">
-        <UIcon name="i-carbon-calendar" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
+      <NuxtLink to="/user/calendar" v-if="global.userinfo.token" title="日历检索">
+        <UIcon name="i-jam-search-folder" class="text-[#9fc84a] w-5 h-5 cursor-pointer"/>
       </NuxtLink>
 
       <NuxtLink to="/sys/settings" v-if="global.userinfo.id === 1" title="系统设置">

@@ -16,7 +16,7 @@
           <div>
             <UIcon v-if="item.pinned" name="i-carbon-pin"/>
             <UIcon v-if="item.showType === 0" name="i-carbon-locked" class="text-red-500 ml-2 dark:text-white"/>
-            <UIcon v-if="($route.path === `/memo/${item.id}` && (global.userinfo.id === 1 || global.userinfo.id === item.userId))" name="i-carbon-overflow-menu-vertical" class="text-red-500 ml-2 dark:text-white cursor-pointer" @click="moreToolbar = true" />
+            <UIcon v-if="($route.path === `/memo/${item.id}` && (global.userinfo.id === 1 || global.userinfo.id === item.userId))" name="i-iconamoon-menu-kebab-vertical-bold" class="text-red-500 ml-2 dark:text-white cursor-pointer" @click="moreToolbar = true" />
           </div>
         </div>
         <div class="mb-2">
@@ -60,7 +60,7 @@
         </div>
 
         <div class="flex justify-between items-center relative">
-          <div class="text-xs text-[#9DA4B0]">{{
+          <div class="flex text-xs text-[#9DA4B0]">{{
               sysConfig.timeFormat === 'timeAgo' ? $dayjs(item.createdAt).fromNow() : $dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")
             }}
           </div>
@@ -89,7 +89,7 @@
             </div>
           </div>
           <template>
-            <USlideover v-model="moreToolbar" side="bottom" :ui="{ width: 'w-screen max-w-md', height: 'h-screen max-h-20'}">
+            <UModal v-model="moreToolbar">
               <div class="flex items-center justify-center gap-8 p-4 text-gray-500 dark:text-white">
                 <template v-if="global.userinfo.id === 1">
                   <div class="flex flex-col gap-1 cursor-pointer items-center" @click="setPinned(item.id)">
@@ -104,15 +104,15 @@
                   </div>
                 </template>
                 <template v-if="(global.userinfo.id === 1 || global.userinfo.id === item.userId) ">
-                  <Confirm @ok="removeMemo(item.id)" @cancel="moreToolbar = false">
-                    <div class="flex flex-col gap-1 cursor-pointer items-center">
-                      <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-trash-can"/>
-                      <div>删除</div>
-                    </div>
-                  </Confirm>
-                </template>
+                <Confirm @ok="removeMemo(item.id)" @cancel="moreToolbar = false">
+                  <div class="flex flex-col gap-1 cursor-pointer items-center">
+                    <UIcon class="text-[#9fc84a] w-5 h-5" name="i-carbon-trash-can"/>
+                  <div>删除</div>
+                  </div>
+                </Confirm>
+              </template>
               </div>
-            </USlideover>
+            </UModal>
           </template>
         </div>
 

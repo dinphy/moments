@@ -1,14 +1,14 @@
 <template>
-  <USlideover v-model="open" side="bottom" :ui="{ width: 'w-screen max-w-md', height: 'h-screen max-h-40'}">
-    <div @click="navigate('/new')" v-if="global.userinfo.token " title="发表" class="flex flex-col items-center p-4 text-gray-500 dark:text-white">
-      <UIcon name="i-carbon-camera" class="text-[#9fc84a] w-7 h-7 cursor-pointer"/>
+  <UModal v-model="open">
+    <div @click="navigate('/new')" v-if="global.userinfo.token " title="发表" class="flex flex-col items-center p-4 pt-8 text-gray-500 dark:text-white">
+      <UIcon name="i-mage-edit" class="text-[#9fc84a] w-7 h-7 cursor-pointer"/>
       <span>发表</span>
     </div>
-    <div class="flex items-center justify-between gap-4 p-4 pt-2 text-gray-500 dark:text-white">
-      <div @click="navigate('/')" v-if="$route.path !== '/'" title="主页" class="flex flex-col items-center">
+    <div class="flex items-center justify-between gap-4 p-8 pt-2 text-gray-500 dark:text-white">
+      <!-- <div @click="navigate('/')" v-if="$route.path !== '/'" title="主页" class="flex flex-col items-center">
         <UIcon name="i-carbon-home" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
         <span>主页</span>
-      </div>
+      </div> -->
       <div class="flex flex-col items-center gap-1">
         <svg @click="toggleMode" xmlns="http://www.w3.org/2000/svg" width="22" height="22" v-if="mode==='light'"
              viewBox="0 0 24 24" fill="none"
@@ -36,9 +36,9 @@
         </svg>
         <span @click="toggleMode">{{mode==='light' ? '暗色' : '亮色'}}</span>
       </div>
-      <div @click="navigate('/user/calendar')" v-if="global.userinfo.token" title="日历" class="flex flex-col items-center">
-        <UIcon name="i-carbon-calendar" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
-        <span>日历</span>
+      <div @click="navigate('/user/calendar')" v-if="global.userinfo.token" title="日历检索" class="flex flex-col items-center">
+        <UIcon name="i-jam-search-folder" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
+        <span>检索</span>
       </div>
       <div @click="navigate('/sys/settings')" v-if="global.userinfo.id === 1" title="系统设置" class="flex flex-col items-center">
         <UIcon name="i-carbon-settings" class="text-[#9fc84a] w-6 h-6 cursor-pointer"/>
@@ -49,7 +49,7 @@
         <span>用户</span>
       </div>
     </div>
-  </USlideover>
+  </UModal>
 </template>
 
 <script setup lang="ts">
