@@ -12,14 +12,11 @@
     <span class="mx-0.5">:</span>
     <span class="inline break-all cursor-pointer" @click="toggle">{{ props.comment.content }}</span>
     <span class="text-xs text-gray-400 ml-2 hidden sm:inline-block">{{$dayjs(props.comment.createdAt).fromNow()}}</span>
-    <span class="text-xs text-gray-400 ml-2 inline-flex">
+    <span class="text-xs text-gray-400 ml-2 inline-flex" v-if="(global.userinfo.id === props.memoUserId || global.userinfo.id === 1)">
       <Confirm @ok="removeComment">
-        <UIcon v-if="(global.userinfo.id === props.memoUserId || global.userinfo.id === 1)" name="i-carbon-trash-can"
-        class="cursor-pointer text-red-400"/>
+        <UIcon name="i-carbon-trash-can" class="cursor-pointer text-red-400"/>
       </Confirm>
     </span>
-    <!-- <UIcon v-if="(global.userinfo.id === props.memoUserId || global.userinfo.id === 1)" name="i-carbon-trash-can"
-           @ok="removeComment" class="cursor-pointer ml-4 text-red-400"/> -->
     
   </div>
   <CommentBox :memo-id="props.memoId" :reply-to="props.comment.username" :comment-id="props.comment.id"/>
