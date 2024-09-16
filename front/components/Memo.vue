@@ -89,7 +89,7 @@
             </div>
           </div>
           <template>
-            <UModal v-model="moreToolbar">
+            <UModal v-model="moreToolbar" :ui="{container: 'sm:items-end'}">
               <div class="flex items-center justify-center gap-8 p-4 text-gray-500 dark:text-white">
                 <template v-if="global.userinfo.id === 1">
                   <div class="flex flex-col gap-1 cursor-pointer items-center" @click="setPinned(item.id)">
