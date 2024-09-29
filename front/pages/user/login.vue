@@ -5,7 +5,7 @@
    <UCard :ui="{base:'w-4/5 mx-auto mt-20'}">
 
      <p class="text-center text-2xl font-sans"> 登录</p>
-     <UForm class="space-y-4" size="sm" :state="state">
+     <UForm class="space-y-4" size="sm" :state="state" @keyup.enter="doLogin" >
        <UFormGroup label="用户名" name="email">
          <UInput v-model="state.username"/>
        </UFormGroup>

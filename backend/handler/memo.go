@@ -376,15 +376,7 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 	memo.ShowType = req.ShowType
 
 	m.base.log.Info().Msgf("memo is %+v", memo)
-
-	if req.ID > 0 {
-		if memo.Tags == nil || *memo.Tags == "" {
-			m.base.db.Select("tags").Updates(&memo)
-		}
-		m.base.db.Updates(&memo)
-	} else {
-		m.base.db.Save(&memo)
-	}
+	m.base.db.Save(&memo)
 
 	return SuccessResp(c, h{})
 }
@@ -402,16 +394,25 @@ func (m MemoHandler) GetMemo(c echo.Context) error {
 	var (
 		memo db.Memo
 	)
+
+	ctx := c.(CustomContext)
+	currentUser := ctx.CurrentUser()
+
 	id, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
 		return FailResp(c, ParamError)
 	}
+
 	latest := c.QueryParam("latest")
 
 	if err = m.base.db.Preload("User", func(x *gorm.DB) *gorm.DB {
 		return x.Select("username", "nickname", "slogan", "id", "avatarUrl", "coverUrl")
 	}).First(&memo, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		return FailResp(c, ParamError)
+	}
+
+	if *memo.ShowType != 1 && (currentUser == nil || currentUser.Id != memo.UserId) {
+		return FailRespWithMsg(c, Fail, "暂无权限查看")
 	}
 
 	var comments []db.Comment
