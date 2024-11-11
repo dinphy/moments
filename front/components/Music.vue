@@ -3,28 +3,33 @@
     <UIcon name="i-carbon-music" class="cursor-pointer w-6 h-6"/>
     <template #panel="{close}">
       <div class="p-4 flex flex-col gap-2 max-h-[400px] overflow-auto">
-        <div class="text-xs text-gray-400">嵌入在线音乐</div>
-        <UFormGroup label="选择平台" :ui="{label:{base:'font-bold'}}">
-          <template #hint>
-            <div class="text-xs text-gray-400">
-              <ULink class="underline" target="_blank" to="https://github.com/metowolf/MetingJS">MetingJS文档</ULink>
-            </div>
+        <UTabs :items="items" class="w-full">
+          <template #musicID="{ item }">
+            <UFormGroup label="选择平台" :ui="{label:{base:'font-bold'}}">
+              <template #hint>
+                <div class="text-xs text-gray-400">
+                  <ULink class="underline" target="_blank" to="https://github.com/metowolf/MetingJS">MetingJS文档</ULink>
+                </div>
+              </template>
+              <USelectMenu v-model="server" :options="servers" value-attribute="value" option-attribute="label"
+                          placeholder="选择平台"></USelectMenu>
+            </UFormGroup>
+
+            <UFormGroup label="选择类型" :ui="{label:{base:'font-bold'}}">
+              <USelectMenu v-model="type" :options="types" value-attribute="value" option-attribute="label"
+                          placeholder="选择平台"></USelectMenu>
+            </UFormGroup>
+
+            <UFormGroup label="ID" :ui="{label:{base:'font-bold'}}">
+              <UInput v-model="id" placeholder="输入歌曲ID/播放列表ID/专辑ID"/>
+            </UFormGroup>
           </template>
-          <USelectMenu v-model="server" :options="servers" value-attribute="value" option-attribute="label"
-                       placeholder="选择平台"></USelectMenu>
-        </UFormGroup>
-
-        <UFormGroup label="选择类型" :ui="{label:{base:'font-bold'}}">
-          <USelectMenu v-model="type" :options="types" value-attribute="value" option-attribute="label"
-                       placeholder="选择平台"></USelectMenu>
-        </UFormGroup>
-
-        <UFormGroup label="ID" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="id" placeholder="输入歌曲ID/播放列表ID/专辑ID"/>
-        </UFormGroup>
-        <UFormGroup label="API接口地址" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="api"/>
-        </UFormGroup>
+          <template #musicAPI="{ item }">
+            <UFormGroup label="API接口地址" :ui="{label:{base:'font-bold'}}">
+              <UInput v-model="api"/>
+            </UFormGroup>
+          </template>
+        </UTabs>
         <MusicPreview v-if="previewing" :id="id" :server="server" :type="type" :api="api"/>
 
         <div class="flex gap-2">
@@ -55,7 +60,13 @@ const server = ref<MetingMusicServer>(props.server)
 const type = ref<MetingMusicType>(props.type)
 const api = ref<string>(props.api)
 const emit = defineEmits(['confirm'])
-
+const items = [{
+  slot: 'musicID',
+  label: '在线音乐'
+}, {
+  slot: 'musicAPI',
+  label: 'API接口'
+}]
 
 watch(props, () => {
   id.value = props.id
