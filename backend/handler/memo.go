@@ -12,6 +12,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +29,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
 	"github.com/samber/do/v2"
+	"github.com/spf13/cast"
 	"golang.org/x/net/html"
 	"gorm.io/gorm"
 )
@@ -148,7 +150,6 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	var (
 		req         vo.ListMemoReq
 		list        []db.Memo
-		pinnedList  []db.Memo
 		total       int64
 		sysConfig   db.SysConfig
 		sysConfigVO vo.FullSysConfigVO
@@ -171,27 +172,22 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	m.base.db.First(&sysConfig)
 	_ = json.Unmarshal([]byte(sysConfig.Content), &sysConfigVO)
 	offset := (req.Page - 1) * req.Size
-	totalCondition := m.base.db.Table("Memo").Where("pinned = 0")
 
 	tx := m.base.db.Preload("User", func(x *gorm.DB) *gorm.DB {
 		return x.Select("username", "nickname", "slogan", "id", "avatarUrl", "coverUrl")
-	}).Where("pinned = 0")
+	})
 
 	if req.Start != nil {
 		tx = tx.Where("createdAt >= ?", req.Start)
-		totalCondition = totalCondition.Where("createdAt >= ?", req.Start)
 	}
 	if req.End != nil {
 		tx = tx.Where("createdAt <= ?", req.End)
-		totalCondition = totalCondition.Where("createdAt <= ?", req.End)
 	}
 	if req.ContentContains != "" {
 		tx = tx.Where("content like ?", "%"+req.ContentContains+"%")
-		totalCondition = totalCondition.Where("content like ?", "%"+req.ContentContains+"%")
 	}
 	if req.ShowType != nil && *req.ShowType >= 0 {
 		tx = tx.Where("showType=?", req.ShowType)
-		totalCondition = totalCondition.Where("showType=?", req.ShowType)
 	}
 	if currentUser == nil {
 		tx = tx.Where("showType = 1")
@@ -203,11 +199,9 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 			tags := strings.Split(req.Tag, ",")
 			for _, tag := range tags {
 				tx = tx.Where("tags like ?", fmt.Sprintf("%%%s,%%", tag))
-				totalCondition = totalCondition.Where("tags like ?", fmt.Sprintf("%%%s,%%", tag))
 			}
 		} else {
 			tx = tx.Where("tags like ?", fmt.Sprintf("%%%s,%%", req.Tag))
-			totalCondition = totalCondition.Where("tags like ?", fmt.Sprintf("%%%s,%%", req.Tag))
 		}
 	}
 	if req.Username != "" {
@@ -216,21 +210,17 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 			return FailRespWithMsg(c, Fail, "不存在的用户")
 		}
 		tx = tx.Where("userId = ?", target.Id)
-		totalCondition = totalCondition.Where("userId = ?", target.Id)
 	}
 	if req.UserId != nil {
 		tx = tx.Where("userId = ?", req.UserId)
-		totalCondition = totalCondition.Where("userId = ?", req.UserId)
 	}
 	tx.Order("createdAt desc").Limit(req.Size).Offset(offset).Find(&list)
-	totalCondition.Count(&total)
+	tx.Count(&total)
 
-	if req.Page == 1 {
-		m.base.db.Preload("User", func(x *gorm.DB) *gorm.DB {
-			return x.Select("username", "nickname", "slogan", "id", "avatarUrl", "coverUrl")
-		}).Where("pinned = 1").Find(&pinnedList)
-		list = append(pinnedList, list...)
-	}
+	// 排序，让Pinned=true的元素在最前
+	sort.SliceStable(list, func(i, j int) bool {
+		return cast.ToBool(list[i].Pinned) && !cast.ToBool(list[j].Pinned)
+	})
 
 	for i, memo := range list {
 		var comments []db.Comment
