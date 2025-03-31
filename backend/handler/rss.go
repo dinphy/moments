@@ -91,21 +91,21 @@ func (r RssHandler) generateRss(host string) (string, error) {
 }
 
 func generateFeed(memos []db.Memo, sysConfigVO *vo.FullSysConfigVO, user *db.User, host string) *feeds.Feed {
-	now := time.Now()
-	feed := &feeds.Feed{
-		Title:       sysConfigVO.Title,
-		Link:        &feeds.Link{Href: fmt.Sprintf("%s/rss", host)},
-		Description: user.Slogan,
-		Author:      &feeds.Author{Name: user.Nickname, Email: user.Email},
-		Created:     now,
-	}
+    now := time.Now()
+    feed := &feeds.Feed{
+        Title:       sysConfigVO.Title,
+        Link:        &feeds.Link{Href: fmt.Sprintf("%s/rss", host)},
+        Description: user.Slogan,
+        Author:      &feeds.Author{Name: user.Nickname, Email: user.Email},
+        Created:     now,
+    }
 
-	feed.Items = []*feeds.Item{}
-	// 定义标题截取的长度
-	const maxTitleLength = 20
-	for _, memo := range memos {
-		memoLink := fmt.Sprintf("%s/memo/%d", host, memo.Id)
-		title := ""
+    feed.Items = []*feeds.Item{}
+    // 定义标题截取的长度
+    const maxTitleLength = 20
+    for _, memo := range memos {
+        memoLink := fmt.Sprintf("%s/memo/%d", host, memo.Id)
+        title := ""
         // 检查内容是否为空
         if memo.Content != "" {
             // 按换行符分割内容，取第一行
@@ -121,17 +121,28 @@ func generateFeed(memos []db.Memo, sysConfigVO *vo.FullSysConfigVO, user *db.Use
             // 若内容为空，使用默认标题格式
             title = fmt.Sprintf("Memo #%d", memo.Id)
         }
-		feed.Items = append(feed.Items, &feeds.Item{
-			Id:          memoLink,
-			Title:       title,
-			Link:        &feeds.Link{Href: memoLink},
-			Description: parseMarkdownToHtml(getContentWithExt(memo, host)),
-			Author:      &feeds.Author{Name: memo.User.Nickname, Email: memo.User.Email},
-			Created:     *memo.CreatedAt,
-			Updated:     *memo.UpdatedAt,
-		})
-	}
-	return feed
+
+        // 获取并格式化标签
+        tagStr := ""
+        if memo.Tags != nil && *memo.Tags != "" {
+            tags := strings.Split(strings.TrimSuffix(*memo.Tags, ","), ",")
+            tagStr = fmt.Sprintf("[%s] ", strings.Join(tags, "]["))
+        }
+
+        // 将标签添加到标题前面
+        title = tagStr + title
+
+        feed.Items = append(feed.Items, &feeds.Item{
+            Id:          memoLink,
+            Title:       title,
+            Link:        &feeds.Link{Href: memoLink},
+            Description: parseMarkdownToHtml(getContentWithExt(memo, host)),
+            Author:      &feeds.Author{Name: memo.User.Nickname, Email: memo.User.Email},
+            Created:     *memo.CreatedAt,
+            Updated:     *memo.UpdatedAt,
+        })
+    }
+    return feed
 }
 
 func parseMarkdownToHtml(md string) string {
