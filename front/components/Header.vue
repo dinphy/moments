@@ -32,6 +32,7 @@
       </NuxtLink>
       <NuxtLink
         v-if="$route.path === '/user/settings' && global.userinfo.token"
+        class="hidden sm:flex"
         title="登出"
         @click="logout"
       >
