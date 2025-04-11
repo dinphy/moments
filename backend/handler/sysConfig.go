@@ -126,6 +126,8 @@ func (s SysConfigHandler) SaveConfig(c echo.Context) error {
 			return FailRespWithMsg(c, Fail, "保存系统配置异常")
 		}
 	}
-	s.base.db.Table("User").Where("id=?", 1).Update("username", result.AdminUserName)
+	if result.AdminUserName != "" {
+		s.base.db.Table("User").Where("id=?", 1).Update("username", result.AdminUserName)
+	}
 	return SuccessResp(c, h{})
 }
