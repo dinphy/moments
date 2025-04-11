@@ -21,7 +21,7 @@
           {{ link.desc || "暂无描述" }}
         </p>
       </a>
-      <div v-if="showDeleteIcon[index] && global.userinfo.token" class="absolute top-2 right-2">
+      <div v-if="showDeleteIcon[index]" class="absolute top-2 right-2">
         <UIcon
           name="i-carbon-delete"
           class="text-red-500 w-4 h-4 cursor-pointer"
@@ -78,9 +78,7 @@
 import { useState } from "#app";
 import type { SysConfigVO, UserVO } from "~/types";
 import { toast } from "vue-sonner";
-import { useGlobalState } from "~/store";
 
-const global = useGlobalState();
 const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
 
