@@ -39,16 +39,6 @@
       >
         <UIcon name="i-carbon-logout" class="w-5 h-5 cursor-pointer" />
       </NuxtLink>
-      <span
-        v-if="$route.path == '/flinks' && global.userinfo.id === 1"
-        class="flex"
-      >
-        <UIcon
-          name="i-carbon-add"
-          class="w-6 h-6 cursor-pointer"
-          @click="$emit('add-flinks')"
-        />
-      </span>
     </div>
 
     <div
