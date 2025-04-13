@@ -94,9 +94,9 @@
         <span class="text-sm mt-1">检索</span>
       </div>
       <div
-        v-if="$route.path == '/' && sysConfig.friendLinks"
+        v-if="$route.path == '/'"
         class="flex flex-col items-center"
-        @click="navigate('/flinks')"
+        @click="navigate('/links')"
         title="友情链接"
       >
         <span

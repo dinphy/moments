@@ -9,24 +9,24 @@ import (
 	"github.com/samber/do/v2"
 )
 
-type NoticeHandler struct {
+type LinksHandler struct {
 	base BaseHandler
 }
 
-func NewNoticeHandler(injector do.Injector) *NoticeHandler {
-	return &NoticeHandler{do.MustInvoke[BaseHandler](injector)}
+func NewLinksHandler(injector do.Injector) *LinksHandler {
+	return &LinksHandler{do.MustInvoke[BaseHandler](injector)}
 }
 
 // 添加公告
 // @Router /api/notice/add [post]
-func (n NoticeHandler) AddNotice(c echo.Context) error {
-	var notice db.Notice
+func (n LinksHandler) AddLinks(c echo.Context) error {
+	var notice db.Links
 	if err := c.Bind(&notice); err != nil {
 		return FailResp(c, ParamError)
 	}
 
-	if notice.NoticeUrl != "" {
-		parsedUrl, err := url.Parse(notice.NoticeUrl)
+	if notice.LinksUrl != "" {
+		parsedUrl, err := url.Parse(notice.LinksUrl)
 		if err != nil || (parsedUrl.Scheme != "http" && parsedUrl.Scheme != "https") {
 			return FailRespWithMsg(c, Fail, "公告链接必须以 http 或 https 开头")
 		}
@@ -45,8 +45,8 @@ func (n NoticeHandler) AddNotice(c echo.Context) error {
 
 // 获取公告列表
 // @Router /api/notice/list [post]
-func (n NoticeHandler) GetNoticeList(c echo.Context) error {
-	var notices []db.Notice
+func (n LinksHandler) GetLinksList(c echo.Context) error {
+	var notices []db.Links
 	if err := n.base.db.Find(&notices).Error; err != nil {
 		return FailRespWithMsg(c, Fail, "获取公告列表失败")
 	}
