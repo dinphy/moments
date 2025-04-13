@@ -84,7 +84,9 @@
       </div>
     </div>
     <div class="flex justify-center items-center text-sm text-gray-400 py-4">
-      <span v-if="linksList.length > 0">共 {{ linksList.length }} 个朋友</span>
+      <span v-if="linksList && linksList.length > 0"
+        >共 {{ linksList.length }} 个朋友</span
+      >
       <span v-else>暂无朋友</span>
     </div>
   </div>
