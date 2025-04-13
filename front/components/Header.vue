@@ -19,6 +19,7 @@
         <span v-else-if="$route.path === '/user/settings'">用户中心</span>
         <span v-else-if="$route.path.indexOf('/tags/') >= 0">话题专栏</span>
         <span v-else-if="$route.path === '/flinks'">友情链接</span>
+        <span v-else-if="$route.path === '/notice'">公告列表</span>
         <span v-else>
           <span v-if="!global.userinfo.token && $route.path === '/user/login'">
             登录
@@ -39,6 +40,16 @@
       >
         <UIcon name="i-carbon-logout" class="w-5 h-5 cursor-pointer" />
       </NuxtLink>
+      <span
+        v-if="$route.path == '/notice' && global.userinfo.id === 1"
+        class="flex"
+      >
+        <UIcon
+          name="i-carbon-add"
+          class="w-6 h-6 cursor-pointer"
+          @click="$emit('add-notice')"
+        />
+      </span>
     </div>
 
     <div

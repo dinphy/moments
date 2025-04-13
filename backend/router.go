@@ -68,6 +68,12 @@ func setupRouter(injector do.Injector) {
 	rssGroup := e.Group("/rss")
 	rssGroup.GET("", rssHandler.GetRss)
 
+	noticeHandler := handler.NewNoticeHandler(injector)
+
+	noticeGroup := apiGroup.Group("/notice")
+    noticeGroup.POST("/add", noticeHandler.AddNotice)
+	noticeGroup.POST("/list", noticeHandler.GetNoticeList)
+
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
 	}

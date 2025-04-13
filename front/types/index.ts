@@ -142,3 +142,13 @@ export type Video = {
 }
 
 export type VideoType = Video["type"]
+
+export type Notice = {
+    id: number;
+    title: string;
+    content: string;
+    noticeUrl: string;
+    description: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+} 
