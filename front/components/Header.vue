@@ -40,7 +40,7 @@
         <UIcon name="i-carbon-logout" class="w-5 h-5 cursor-pointer" />
       </NuxtLink>
       <span
-        v-if="$route.path == '/links' && global.userinfo.id === 1"
+        v-if="$route.path == '/links'"
         class="flex"
       >
         <UIcon

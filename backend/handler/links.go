@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/kingwrcy/moments/db"
@@ -17,38 +18,53 @@ func NewLinksHandler(injector do.Injector) *LinksHandler {
 	return &LinksHandler{do.MustInvoke[BaseHandler](injector)}
 }
 
-// 添加公告
-// @Router /api/notice/add [post]
+// 添加友情链接
+// @Router /api/links/add [post]
 func (n LinksHandler) AddLinks(c echo.Context) error {
-	var notice db.Links
-	if err := c.Bind(&notice); err != nil {
+	var links db.Links
+	if err := c.Bind(&links); err != nil {
 		return FailResp(c, ParamError)
 	}
 
-	if notice.LinksUrl != "" {
-		parsedUrl, err := url.Parse(notice.LinksUrl)
+	if links.LinksUrl != "" {
+		parsedUrl, err := url.Parse(links.LinksUrl)
 		if err != nil || (parsedUrl.Scheme != "http" && parsedUrl.Scheme != "https") {
-			return FailRespWithMsg(c, Fail, "公告链接必须以 http 或 https 开头")
+			return FailRespWithMsg(c, Fail, "必须以 http 或 https 开头")
 		}
 	}
 
 	now := time.Now()
-	notice.CreatedAt = &now
-	notice.UpdatedAt = &now
+	links.CreatedAt = &now
+	links.UpdatedAt = &now
 
-	if err := n.base.db.Create(&notice).Error; err != nil {
-		return FailRespWithMsg(c, Fail, "添加公告失败")
+	if err := n.base.db.Create(&links).Error; err != nil {
+		return FailRespWithMsg(c, Fail, "添加友情链接失败")
 	}
 
-	return SuccessResp(c, notice)
+	return SuccessResp(c, links)
 }
 
-// 获取公告列表
-// @Router /api/notice/list [post]
+// 获取友情链接列表
+// @Router /api/links/list [post]
 func (n LinksHandler) GetLinksList(c echo.Context) error {
-	var notices []db.Links
-	if err := n.base.db.Find(&notices).Error; err != nil {
-		return FailRespWithMsg(c, Fail, "获取公告列表失败")
+	var linkss []db.Links
+	if err := n.base.db.Find(&linkss).Error; err != nil {
+		return FailRespWithMsg(c, Fail, "获取友情链接列表失败")
 	}
-	return SuccessResp(c, notices)
+	return SuccessResp(c, linkss)
+}
+
+// 删除友情链接
+// @Router /api/links/delete [post]
+func (n LinksHandler) DeleteLinks(c echo.Context) error {
+	id, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return FailResp(c, ParamError)
+	}
+
+	if err := n.base.db.Delete(&db.Links{}, id).Error; err != nil {
+		return FailRespWithMsg(c, Fail, "删除友情链接失败")
+	}
+
+	return SuccessResp[map[string]string](c, map[string]string{"message": "友情链接删除成功"})
 }

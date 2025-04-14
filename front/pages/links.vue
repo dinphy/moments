@@ -1,5 +1,9 @@
 <template>
-  <Header v-bind:user="currentUser" @add-links="showAddModal = true" />
+  <Header
+    v-if="currentUser"
+    v-bind:user="currentUser"
+    @add-links="showAddModal = true"
+  />
   <UModal
     v-model="showAddModal"
     :ui="{
@@ -66,7 +70,9 @@
       <div
         v-for="links in linksList"
         :key="links.id"
-        class="bg-neutral-100 dark:bg-neutral-700 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 duration-300"
+        class="bg-neutral-100 dark:bg-neutral-700 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 duration-300 relative"
+        @mouseenter="showDeleteIcon(links.id)"
+        @mouseleave="hideDeleteIcon(links.id)"
       >
         <a :href="links.linksUrl" target="_blank" class="block p-4">
           <div class="flex items-center gap-2 mb-2">
@@ -81,19 +87,48 @@
             {{ links.linksDesc || "暂无描述" }}
           </p>
         </a>
+        <div
+          v-if="showDelete[links.id]"
+          class="absolute top-0 right-0 px-1 bg-white dark:bg-gray-900 m-2 rounded hover:text-red-500 cursor-pointer"
+          @click="showConfirmModal(links.id)"
+        >
+          <UIcon name="i-carbon-trash-can" />
+        </div>
       </div>
     </div>
     <div class="flex justify-center items-center text-sm text-gray-400 py-4">
       <span v-if="linksList && linksList.length > 0"
         >共 {{ linksList.length }} 个朋友</span
       >
-      <span v-else>暂无朋友</span>
+      <span v-else>
+        暂无朋友，<span
+          class="text-blue-500 cursor-pointer"
+          @click="showAddModal = true"
+          >点击添加</span
+        >
+      </span>
     </div>
   </div>
+  <UModal
+    v-model="showConfirm"
+    :ui="{
+      container:
+        'fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center',
+    }"
+  >
+    <div class="p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-md">
+      <p class="text-center text-lg font-bold mb-2">确认删除</p>
+      <p class="text-gray-600 mb-4">你确定要删除这个友情链接吗？</p>
+      <div class="flex justify-end gap-2 mt-4">
+        <UButton color="white" @click="hideConfirmModal">取消</UButton>
+        <UButton @click="deleteLinks(selectedLinkId)">确认删除</UButton>
+      </div>
+    </div>
+  </UModal>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useMyFetch } from "~/utils";
 import { useState } from "#app";
 import type { UserVO, Links } from "~/types";
@@ -109,6 +144,9 @@ const state = reactive({
 const currentUser = useState<UserVO>("userinfo");
 const linksList = ref<Links[]>([]);
 const showAddModal = ref(false);
+const showDelete = ref<{ [key: number]: boolean }>({});
+const showConfirm = ref(false);
+const selectedLinkId = ref<number>(0);
 
 const addLinks = async () => {
   if (state.linksName.length === 0) {
@@ -123,12 +161,10 @@ const addLinks = async () => {
     toast.warning("网址不能为空");
     return;
   }
-
   if (!/^https?:\/\//.test(state.linksUrl)) {
     toast.warning("必须以 http 或 https 开头");
     return;
   }
-
   if (state.linksDesc.length === 0) {
     state.linksDesc = "暂无描述";
   }
@@ -137,6 +173,7 @@ const addLinks = async () => {
     const response = await useMyFetch("/links/add", state);
     toast.success("友情链接添加成功");
     await getLinksList();
+    showAddModal.value = false;
   } catch (error) {
     toast.error("友情链接添加失败，请稍后重试");
   }
@@ -146,8 +183,39 @@ const getLinksList = async () => {
   try {
     const response = await useMyFetch("/links/list");
     linksList.value = response as Links[];
+    linksList.value.forEach((links) => {
+      showDelete.value[links.id] = false;
+    });
   } catch (error) {
     toast.error("获取友情链接列表失败，请稍后重试");
+  }
+};
+
+const showDeleteIcon = (id: number) => {
+  showDelete.value[id] = true;
+};
+
+const hideDeleteIcon = (id: number) => {
+  showDelete.value[id] = false;
+};
+
+const showConfirmModal = (id: number) => {
+  selectedLinkId.value = id;
+  showConfirm.value = true;
+};
+
+const hideConfirmModal = () => {
+  showConfirm.value = false;
+};
+
+const deleteLinks = async (id: number) => {
+  try {
+    await useMyFetch(`/links/delete?id=${id}`);
+    toast.success("友情链接删除成功");
+    await getLinksList();
+    showConfirm.value = false;
+  } catch (error) {
+    toast.error("友情链接删除失败，请稍后重试");
   }
 };
 
