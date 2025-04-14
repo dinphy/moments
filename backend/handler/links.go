@@ -21,6 +21,12 @@ func NewLinksHandler(injector do.Injector) *LinksHandler {
 // 添加友情链接
 // @Router /api/links/add [post]
 func (n LinksHandler) AddLinks(c echo.Context) error {
+	context := c.(CustomContext)
+	currentUser := context.CurrentUser()
+	if currentUser == nil || currentUser.Id != 1 {
+		return FailRespWithMsg(c, Fail, "你没有权限添加友情链接")
+	}
+
 	var links db.Links
 	if err := c.Bind(&links); err != nil {
 		return FailResp(c, ParamError)
@@ -57,6 +63,12 @@ func (n LinksHandler) GetLinksList(c echo.Context) error {
 // 删除友情链接
 // @Router /api/links/delete [post]
 func (n LinksHandler) DeleteLinks(c echo.Context) error {
+	context := c.(CustomContext)
+	currentUser := context.CurrentUser()
+	if currentUser == nil || currentUser.Id != 1 {
+		return FailRespWithMsg(c, Fail, "你没有权限删除友情链接")
+	}
+
 	id, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
 		return FailResp(c, ParamError)

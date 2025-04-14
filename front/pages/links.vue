@@ -1,9 +1,5 @@
 <template>
-  <Header
-    v-if="currentUser"
-    v-bind:user="currentUser"
-    @add-links="showAddModal = true"
-  />
+  <Header v-bind:user="currentUser" @add-links="showAddModal = true" />
   <UModal
     v-model="showAddModal"
     :ui="{
@@ -88,7 +84,7 @@
           </p>
         </a>
         <div
-          v-if="showDelete[links.id]"
+          v-if="showDelete[links.id] && global.userinfo.id === 1"
           class="absolute top-0 right-0 px-1 bg-white dark:bg-gray-900 m-2 rounded hover:text-red-500 cursor-pointer"
           @click="showConfirmModal(links.id)"
         >
@@ -96,15 +92,19 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center items-center text-sm text-gray-400 py-4">
+    <div
+      class="flex justify-center items-center text-sm text-gray-400 pt-4 pb-10"
+    >
       <span v-if="linksList && linksList.length > 0"
         >共 {{ linksList.length }} 个朋友</span
       >
-      <span v-else>
-        暂无朋友，<span
-          class="text-blue-500 cursor-pointer"
+      <span v-else class="text-gray-600 dark:text-gray-300">
+        暂无朋友
+        <UButton
+          v-if="global.userinfo.id === 1"
+          class="ml-2"
           @click="showAddModal = true"
-          >点击添加</span
+          >点击添加</UButton
         >
       </span>
     </div>
@@ -128,12 +128,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
-import { useMyFetch } from "~/utils";
-import { useState } from "#app";
-import type { UserVO, Links } from "~/types";
+import type { Links, UserVO } from "~/types";
 import { toast } from "vue-sonner";
+import { useGlobalState } from "~/store";
 
+const global = useGlobalState();
 const state = reactive({
   linksName: "",
   linksIcon: "",
