@@ -6,8 +6,10 @@
     <div class="flex flex-col w-2/6 sm:w-1/6">
       <template v-if="!isPinned">
         <div class="flex justify-center">
-          <span class="text-lg font-bold">{{ formattedDate.day }}</span>
-          <span class="flex items-end">{{ formattedDate.month }}月</span>
+          <span class="text-xl font-bold">{{ formattedDate.day }}</span>
+          <span class="flex items-end text-xs"
+            >{{ formattedDate.month }}月</span
+          >
         </div>
         <div
           class="flex justify-center text-[#576b95] font-medium dark:text-white text-xs mt-2 mb-1 select-none"
@@ -22,61 +24,34 @@
     <div class="flex w-full flex-col px-2">
       <NuxtLink class="flex" :to="`/memo/${item.id}`">
         <div class="w-24 h-24" v-if="imageCount > 0">
-          <!-- 1图布局 -->
           <div
             v-if="imageCount === 1"
             class="h-full w-full border border-white dark:border-neutral-800"
           >
-            <img
-              :src="images[0]"
-              alt="图片"
-              class="h-full w-full object-cover"
-            />
+            <img :src="images[0]" class="h-full w-full object-cover" />
           </div>
-          <!-- 2图布局 -->
           <div v-if="imageCount === 2" class="h-full w-full flex gap-0.1">
             <div class="w-1/2 border border-white dark:border-neutral-800">
-              <img
-                :src="images[0]"
-                alt="图片1"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[0]" class="h-full w-full object-cover" />
             </div>
             <div class="w-1/2 border border-white dark:border-neutral-800">
-              <img
-                :src="images[1]"
-                alt="图片2"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[1]" class="h-full w-full object-cover" />
             </div>
           </div>
-          <!-- 3图布局 -->
           <div v-if="imageCount === 3" class="h-full w-full flex gap-0.1">
             <div class="w-1/2 border border-white dark:border-neutral-800">
-              <img
-                :src="images[0]"
-                alt="图片1"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[0]" class="h-full w-full object-cover" />
             </div>
             <div class="w-1/2 flex flex-col gap-0.1">
               <div class="h-1/2 border border-white dark:border-neutral-800">
-                <img
-                  :src="images[1]"
-                  alt="图片2"
-                  class="h-full w-full object-cover"
-                />
+                <img :src="images[1]" class="h-full w-full object-cover" />
               </div>
               <div class="h-1/2 border border-white dark:border-neutral-800">
-                <img
-                  :src="images[2]"
-                  alt="图片3"
-                  class="h-full w-full object-cover"
-                />
+                <img :src="images[2]" class="h-full w-full object-cover" />
               </div>
             </div>
           </div>
-          <!-- 4图布局 -->
+
           <div
             v-if="imageCount === 4"
             class="h-full w-full grid grid-cols-2 grid-rows-2 gap-0.1"
@@ -86,14 +61,10 @@
               v-for="(img, index) in images.slice(0, 4)"
               :key="index"
             >
-              <img
-                :src="img"
-                :alt="'图片' + (index + 1)"
-                class="h-full w-full object-cover"
-              />
+              <img :src="img" class="h-full w-full object-cover" />
             </div>
           </div>
-          <!-- 5 - 9图布局 -->
+
           <div
             v-if="imageCount >= 5 && imageCount <= 9"
             class="h-full w-full grid grid-cols-3 grid-rows-3 gap-0.1"
@@ -103,99 +74,63 @@
               :class="getGridClass(0, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[0]"
-                alt="图片1"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[0]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 2"
               :class="getGridClass(1, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[1]"
-                alt="图片2"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[1]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 3"
               :class="getGridClass(2, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[2]"
-                alt="图片3"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[2]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 4"
               :class="getGridClass(3, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[3]"
-                alt="图片4"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[3]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 5"
               :class="getGridClass(4, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[4]"
-                alt="图片5"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[4]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 6"
               :class="getGridClass(5, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[5]"
-                alt="图片6"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[5]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 7"
               :class="getGridClass(6, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[6]"
-                alt="图片7"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[6]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount >= 8"
               :class="getGridClass(7, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[7]"
-                alt="图片8"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[7]" class="h-full w-full object-cover" />
             </div>
             <div
               v-if="imageCount === 9"
               :class="getGridClass(8, imageCount)"
               class="border border-white dark:border-neutral-800"
             >
-              <img
-                :src="images[8]"
-                alt="图片9"
-                class="h-full w-full object-cover"
-              />
+              <img :src="images[8]" class="h-full w-full object-cover" />
             </div>
           </div>
         </div>

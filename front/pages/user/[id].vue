@@ -2,7 +2,17 @@
   <Header v-if="memos.length > 0" v-bind:user="memos[0].user" />
 
   <div class="flex flex-col">
-    <userMemo v-bind:memo="m" v-for="m in memos" :key="m.id" />
+    <div v-for="(memo, index) in pinnedMemos" :key="index">
+      <userMemo v-bind:memo="memo" />
+    </div>
+    <div v-for="(memo, index) in nonPinnedMemoList" :key="index">
+      <div v-if="memo.displayYear">
+        <div class="pl-5 py-4">
+          <span class="text-2xl">{{ memo.displayYear }}年</span>
+        </div>
+      </div>
+      <userMemo v-bind:memo="memo" />
+    </div>
   </div>
   <div
     ref="loadMoreEle"
@@ -22,6 +32,8 @@ import type { MemoVO, SysConfigVO } from "~/types";
 import userMemo from "~/components/userMemo.vue";
 import { memoChangedEvent, memoReloadEvent } from "~/event";
 import { useElementVisibility } from "@vueuse/core";
+import { computed, onMounted, reactive, ref, watch } from "vue";
+import dayjs from "dayjs";
 
 const loadMoreEle = ref(null);
 const targetIsVisible = useElementVisibility(loadMoreEle);
@@ -32,6 +44,7 @@ watch(targetIsVisible, async (visible) => {
     await loadMore();
   }
 });
+
 const hasNext = ref(false);
 const route = useRoute();
 const userId = route.params.id as any as string;
@@ -41,6 +54,7 @@ const state = reactive({
 });
 
 const memos = ref<Array<MemoVO>>([]);
+
 onMounted(async () => {
   await reload();
 });
@@ -79,6 +93,28 @@ memoChangedEvent.on(async (id: number) => {
   if (index >= 0) {
     memos.value[index] = res;
   }
+});
+
+// 分离置顶和非置顶memo
+const pinnedMemos = computed(() => memos.value.filter((memo) => memo.pinned));
+const nonPinnedMemos = computed(() =>
+  memos.value.filter((memo) => !memo.pinned)
+);
+
+const nonPinnedMemoList = computed(() => {
+  if (!nonPinnedMemos.value.length) return [];
+  let lastYear = null;
+  return nonPinnedMemos.value.map((memo) => {
+    const currentYear = dayjs(memo.createdAt).locale("zh-cn").format("YYYY");
+    let returns = memo;
+    if (currentYear !== lastYear) {
+      lastYear = currentYear;
+      returns = { ...returns, displayYear: currentYear };
+    } else {
+      returns = { ...returns, displayYear: null };
+    }
+    return returns;
+  });
 });
 </script>
 
