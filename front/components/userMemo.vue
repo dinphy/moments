@@ -1,4 +1,4 @@
-<template class="dark:bg-neutral-700">
+<template>
   <div
     class="flex flex-row sm:gap-2 text-sm sm:py-2 sm:px-2 w-full"
     :class="{ 'bg-slate-100 dark:bg-neutral-800': props.memo.pinned }"
