@@ -3,11 +3,12 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY front/package.json .
 COPY front/pnpm-lock.yaml .
+COPY front/pnpm-workspace.yaml .
 RUN pnpm install
 COPY front/. .
 RUN pnpm run generate
 
-FROM golang:1.22.5-alpine AS backend
+FROM golang:1.23.3-alpine AS backend
 ARG VERSION
 ARG COMMIT_ID
 WORKDIR /app

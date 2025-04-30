@@ -81,7 +81,7 @@ func migrateTo3(tx *gorm.DB, log zerolog.Logger) {
 		tx.Find(&memos)
 		for _, memo := range memos {
 			log.Info().Msgf("开始迁移memo id:%d", memo.Id)
-			var extMap = map[string]interface{}{}
+			var extMap = map[string]any{}
 			var ext vo.MemoExt
 			err := json.Unmarshal([]byte(memo.Ext), &extMap)
 			if err != nil {

@@ -62,7 +62,7 @@ interface ImgConfig {
 const sysConfig = useState<SysConfigVO>("sysConfig");
 const route = useRoute();
 const el = ref(null);
-const props = defineProps<{ imgs: string; imgConfigs?: ImgConfig[] }>();
+const props = defineProps<{ imgs?: string; imgConfigs?: ImgConfig[] }>();
 const emit = defineEmits(["removeImage", "dragImage"]);
 const images = ref<string[]>((props.imgs || "").split(",").filter(Boolean));
 

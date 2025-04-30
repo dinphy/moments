@@ -35,16 +35,16 @@ func (m myLog) LogMode(level logger.LogLevel) logger.Interface {
 	return m
 }
 
-func (m myLog) Info(ctx context.Context, s string, i ...interface{}) {
-	m.log.Info().Msgf(s, i)
+func (m myLog) Info(ctx context.Context, s string, i ...any) {
+	m.log.Info().Msgf(s, i...)
 }
 
-func (m myLog) Warn(ctx context.Context, s string, i ...interface{}) {
-	m.log.Warn().Msgf(s, i)
+func (m myLog) Warn(ctx context.Context, s string, i ...any) {
+	m.log.Warn().Msgf(s, i...)
 }
 
-func (m myLog) Error(ctx context.Context, s string, i ...interface{}) {
-	m.log.Error().Msgf(s, i)
+func (m myLog) Error(ctx context.Context, s string, i ...any) {
+	m.log.Error().Msgf(s, i...)
 }
 
 func (m myLog) Trace(ctx context.Context, begin time.Time, fc func() (sql string, rowsAffected int64), err error) {

@@ -6,6 +6,9 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
+	"regexp"
+	"sort"
 	"time"
 
 	"github.com/glebarez/sqlite"
@@ -30,7 +33,7 @@ func backupDatabase(log zerolog.Logger, cfg *vo.AppConfig) {
 	var sysConfig string
 	db.Raw("SELECT content FROM SysConfig").Scan(&sysConfig)
 
-	var config map[string]interface{}
+	var config map[string]any
 	err = json.Unmarshal([]byte(sysConfig), &config)
 	if err != nil {
 		log.Fatal().Msgf("反序列化原配置出错, err: %v", err)
@@ -88,4 +91,38 @@ func backupDatabase(log zerolog.Logger, cfg *vo.AppConfig) {
 	}
 
 	db.Exec("UPDATE SysConfig SET content = ?", string(content))
+
+	cleanBackupFiles(path.Dir(cfg.DB))
+}
+
+func cleanBackupFiles(dir string) error {
+	re := regexp.MustCompile(`^backup-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-dev-.{7}\.sqlite3$`)
+
+	var files []os.FileInfo
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() && re.MatchString(info.Name()) {
+			files = append(files, info)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].ModTime().After(files[j].ModTime())
+	})
+
+	for i, file := range files {
+		if i >= 5 {
+			filePath := filepath.Join(dir, file.Name())
+			os.Remove(filePath)
+		}
+	}
+
+	return nil
 }

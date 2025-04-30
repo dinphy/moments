@@ -27,7 +27,7 @@ func migrateFriendLink(log zerolog.Logger, cfg *vo.AppConfig) {
 	var sysConfig string
 	db.Raw("SELECT content FROM SysConfig").Scan(&sysConfig)
 
-	var config map[string]interface{}
+	var config map[string]any
 	err = json.Unmarshal([]byte(sysConfig), &config)
 	if err != nil {
 		log.Fatal().Msgf("反序列化原配置出错, err: %v", err)

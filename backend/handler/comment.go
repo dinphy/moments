@@ -91,7 +91,7 @@ func checkGoogleRecaptcha(logger zerolog.Logger, sysConfigVO vo.FullSysConfigVO,
 		}
 		logger.Info().Str("Action", "评论").Msgf("google resp: %s", resp)
 
-		var result map[string]interface{}
+		var result map[string]any
 		err = json.Unmarshal(resp, &result)
 		if err != nil {
 			return err

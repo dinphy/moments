@@ -22,10 +22,8 @@ if (document.readyState === 'loading') {
 }
 
 function init() {
-    console.log('DOMContentLoaded');
     setTimeout(() => {
         const list = document.querySelectorAll(".markdown-content>pre.shiki");
-        console.log('find code block:', list);
         list.forEach((pre) => {
             const copyBtn = document.createElement('div');
             copyBtn.innerText = '复制';

@@ -37,7 +37,7 @@ func Auth(injector do.Injector) echo.MiddlewareFunc {
 			cc := handler.CustomContext{Context: c}
 			//zlog.Info().Msgf("token :%s", tokenStr)
 			if tokenStr != "" {
-				token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+				token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 					return []byte(cfg.JwtKey), nil
 				})
 
