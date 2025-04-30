@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import type { ExtDTO, MemoVO, SysConfigVO } from "~/types";
 import { md } from "~/utils";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { toast } from "vue-sonner";
 import { useRouter } from "vue-router";
 
