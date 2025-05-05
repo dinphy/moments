@@ -151,13 +151,15 @@
             <div class="flex flex-row gap-2">
               <div
                 class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                @click="likeMemo(item.id)"
+                @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
               >
                 <UIcon
                   name="i-carbon-favorite"
                   :class="[liked ? 'text-red-400' : '']"
                 />
-                <div>赞</div>
+                <div>
+                  {{ liked ? "取消" : "赞" }}
+                </div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
@@ -169,7 +171,12 @@
                   <div>评论</div>
                 </div>
               </template>
-              <template v-if="$route.path !== `/memo/${item.id}` && sysConfig.enableDetailEntry">
+              <template
+                v-if="
+                  $route.path !== `/memo/${item.id}` &&
+                  sysConfig.enableDetailEntry
+                "
+              >
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
                 <div
                   class="flex flex-row gap-1 cursor-pointer items-center px-4"
@@ -256,12 +263,16 @@
           class="rounded bottom-shadow bg-[#f7f7f7] dark:bg-[#202020] flex flex-col gap-1"
         >
           <div
-            v-if="item.favCount > 0"
+            v-if="likeInfo && likeInfo.length > 0"
             class="flex flex-row py-2 px-4 gap-2 items-center text-sm"
           >
-            <UIcon name="i-carbon-favorite" class="text-red-500" />
-            <div class="text-[#576b95]">
-              <span class="mx-1">{{ item.favCount }}位访客</span>
+            <div class="flex items-start text-[#576b95]">
+              <span>
+                <UIcon name="i-carbon-favorite" class="text-red-500" />
+              </span>
+              <span class="mx-1">
+                {{ likeInfo.map((info) => info.name).join(", ") }}, 等{{ likeNum }}位访客
+              </span>
             </div>
           </div>
           <div class="flex flex-col gap-1" v-if="sysConfig.enableComment">
@@ -329,12 +340,10 @@ const item = computed(() => {
 });
 
 const global = useGlobalState();
-
 const moreToolbar = ref(false);
-
 const showToolbar = ref(false);
 const toolbarRef = ref(null);
-const liked = ref(false);
+
 onClickOutside(toolbarRef, () => (showToolbar.value = false));
 
 const location = computed(() => {
@@ -392,46 +401,84 @@ const setPinned = async (id: number) => {
   moreToolbar.value = false;
 };
 
-const doLike = async (id: number, token: string = "") => {
-  const likes = JSON.parse(
-    localStorage.getItem("likeMemos") || "[]"
-  ) as Array<number>;
-  await useMyFetch(`/memo/like?id=${id}&token=${token}`);
-  toast.success("点赞成功!");
-  likes.push(id);
-  localStorage.setItem("likeMemos", JSON.stringify(likes));
-  memoChangedEvent.emit(id);
-  liked.value = true;
-};
+const liked = ref(false);
+const likeInfo = ref<{ name: string }[] | null>(null);
+const likeNum = ref(0);
 
 const likeMemo = async (id: number) => {
-  showToolbar.value = false;
-  const likes = JSON.parse(
-    localStorage.getItem("likeMemos") || "[]"
-  ) as Array<number>;
-  if (likes.includes(id)) {
-    toast.warning("您已经点赞过了!");
-    return;
-  }
-
+  let params = `id=${id}`;
   if (sysConfig.value.enableGoogleRecaptcha) {
     grecaptcha.ready(() => {
       grecaptcha
         .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
         .then(async (token) => {
-          await doLike(id, token);
+          params += `&token=${token}`;
+          await doLike(params);
         });
     });
   } else {
-    await doLike(id);
+    await doLike(params);
+  }
+  await getLike(id);
+  memoChangedEvent.emit(id);
+};
+
+const unlikeMemo = async (id: number) => {
+  let params = `id=${id}`;
+  try {
+    await useMyFetch(`/memo/unLike?${params}`);
+    toast.success("取消点赞成功!");
+    liked.value = false;
+  } catch (error) {
+    toast.warning("访客不支持取消点赞！");
+  }
+  await getLike(id);
+  memoChangedEvent.emit(id);
+};
+
+const doLike = async (params: string) => {
+  try {
+    await useMyFetch(`/memo/like?${params}`);
+    toast.success("点赞成功!");
+    liked.value = true;
+  } catch (error) {
+    toast.warning("您已经点赞过了！");
   }
 };
 
-onMounted(() => {
-  const likes = JSON.parse(
-    localStorage.getItem("likeMemos") || "[]"
-  ) as Array<number>;
-  liked.value = likes.findIndex((r) => r === item.value.id) >= 0;
+const getLike = async (id: number) => {
+  let params = `id=${id}`;
+  try {
+    const response = await useMyFetch<{
+      likes: { name: string }[];
+      total: number;
+    }>(`/memo/getLike?${params}`);
+    likeInfo.value = response.likes;
+    likeNum.value = response.total;
+    liked.value =
+      likeInfo.value?.some((info) => {
+        if (global.value.userinfo.token) {
+          const Nickname = global.value.userinfo as { nickname: string };
+          return info.name === Nickname.nickname;
+        } else {
+          const guestID = document.cookie.replace(
+            /(?:(?:^|.*;\s*)guest_id\s*\=\s*([^;]*).*$)|^.*$/,
+            "$1"
+          );
+          return info.name === guestID;
+        }
+      }) || false;
+  } catch (error) {
+    toast.error("获取点赞信息失败，请稍后重试！");
+    likeInfo.value = null;
+    likeNum.value = 0;
+    liked.value = false;
+  }
+};
+
+onMounted(async () => {
+  await getLike(item.value.id);
+
   if (!isDetailPage.value) {
     setTimeout(() => {
       const { height } = useElementSize(contentRef.value);

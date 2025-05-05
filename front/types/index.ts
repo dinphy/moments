@@ -150,3 +150,12 @@ export type Friend = {
     url: string;
     desc: string;
 }
+
+export type LikeInfo = {
+    name: string;
+};
+
+export type GetLikeResp = {
+    likes: LikeInfo[];
+    total: number;
+};
