@@ -400,8 +400,18 @@ const liked = ref(false);
 const likeInfo = ref<{ name: string }[] | null>(null);
 const likeNum = ref(0);
 
+const getGuestId = () => {
+  let guestId = localStorage.getItem("guest_id");
+  if (!guestId) {
+    guestId = `访客_${Math.random().toString(36).substr(2, 4)}`;
+    localStorage.setItem("guest_id", guestId);
+  }
+  return guestId;
+};
+
 const likeMemo = async (id: number) => {
-  let params = `id=${id}`;
+  const guestId = getGuestId();
+  let params = `id=${id}&guest_id=${guestId}`;
   if (sysConfig.value.enableGoogleRecaptcha) {
     grecaptcha.ready(() => {
       grecaptcha
@@ -429,7 +439,8 @@ const doLike = async (params: string) => {
 };
 
 const getLike = async (id: number) => {
-  let params = `id=${id}`;
+  const guestId = getGuestId();
+  let params = `id=${id}&guest_id=${guestId}`;
   try {
     const response = await useMyFetch<{
       likes: { name: string }[];
@@ -443,11 +454,7 @@ const getLike = async (id: number) => {
           const Nickname = global.value.userinfo as { nickname: string };
           return info.name === Nickname.nickname;
         } else {
-          const guestID = document.cookie.replace(
-            /(?:(?:^|.*;\s*)guest_id\s*\=\s*([^;]*).*$)|^.*$/,
-            "$1"
-          );
-          return info.name === guestID;
+          return info.name === guestId;
         }
       }) || false;
   } catch (error) {
