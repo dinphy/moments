@@ -264,15 +264,10 @@
             v-if="likeInfo && likeInfo.length > 0"
             class="flex flex-row py-2 px-4 gap-2 items-center text-sm"
           >
-            <div class="flex items-start text-[#576b95]">
-              <span>
-                <UIcon name="i-carbon-favorite" class="text-red-500" />
-              </span>
-              <span class="mx-1">
-                {{ likeInfo.map((info) => info.name).join(", ") }}, 等{{
-                  likeNum
-                }}位访客
-              </span>
+            <div class="text-[#576b95]">
+              <UIcon name="i-carbon-favorite" class="text-red-500" />
+              {{ likeInfo.map((info) => info.name).join(", ") }}
+              <span v-if="likeNum > 5">等{{ likeNum }}位访客</span>
             </div>
           </div>
           <div class="flex flex-col gap-1" v-if="sysConfig.enableComment">
