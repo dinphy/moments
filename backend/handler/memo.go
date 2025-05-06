@@ -380,102 +380,56 @@ func (m MemoHandler) LikeMemo(c echo.Context) error {
 	return SuccessResp(c, h{})
 }
 
-// @Router /api/memo/unLike [post]
-func (m MemoHandler) UnlikeMemo(c echo.Context) error {
+// @Router /api/memo/getLike [post]
+func (m MemoHandler) GetLike(c echo.Context) error {
 	var (
-		memo db.Memo
-		like db.Like
+		likes    []db.Like
+		users    []db.User
+		likeInfo []map[string]interface{}
 	)
 	id, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
 		return FailResp(c, ParamError)
 	}
 
-	if err = m.base.db.First(&memo, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-		return FailResp(c, ParamError)
+	if err = m.base.db.Where("memo_id = ?", id).Find(&likes).Error; err != nil {
+		return FailRespWithMsg(c, Fail, "获取点赞信息失败")
 	}
 
-	ctx, ok := c.(CustomContext)
-	if !ok {
-		return FailResp(c, ParamError)
+	userIDs := make([]int, 0)
+	for _, like := range likes {
+		if like.UserID != nil {
+			userIDs = append(userIDs, int(*like.UserID))
+		}
 	}
-	currentUser := (&ctx).CurrentUser()
-
-	var guestID string
-	if currentUser != nil {
-		userId := int(currentUser.Id)
-		if err = m.base.db.Where("memo_id = ? AND user_id = ?", id, userId).Delete(&like).Error; err != nil {
-			return FailRespWithMsg(c, Fail, "取消点赞失败")
-		}
-	} else {
-
-		cookie, err := c.Cookie("guest_id")
-		if err != nil || cookie.Value == "" {
-			return FailRespWithMsg(c, ParamError, "guest_id 不能为空")
-		}
-		guestID, err = url.QueryUnescape(cookie.Value)
-		if err != nil {
-			return FailRespWithMsg(c, ParamError, "guest_id 解析失败")
-		}
-
-		if err = m.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).Delete(&like).Error; err != nil {
-			return FailRespWithMsg(c, Fail, "取消点赞失败")
+	if len(userIDs) > 0 {
+		if err = m.base.db.Where("id IN ?", userIDs).Find(&users).Error; err != nil {
+			return FailRespWithMsg(c, Fail, "获取用户信息失败")
 		}
 	}
 
-	return SuccessResp(c, h{})
-}
+	userMap := make(map[int]db.User)
+	for _, user := range users {
+		userMap[int(user.Id)] = user
+	}
 
-// @Router /api/memo/getLike [post]
-func (m MemoHandler) GetLike(c echo.Context) error {
-    var (
-        likes    []db.Like
-        users    []db.User
-        likeInfo []map[string]interface{}
-    )
-    id, err := strconv.Atoi(c.QueryParam("id"))
-    if err != nil {
-        return FailResp(c, ParamError)
-    }
+	for _, like := range likes {
+		info := make(map[string]interface{})
+		if like.UserID != nil {
+			user, ok := userMap[int(*like.UserID)]
+			if ok {
+				info["name"] = user.Nickname
+			}
+		} else {
+			info["name"] = like.GuestID
+		}
+		likeInfo = append(likeInfo, info)
+	}
 
-    if err = m.base.db.Where("memo_id = ?", id).Find(&likes).Error; err != nil {
-        return FailRespWithMsg(c, Fail, "获取点赞信息失败")
-    }
-
-    userIDs := make([]int, 0)
-    for _, like := range likes {
-        if like.UserID != nil {
-            userIDs = append(userIDs, int(*like.UserID))
-        }
-    }
-    if len(userIDs) > 0 {
-        if err = m.base.db.Where("id IN ?", userIDs).Find(&users).Error; err != nil {
-            return FailRespWithMsg(c, Fail, "获取用户信息失败")
-        }
-    }
-
-    userMap := make(map[int]db.User)
-    for _, user := range users {
-        userMap[int(user.Id)] = user
-    }
-
-    for _, like := range likes {
-        info := make(map[string]interface{})
-        if like.UserID != nil {
-            user, ok := userMap[int(*like.UserID)]
-            if ok {
-                info["name"] = user.Nickname 
-            }
-        } else {
-            info["name"] = like.GuestID
-        }
-        likeInfo = append(likeInfo, info)
-    }
-
-    return SuccessResp(c, h{
-        "likes": likeInfo,
-        "total": len(likes),
-    })
+	return SuccessResp(c, h{
+		"likes": likeInfo,
+		"total": len(likes),
+	})
 }
 
 // FindAndReplaceTags 处理 markdown 文本
@@ -551,7 +505,6 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 	} else {
 		memo.CreatedAt = &now
 		memo.UserId = currentUser.Id
-		memo.FavCount = 0
 		memo.CommentCount = 0
 	}
 

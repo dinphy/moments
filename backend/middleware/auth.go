@@ -23,7 +23,6 @@ func Auth(injector do.Injector) echo.MiddlewareFunc {
 		"/api/user/profile",
 		"/api/sysConfig/get",
 		"/api/memo/like",
-		"/api/memo/unlike",
 		"/api/comment/add",
 		"/api/memo/get",
 		"/api/friend/list",

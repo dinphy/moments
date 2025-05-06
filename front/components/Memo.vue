@@ -151,15 +151,13 @@
             <div class="flex flex-row gap-2">
               <div
                 class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
+                @click="likeMemo(item.id)"
               >
                 <UIcon
                   name="i-carbon-favorite"
                   :class="[liked ? 'text-red-400' : '']"
                 />
-                <div>
-                  {{ liked ? "取消" : "赞" }}
-                </div>
+                <div>赞</div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
@@ -271,7 +269,9 @@
                 <UIcon name="i-carbon-favorite" class="text-red-500" />
               </span>
               <span class="mx-1">
-                {{ likeInfo.map((info) => info.name).join(", ") }}, 等{{ likeNum }}位访客
+                {{ likeInfo.map((info) => info.name).join(", ") }}, 等{{
+                  likeNum
+                }}位访客
               </span>
             </div>
           </div>
@@ -418,19 +418,6 @@ const likeMemo = async (id: number) => {
     });
   } else {
     await doLike(params);
-  }
-  await getLike(id);
-  memoChangedEvent.emit(id);
-};
-
-const unlikeMemo = async (id: number) => {
-  let params = `id=${id}`;
-  try {
-    await useMyFetch(`/memo/unLike?${params}`);
-    toast.success("取消点赞成功!");
-    liked.value = false;
-  } catch (error) {
-    toast.warning("访客不支持取消点赞！");
   }
   await getLike(id);
   memoChangedEvent.emit(id);

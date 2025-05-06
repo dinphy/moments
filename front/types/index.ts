@@ -28,7 +28,6 @@ export type  MemoVO = {
     content: string
     location: string
     imgs: string
-    favCount: number
     userId: number
     createdAt: string
     updatedAt: string
@@ -150,12 +149,3 @@ export type Friend = {
     url: string;
     desc: string;
 }
-
-export type LikeInfo = {
-    name: string;
-};
-
-export type GetLikeResp = {
-    likes: LikeInfo[];
-    total: number;
-};
