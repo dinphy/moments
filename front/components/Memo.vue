@@ -397,7 +397,7 @@ const setPinned = async (id: number) => {
 };
 
 const liked = ref(false);
-const likeInfo = ref<{ name: string }[] | null>(null);
+const likeInfo = ref<{ id: number; name: string }[] | null>(null);
 const likeNum = ref(0);
 
 const getGuestId = () => {
@@ -443,20 +443,18 @@ const getLike = async (id: number) => {
   let params = `id=${id}&guest_id=${guestId}`;
   try {
     const response = await useMyFetch<{
-      likes: { name: string }[];
+      likes: { id: number; name: string }[];
       total: number;
     }>(`/memo/getLike?${params}`);
     likeInfo.value = response.likes;
     likeNum.value = response.total;
-    liked.value =
-      likeInfo.value?.some((info) => {
-        if (global.value.userinfo.token) {
-          const Nickname = global.value.userinfo as { nickname: string };
-          return info.name === Nickname.nickname;
-        } else {
-          return info.name === guestId;
-        }
-      }) || false;
+    if (global.value.userinfo.token) {
+      const userId = global.value.userinfo.id;
+      liked.value = likeInfo.value?.some((info) => info.id === userId) || false;
+    } else {
+      liked.value =
+        likeInfo.value?.some((info) => info.name === guestId) || false;
+    }
   } catch (error) {
     toast.error("获取点赞信息失败，请稍后重试！");
     likeInfo.value = null;

@@ -291,80 +291,80 @@ func (m MemoHandler) RemoveMemo(c echo.Context) error {
 //
 // @Router /api/memo/like [post]
 func (m MemoHandler) LikeMemo(c echo.Context) error {
-    var (
-        memo        db.Memo
-        like        db.Like
-        sysConfig   db.SysConfig
-        sysConfigVO vo.FullSysConfigVO
-        token       string
-    )
-    id, err := strconv.Atoi(c.QueryParam("id"))
-    if err != nil {
-        return FailResp(c, ParamError)
-    }
+	var (
+		memo        db.Memo
+		like        db.Like
+		sysConfig   db.SysConfig
+		sysConfigVO vo.FullSysConfigVO
+		token       string
+	)
+	id, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return FailResp(c, ParamError)
+	}
 
-    m.base.db.First(&sysConfig)
-    _ = json.Unmarshal([]byte(sysConfig.Content), &sysConfigVO)
+	m.base.db.First(&sysConfig)
+	_ = json.Unmarshal([]byte(sysConfig.Content), &sysConfigVO)
 
-    if sysConfigVO.EnableGoogleRecaptcha {
-        token = c.QueryParam("token")
-        if token == "" {
-            return FailRespWithMsg(c, ParamError, "token不能为空")
-        }
-        if err := checkGoogleRecaptcha(m.base.log, sysConfigVO, token); err != nil {
-            return FailRespWithMsg(c, Fail, err.Error())
-        }
-    }
+	if sysConfigVO.EnableGoogleRecaptcha {
+		token = c.QueryParam("token")
+		if token == "" {
+			return FailRespWithMsg(c, ParamError, "token不能为空")
+		}
+		if err := checkGoogleRecaptcha(m.base.log, sysConfigVO, token); err != nil {
+			return FailRespWithMsg(c, Fail, err.Error())
+		}
+	}
 
-    if err = m.base.db.First(&memo, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-        return FailResp(c, ParamError)
-    }
+	if err = m.base.db.First(&memo, id).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		return FailResp(c, ParamError)
+	}
 
-    ctx, ok := c.(CustomContext)
-    if !ok {
-        return FailResp(c, ParamError)
-    }
-    currentUser := (&ctx).CurrentUser()
+	ctx, ok := c.(CustomContext)
+	if !ok {
+		return FailResp(c, ParamError)
+	}
+	currentUser := (&ctx).CurrentUser()
 
-    var guestID string
-    if currentUser != nil {
-        userId := int(currentUser.Id)
-        if err = m.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; err == nil {
-            return FailRespWithMsg(c, Fail, "您已经点赞过了")
-        }
-        like = db.Like{
-            MemoID: id,
-            UserID: &userId,
-        }
-    } else {
-        guestID = c.QueryParam("guest_id")
-        if err = m.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; err == nil {
-            return FailRespWithMsg(c, Fail, "您已经点赞过了")
-        }
-        like = db.Like{
-            MemoID:  id,
-            GuestID: guestID,
-        }
-    }
+	var guestID string
+	if currentUser != nil {
+		userId := int(currentUser.Id)
+		if err = m.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; err == nil {
+			return FailRespWithMsg(c, Fail, "您已经点赞过了")
+		}
+		like = db.Like{
+			MemoID: id,
+			UserID: &userId,
+		}
+	} else {
+		guestID = c.QueryParam("guest_id")
+		if err = m.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; err == nil {
+			return FailRespWithMsg(c, Fail, "您已经点赞过了")
+		}
+		like = db.Like{
+			MemoID:  id,
+			GuestID: guestID,
+		}
+	}
 
-    // 开启事务
-    tx := m.base.db.Begin()
-    if tx.Error != nil {
-        return FailRespWithMsg(c, Fail, "开启事务失败")
-    }
+	// 开启事务
+	tx := m.base.db.Begin()
+	if tx.Error != nil {
+		return FailRespWithMsg(c, Fail, "开启事务失败")
+	}
 
-    if err = tx.Create(&like).Error; err != nil {
-        // 回滚事务
-        tx.Rollback()
-        return FailRespWithMsg(c, Fail, "点赞失败")
-    }
+	if err = tx.Create(&like).Error; err != nil {
+		// 回滚事务
+		tx.Rollback()
+		return FailRespWithMsg(c, Fail, "点赞失败")
+	}
 
-    // 提交事务
-    if err = tx.Commit().Error; err != nil {
-        return FailRespWithMsg(c, Fail, "提交事务失败")
-    }
+	// 提交事务
+	if err = tx.Commit().Error; err != nil {
+		return FailRespWithMsg(c, Fail, "提交事务失败")
+	}
 
-    return SuccessResp(c, h{})
+	return SuccessResp(c, h{})
 }
 
 // @Router /api/memo/getLike [post]
@@ -405,6 +405,7 @@ func (m MemoHandler) GetLike(c echo.Context) error {
 		if like.UserID != nil {
 			user, ok := userMap[int(*like.UserID)]
 			if ok {
+				info["id"] = user.Id
 				info["name"] = user.Nickname
 			}
 		} else {
