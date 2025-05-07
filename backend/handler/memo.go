@@ -420,6 +420,70 @@ func (m MemoHandler) GetLike(c echo.Context) error {
 	})
 }
 
+// @Router /api/memo/unlike [post]
+func (m MemoHandler) UnlikeMemo(c echo.Context) error {
+	var (
+		like        db.Like
+		sysConfig   db.SysConfig
+		sysConfigVO vo.FullSysConfigVO
+		token       string
+	)
+	id, err := strconv.Atoi(c.QueryParam("id"))
+	if err != nil {
+		return FailResp(c, ParamError)
+	}
+
+	m.base.db.First(&sysConfig)
+	_ = json.Unmarshal([]byte(sysConfig.Content), &sysConfigVO)
+
+	if sysConfigVO.EnableGoogleRecaptcha {
+		token = c.QueryParam("token")
+		if token == "" {
+			return FailRespWithMsg(c, ParamError, "token不能为空")
+		}
+		if err := checkGoogleRecaptcha(m.base.log, sysConfigVO, token); err != nil {
+			return FailRespWithMsg(c, Fail, err.Error())
+		}
+	}
+
+	ctx, ok := c.(CustomContext)
+	if !ok {
+		return FailResp(c, ParamError)
+	}
+	currentUser := (&ctx).CurrentUser()
+
+	if currentUser != nil {
+		userId := int(currentUser.Id)
+		if err = m.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return FailRespWithMsg(c, Fail, "您还没有点赞过")
+		}
+	} else {
+		guestID := c.QueryParam("guest_id")
+		if err = m.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+			return FailRespWithMsg(c, Fail, "您还没有点赞过")
+		}
+	}
+
+	// 开启事务
+	tx := m.base.db.Begin()
+	if tx.Error != nil {
+		return FailRespWithMsg(c, Fail, "开启事务失败")
+	}
+
+	if err = tx.Delete(&like).Error; err != nil {
+		// 回滚事务
+		tx.Rollback()
+		return FailRespWithMsg(c, Fail, "取消点赞失败")
+	}
+
+	// 提交事务
+	if err = tx.Commit().Error; err != nil {
+		return FailRespWithMsg(c, Fail, "提交事务失败")
+	}
+
+	return SuccessResp(c, h{})
+}
+
 // FindAndReplaceTags 处理 markdown 文本
 func FindAndReplaceTags(content string) (string, []string) {
 	// 定义正则表达式来匹配标签

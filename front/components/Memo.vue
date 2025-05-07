@@ -151,13 +151,13 @@
             <div class="flex flex-row gap-2">
               <div
                 class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                @click="likeMemo(item.id)"
+                @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
               >
                 <UIcon
                   name="i-carbon-favorite"
                   :class="[liked ? 'text-red-400' : '']"
                 />
-                <div>赞</div>
+                <div>{{ liked ? "取消" : "赞" }}</div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
@@ -409,6 +409,16 @@ const getGuestId = () => {
   return guestId;
 };
 
+const doLike = async (params: string) => {
+  try {
+    await useMyFetch(`/memo/like?${params}`);
+    toast.success("点赞成功!");
+    liked.value = true;
+  } catch (error) {
+    toast.warning("点赞失败，请稍后重试！");
+  }
+};
+
 const likeMemo = async (id: number) => {
   const guestId = getGuestId();
   let params = `id=${id}&guest_id=${guestId}`;
@@ -428,14 +438,37 @@ const likeMemo = async (id: number) => {
   memoChangedEvent.emit(id);
 };
 
-const doLike = async (params: string) => {
-  try {
-    await useMyFetch(`/memo/like?${params}`);
-    toast.success("点赞成功!");
-    liked.value = true;
-  } catch (error) {
-    toast.warning("您已经点赞过了！");
+const doUnlike = async (params: string) => {
+  if (!global.value.userinfo.token) {
+    toast.warning("访客不支持取消点赞！");
+    return;
   }
+  try {
+    await useMyFetch(`/memo/unlike?${params}`);
+    toast.success("取消点赞成功!");
+    liked.value = false;
+  } catch (error) {
+    toast.warning("取消点赞失败，请稍后重试！");
+  }
+};
+
+const unlikeMemo = async (id: number) => {
+  const guestId = getGuestId();
+  let params = `id=${id}&guest_id=${guestId}`;
+  if (sysConfig.value.enableGoogleRecaptcha) {
+    grecaptcha.ready(() => {
+      grecaptcha
+        .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
+        .then(async (token) => {
+          params += `&token=${token}`;
+          await doUnlike(params);
+        });
+    });
+  } else {
+    await doUnlike(params);
+  }
+  await getLike(id);
+  memoChangedEvent.emit(id);
 };
 
 const getLike = async (id: number) => {

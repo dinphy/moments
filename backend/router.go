@@ -34,6 +34,7 @@ func setupRouter(injector do.Injector) {
 	memoGroup.POST("/save", memoHandler.SaveMemo)
 	memoGroup.POST("/remove", memoHandler.RemoveMemo)
 	memoGroup.POST("/like", memoHandler.LikeMemo)
+	memoGroup.POST("/unlike", memoHandler.UnlikeMemo)
 	memoGroup.POST("/getLike", memoHandler.GetLike)
 	memoGroup.POST("/get", memoHandler.GetMemo)
 	memoGroup.POST("/setPinned", memoHandler.SetPinned)
