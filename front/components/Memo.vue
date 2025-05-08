@@ -400,6 +400,7 @@ const setPinned = async (id: number) => {
 const liked = ref(false);
 const likeInfo = ref<{ id: number; name: string }[] | null>(null);
 const likeNum = ref(0);
+const isLoading = ref(false);
 
 const getGuestId = () => {
   let guestId = localStorage.getItem("guest_id");
@@ -422,56 +423,88 @@ const doLike = async (params: string) => {
 };
 
 const likeMemo = async (id: number) => {
-  const guestId = getGuestId();
-  let params = `id=${id}&guest_id=${guestId}`;
-  if (sysConfig.value.enableGoogleRecaptcha) {
-    grecaptcha.ready(() => {
-      grecaptcha
-        .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
-        .then(async (token) => {
-          params += `&token=${token}`;
-          await doLike(params);
+  if (isLoading.value) return;
+  isLoading.value = true;
+  
+  try {
+    const guestId = getGuestId();
+    let params = `id=${id}&guest_id=${guestId}`;
+    
+    if (sysConfig.value.enableGoogleRecaptcha) {
+      await new Promise<void>((resolve) => {
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
+            .then(async (token) => {
+              params += `&token=${token}`;
+              await doLike(params);
+              await getLike(id);
+              memoChangedEvent.emit(id);
+              resolve();
+            });
         });
-    });
-  } else {
-    await doLike(params);
+      });
+    } else {
+      await doLike(params);
+      await getLike(id);
+      memoChangedEvent.emit(id);
+    }
+  } finally {
+    isLoading.value = false;
   }
-  await getLike(id);
-  memoChangedEvent.emit(id);
 };
 
 const doUnlike = async (params: string) => {
   showToolbar.value = false;
   if (!global.value.userinfo.token) {
-    toast.warning("访客不支持取消点赞！");
-    return;
+    toast.warning("访客不允许取消点赞！");
+    return false;
   }
   try {
     await useMyFetch(`/memo/unlike?${params}`);
     toast.success("取消点赞成功!");
     liked.value = false;
+    return true;
   } catch (error) {
     toast.warning("取消点赞失败，请稍后重试！");
+    return false;
   }
 };
 
 const unlikeMemo = async (id: number) => {
-  const guestId = getGuestId();
-  let params = `id=${id}&guest_id=${guestId}`;
-  if (sysConfig.value.enableGoogleRecaptcha) {
-    grecaptcha.ready(() => {
-      grecaptcha
-        .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
-        .then(async (token) => {
-          params += `&token=${token}`;
-          await doUnlike(params);
+  if (isLoading.value) return;
+  isLoading.value = true;
+  
+  try {
+    const guestId = getGuestId();
+    let params = `id=${id}&guest_id=${guestId}`;
+    
+    if (sysConfig.value.enableGoogleRecaptcha) {
+      await new Promise<void>((resolve) => {
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute(sysConfig.value.googleSiteKey, { action: "newComment" })
+            .then(async (token) => {
+              params += `&token=${token}`;
+              const success = await doUnlike(params);
+              if (success) {
+                await getLike(id);
+                memoChangedEvent.emit(id);
+              }
+              resolve();
+            });
         });
-    });
-  } else {
-    await doUnlike(params);
+      });
+    } else {
+      const success = await doUnlike(params);
+      if (success) {
+        await getLike(id);
+        memoChangedEvent.emit(id);
+      }
+    }
+  } finally {
+    isLoading.value = false;
   }
-  await getLike(id);
-  memoChangedEvent.emit(id);
 };
 
 const getLike = async (id: number) => {
@@ -491,11 +524,10 @@ const getLike = async (id: number) => {
       liked.value =
         likeInfo.value?.some((info) => info.name === guestId) || false;
     }
+    return true;
   } catch (error) {
     toast.error("获取点赞信息失败，请稍后重试！");
-    likeInfo.value = null;
-    likeNum.value = 0;
-    liked.value = false;
+    return false;
   }
 };
 
