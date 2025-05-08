@@ -48,12 +48,12 @@
         </div>
         <div class="flex-1 flex flex-col justify-between">
           <div
-            class="markdown-content bg-neutral-100 dark:bg-neutral-800 p-2 !leading-7 line-clamp-3"
+            class="markdown-content bg-neutral-100 dark:bg-neutral-800 p-2 !leading-7 line-clamp-2 sm:line-clamp-3"
             v-if="imageCount === 0"
             v-html="content"
           ></div>
           <div
-            class="markdown-content ml-1 !leading-5 line-clamp-3"
+            class="markdown-content ml-1 !leading-5 line-clamp-2 sm:line-clamp-3"
             v-if="imageCount > 0"
             v-html="content"
           ></div>
@@ -159,48 +159,25 @@ const images = computed(() => {
   return imgs.split(",").filter(Boolean);
 });
 
-const getGridClass = (index: number, count: number) => {
-  switch (count) {
-    case 3:
-      if (index === 0) return "col-span-1 row-span-2";
-      return "";
-    case 5:
-      if (index === 0) return "col-span-2 row-span-2";
-      if (index === 1) return "col-span-1 row-span-2";
-      return "";
-    case 6:
-      if (index === 0) return "col-span-2 row-span-2";
-      return "";
-    case 7:
-      if (index === 0 || index === 1) return "col-span-1 row-span-2";
-      return "";
-    case 8:
-      if (index === 0) return "col-span-1 row-span-2";
-      return "";
-    default:
-      return "";
-  }
-};
+const gridRules: Record<number, Record<number, string>> = {
+  2: {0: 'col-span-1', 1: 'col-span-1'},
+  3: {0: 'col-span-1', 1: 'col-span-1', 2: 'col-span-1'},
+  5: {0: 'col-span-2 row-span-2',1: 'col-span-1 row-span-2'},
+  6: {0: 'col-span-2 row-span-2'},
+  7: {0: 'col-span-1 row-span-2',1: 'col-span-1 row-span-2'},
+  8: {0: 'col-span-1 row-span-2'}
+} as const;
 
 const getImageGridClass = (count: number) => {
-  switch (count) {
-    case 1:
-      return "";
-    case 2:
-      return "grid grid-cols-2";
-    case 3:
-      return "grid grid-cols-2";
-    case 4:
-      return "grid grid-cols-2 grid-rows-2";
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-      return "grid grid-cols-3 grid-rows-3";
-    default:
-      return "";
-  }
+  if (count <= 1) return '';
+  if (count === 2) return 'grid grid-cols-2';
+  if (count === 3) return 'grid grid-cols-3';
+  if (count <= 4) return 'grid grid-cols-2 grid-rows-2';
+  return 'grid grid-cols-3 grid-rows-3';
+};
+
+const getGridClass = (index: number, count: keyof typeof gridRules): string => {
+  return gridRules[count]?.[index] || '';
 };
 </script>
 
