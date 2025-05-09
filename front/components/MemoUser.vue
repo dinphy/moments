@@ -48,7 +48,7 @@
         </div>
         <div class="flex-1 flex flex-col justify-between">
           <div
-            class="markdown-content bg-neutral-100 dark:bg-neutral-800 p-2 !leading-7 line-clamp-2 sm:line-clamp-3"
+            class="markdown-content bg-neutral-100 dark:bg-neutral-800 p-2 sm:pb-2 pb-1 !leading-7 line-clamp-2 sm:line-clamp-3"
             v-if="imageCount === 0"
             v-html="content"
           ></div>
