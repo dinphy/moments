@@ -64,6 +64,7 @@ export type SysConfigVO = {
     rss: string,
     enableAutoLoadNextPage: boolean
     enableDetailEntry: boolean
+    enableNewMemo: boolean
     enableS3: boolean
     enableRegister: boolean
     enableGoogleRecaptcha: boolean,

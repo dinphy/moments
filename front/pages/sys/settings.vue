@@ -24,6 +24,9 @@
     <UFormGroup label="首页是否显示详情页按钮" name="enableDetailEntry" :ui="{label:{base:'font-bold'}}">
       <UToggle v-model="state.enableDetailEntry"/>
     </UFormGroup>
+    <UFormGroup label="用户主页是否切换列表布局" name="enableNewMemo" :ui="{label:{base:'font-bold'}}">
+      <UToggle v-model="state.enableNewMemo"/>
+    </UFormGroup>
     <UFormGroup label="是否启用评论" name="enableComment" :ui="{label:{base:'font-bold'}}">
       <UToggle v-model="state.enableComment"/>
     </UFormGroup>
@@ -131,6 +134,7 @@ const state = reactive({
   googleSecretKey:"",
   enableAutoLoadNextPage: true,
   enableDetailEntry: true,
+  enableNewMemo: true,
   enableComment: true,
   enableRegister: true,
   maxCommentLength: 120,
