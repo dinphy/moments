@@ -161,7 +161,7 @@ const images = computed(() => {
 
 const gridRules: Record<number, Record<number, string>> = {
   2: {0: 'col-span-1', 1: 'col-span-1'},
-  3: {0: 'col-span-1', 1: 'col-span-1', 2: 'col-span-1'},
+  3: {0: 'row-span-2', 1: 'row-span-1', 2: 'row-span-1'},
   5: {0: 'col-span-2 row-span-2',1: 'col-span-1 row-span-2'},
   6: {0: 'col-span-2 row-span-2'},
   7: {0: 'col-span-1 row-span-2',1: 'col-span-1 row-span-2'},
@@ -171,7 +171,7 @@ const gridRules: Record<number, Record<number, string>> = {
 const getImageGridClass = (count: number) => {
   if (count <= 1) return '';
   if (count === 2) return 'grid grid-cols-2';
-  if (count === 3) return 'grid grid-cols-3';
+  if (count === 3) return 'grid grid-cols-2';
   if (count <= 4) return 'grid grid-cols-2 grid-rows-2';
   return 'grid grid-cols-3 grid-rows-3';
 };
