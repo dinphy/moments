@@ -134,7 +134,7 @@
             }}
           </div>
           <div
-            @click="showToolbar = true"
+            @click="showToolbar = !showToolbar"
             class="toolbar-icon px-2 py-1 bg-[#f7f7f7] dark:bg-slate-700 hover:bg-[#dedede] cursor-pointer rounded flex items-center justify-center"
           >
             <img
@@ -370,7 +370,11 @@ const moreToolbar = ref(false);
 const showToolbar = ref(false);
 const toolbarRef = ref(null);
 
-onClickOutside(toolbarRef, () => (showToolbar.value = false));
+onClickOutside(toolbarRef, () =>
+  setTimeout(() => {
+    showToolbar.value = false;
+  }, 10)
+)
 
 const location = computed(() => {
   return (item.value.location || "").replaceAll(" ", " · ");
