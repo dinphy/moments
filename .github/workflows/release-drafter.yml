@@ -17,7 +17,7 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: 22.2.0
+          node-version: 20.19.1
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
@@ -46,7 +46,7 @@ jobs:
           xargs -I {} gh release delete-asset ${{ env.TAG_NAME }} {}
       - name: Install Front Dependencies
         run: |
-          npm install -g pnpm
+          npm install -g pnpm@10.10.0
           make frontend-install
       - name: Build Front and Backend
         run: |
