@@ -63,7 +63,6 @@ export type SysConfigVO = {
     js: string,
     rss: string,
     enableAutoLoadNextPage: boolean
-    enableDetailEntry: boolean
     enableNewMemo: boolean
     enableS3: boolean
     enableRegister: boolean

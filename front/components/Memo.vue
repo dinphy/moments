@@ -26,7 +26,7 @@
       :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
     >
       <div class="avatar">
-        <NuxtLink :to="`/user/${item.user.id}`">
+        <NuxtLink :to="`/memo/${item.id}`">
           <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
         </NuxtLink>
       </div>
@@ -167,21 +167,6 @@
                 >
                   <UIcon name="i-octicon-comment" />
                   <div>评论</div>
-                </div>
-              </template>
-              <template
-                v-if="
-                  $route.path !== `/memo/${item.id}` &&
-                  sysConfig.enableDetailEntry
-                "
-              >
-                <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
-                <div
-                  class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                  @click="navigateTo(`/memo/${item.id}`)"
-                >
-                  <UIcon name="i-carbon-view" />
-                  <div>详情</div>
                 </div>
               </template>
             </div>
@@ -374,7 +359,7 @@ onClickOutside(toolbarRef, () =>
   setTimeout(() => {
     showToolbar.value = false;
   }, 10)
-)
+);
 
 const location = computed(() => {
   return (item.value.location || "").replaceAll(" ", " · ");
