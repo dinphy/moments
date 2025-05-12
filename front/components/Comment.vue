@@ -1,8 +1,7 @@
 <template>
   <div>
-    <span v-if="props.comment.author == props.memoUserId" class="text-[#576b95] text-nowrap">
+    <span v-if="props.comment.author == props.memoUserId" class="text-[#9fc84a] text-nowrap">
       {{ props.comment.username }}
-      <UBadge color="gray" variant="solid" size="xs">作者</UBadge>
     </span>
     <span v-else class="text-[#576b95] text-nowrap">
       <a v-if="props.comment.website" :href="formatWebsite(props.comment.website)" target="_blank">
@@ -10,10 +9,10 @@
       </a>
       <span v-else>{{ props.comment.username }}</span>
     </span>
-   <template v-if="props.comment.replyTo">
-     <span class="mx-1">回复</span>
-     <span  class="text-[#576b95] text-nowrap">{{props.comment.replyTo}}</span>
-   </template>
+    <template v-if="props.comment.replyTo">
+      <span class="mx-1">回复</span>
+      <span  class="text-[#576b95] text-nowrap">{{props.comment.replyTo}}</span>
+    </template>
     <span class="mx-0.5">:</span>
     <span class="inline break-all cursor-pointer" @click="toggle">{{ props.comment.content }}</span>
     <span class="text-xs text-gray-400 ml-2 hidden sm:inline-block">{{$dayjs(props.comment.createdAt).fromNow()}}</span>
