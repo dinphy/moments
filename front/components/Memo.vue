@@ -155,9 +155,11 @@
               >
                 <UIcon
                   name="i-carbon-favorite"
-                  :class="[liked ? 'text-red-400' : '']"
+                  :class="[liked ? 'text-gray-400' : '']"
                 />
-                <div>{{ liked ? "取消" : "赞" }}</div>
+                <div :class="[liked ? 'text-gray-400' : '']">
+                  {{ liked ? "取消" : "赞" }}
+                </div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
@@ -255,7 +257,7 @@
             ]"
           >
             <div class="text-[#576b95]">
-              <UIcon name="i-carbon-favorite" class="text-red-500 mr-1" />
+              <UIcon name="i-carbon-favorite" class="mr-1 relative top-[1px]" />
               <span v-if="loggedLikes.length > 0">
                 {{ loggedLikes.map((info) => info.name).join(", ") }}
                 <span v-if="guestLikes.length > 0">, </span>
@@ -281,7 +283,7 @@
                   class="cursor-pointer hover:text-blue-500"
                   @click="showFullGuestLikes = false"
                 >
-                  <UIcon name="i-carbon-deploy-rules" class="w-5 h-5" />
+                  <UIcon name="ep:upload" class="w-5 h-5 relative top-[4px]" />
                 </span>
               </template>
             </div>
