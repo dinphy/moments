@@ -38,7 +38,7 @@
         共 {{ friendList.length }} 个朋友
       </span>
       <span v-else class="text-gray-600 dark:text-gray-300 font-semibold">
-        空空如也，请点击右上角添加
+        空空如也{{ globalState.userinfo.id === 1 ? '，请点击右上角添加' : '，请联系管理员添加' }}
       </span>
     </div>
   </div>
@@ -104,7 +104,7 @@
     }"
   >
     <div class="p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-md">
-      <p class="text-center text-lg font-bold mb-2">确认删除</p>
+      <p class="text-center text-lg font-bold mb-2">谨慎操作</p>
       <p class="text-gray-600 mb-4">你确定要删除这个友情链接吗？</p>
       <div class="flex justify-end gap-2 mt-4">
         <UButton color="white" @click="cancelDelete">取消</UButton>

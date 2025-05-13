@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-if="props.comment.author == props.memoUserId" class="text-[#9fc84a] text-nowrap">
+    <span v-if="props.comment.author == props.memoUserId" class="text-[#576b95] text-nowrap">
       {{ props.comment.username }}
     </span>
     <span v-else class="text-[#576b95] text-nowrap">

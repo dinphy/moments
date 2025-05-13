@@ -26,7 +26,7 @@
       :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
     >
       <div class="avatar">
-        <NuxtLink :to="`/memo/${item.id}`">
+        <NuxtLink :to="$route.path === `/memo/${item.id}` ? '' : `/memo/${item.id}`">
           <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
         </NuxtLink>
       </div>
