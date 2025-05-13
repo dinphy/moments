@@ -154,12 +154,16 @@
                 @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
               >
                 <UIcon
-                  name="i-carbon-favorite"
-                  :class="[liked ? 'text-gray-400' : '']"
+                  v-if="liked"
+                  name="i-carbon-favorite-filled"
+                  class="w-4 h-4 text-red-400"
                 />
-                <div :class="[liked ? 'text-gray-400' : '']">
-                  {{ liked ? "取消" : "赞" }}
-                </div>
+                <UIcon
+                  v-else
+                  name="i-carbon-favorite"
+                  class="w-4 h-4"
+                />
+                <div>{{ liked ? "取消" : "赞" }}</div>
               </div>
               <template v-if="sysConfig.enableComment">
                 <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
@@ -167,7 +171,7 @@
                   class="flex flex-row gap-1 cursor-pointer items-center px-4"
                   @click="doComment"
                 >
-                  <UIcon name="i-octicon-comment" />
+                  <UIcon name="i-octicon-comment" class="w-4 h-4 relative top-[2px]"/>
                   <div>评论</div>
                 </div>
               </template>
