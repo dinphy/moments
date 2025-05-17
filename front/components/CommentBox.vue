@@ -83,7 +83,8 @@ const doComment = async (token?: string) => {
     return
   }
   
-  const guestId = getGuestId()
+  const guestId = await getGuestId()
+  if (!guestId) return
   await useMyFetch(`/comment/add`, {...state, token, guest_id: guestId})
   toast.success("评论成功!")
   currentCommentBox.value = ''

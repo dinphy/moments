@@ -26,7 +26,9 @@
       :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
     >
       <div class="avatar">
-        <NuxtLink :to="$route.path === `/memo/${item.id}` ? '' : `/memo/${item.id}`">
+        <NuxtLink
+          :to="$route.path === `/memo/${item.id}` ? '' : `/memo/${item.id}`"
+        >
           <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
         </NuxtLink>
       </div>
@@ -158,11 +160,7 @@
                   name="i-carbon-favorite-filled"
                   class="w-4 h-4 text-red-400"
                 />
-                <UIcon
-                  v-else
-                  name="i-carbon-favorite"
-                  class="w-4 h-4"
-                />
+                <UIcon v-else name="i-carbon-favorite" class="w-4 h-4" />
                 <div>{{ liked ? "取消" : "赞" }}</div>
               </div>
               <template v-if="sysConfig.enableComment">
@@ -171,7 +169,10 @@
                   class="flex flex-row gap-1 cursor-pointer items-center px-4"
                   @click="doComment"
                 >
-                  <UIcon name="i-octicon-comment" class="w-4 h-4 relative top-[2px]"/>
+                  <UIcon
+                    name="i-octicon-comment"
+                    class="w-4 h-4 relative top-[2px]"
+                  />
                   <div>评论</div>
                 </div>
               </template>
@@ -443,7 +444,8 @@ const likeMemo = async (id: number) => {
   isLoading.value = true;
 
   try {
-    const guestId = getGuestId();
+    const guestId = await getGuestId();
+    if (!guestId) return;
     let params = `id=${id}&guest_id=${guestId}`;
 
     if (sysConfig.value.enableGoogleRecaptcha) {
@@ -492,7 +494,8 @@ const unlikeMemo = async (id: number) => {
   isLoading.value = true;
 
   try {
-    const guestId = getGuestId();
+    const guestId = await getGuestId();
+    if (!guestId) return;
     let params = `id=${id}&guest_id=${guestId}`;
 
     if (sysConfig.value.enableGoogleRecaptcha) {
@@ -533,7 +536,8 @@ const guestLikes = computed(() => {
 });
 
 const getLike = async (id: number) => {
-  const guestId = getGuestId();
+  const guestId = await getGuestId();
+  if (!guestId) return;
   let params = `id=${id}&guest_id=${guestId}`;
   try {
     const response = await useMyFetch<{
