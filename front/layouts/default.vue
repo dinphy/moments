@@ -48,7 +48,7 @@
           ></UIcon>
         </div>
         <NuxtLink
-          to="/user/login"
+          @click="mobileloginReg = true"
           v-if="!global.userinfo.token && $route.path === '/'"
           class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
         >
@@ -58,6 +58,7 @@
     </div>
 
     <MobileNav :open="open" />
+    <LoginReg v-model="mobileloginReg" />
   </div>
 </template>
 
@@ -67,6 +68,7 @@ import { useGlobalState } from "~/store";
 
 const global = useGlobalState();
 const open = useState<boolean>("sidebarOpen", () => false);
+const mobileloginReg = useState<boolean>("mobileloginReg", () => false);
 const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
 const currentProfile = await useMyFetch<UserVO>("/user/profile");

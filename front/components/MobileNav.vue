@@ -158,7 +158,6 @@ const sysConfig = useState<SysConfigVO>("sysConfig");
 const global = useGlobalState();
 const mode = useColorMode();
 const open = useState<boolean>("sidebarOpen", () => false);
-
 const toggleMode = () => {
   if (mode.preference === "system") {
     mode.preference = "dark";
@@ -176,6 +175,7 @@ const navigate = async (url: string) => {
 };
 
 const logout = async () => {
+  open.value = false;
   global.value.userinfo = {};
   await navigateTo("/");
 };

@@ -21,17 +21,7 @@
           {{ route.params.tag || "话题专栏" }}
         </span>
         <span v-else-if="$route.path === '/friend'">友情链接</span>
-        <span v-else>
-          <span v-if="!global.userinfo.token && $route.path === '/user/login'">
-            登录
-          </span>
-          <span
-            v-else-if="!global.userinfo.token && $route.path === '/user/reg'"
-          >
-            注册
-          </span>
-          <span v-else>{{ props.user.nickname }} 的空间</span>
-        </span>
+        <span v-else>{{ props.user.nickname }} 的空间</span>
       </NuxtLink>
       <NuxtLink
         v-if="$route.path === '/user/settings' && global.userinfo.token"
@@ -142,14 +132,13 @@
           class="text-[#9fc84a] w-5 h-5 cursor-pointer"
         />
       </NuxtLink>
-      <NuxtLink v-if="!global.userinfo.token" to="/user/login" title="登录">
+      <div v-if="!global.userinfo.token" title="登录" @click="loginReg = true">
         <UIcon
           name="i-carbon-login"
           class="text-[#9fc84a] w-5 h-5 cursor-pointer"
         />
-      </NuxtLink>
+      </div>
     </div>
-
     <img class="header-img w-full" :src="props.user.coverUrl" alt="" />
     <div class="absolute right-2 bottom-[-40px]">
       <div class="userinfo flex flex-col">
@@ -167,6 +156,7 @@
         </div>
       </div>
     </div>
+    <LoginReg v-model="loginReg" />
   </div>
 </template>
 <script setup lang="ts">
@@ -180,7 +170,7 @@ const route = useRoute();
 const props = defineProps<{ user: UserVO }>();
 const mode = useColorMode();
 const { y } = useWindowScroll();
-
+const loginReg = useState<boolean>("loginReg", () => false);
 const logout = async () => {
   global.value.userinfo = {};
   await navigateTo("/");
