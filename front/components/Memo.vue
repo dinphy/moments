@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$route.path === `/memo/${item.id}`" class="header relative mb-14">
+  <div v-if="isDetailPage" class="header relative mb-14">
     <div
       :class="{ 'bg-[#4c4c4c]/80 z-10': y > 100 }"
       class="flex fixed justify-between items-center p-4 w-full md:w-[567px] text-white top-0"
@@ -27,7 +27,7 @@
     >
       <div class="avatar">
         <NuxtLink
-          :to="$route.path === `/memo/${item.id}` ? '' : `/memo/${item.id}`"
+          :to="isDetailPage ? '' : `/memo/${item.id}`"
         >
           <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
         </NuxtLink>
@@ -269,7 +269,7 @@
               </span>
               <template v-if="guestLikes.length > 0">
                 {{
-                  showFullGuestLikes
+                  (isDetailPage || showFullGuestLikes)
                     ? guestLikes.map((info) => info.name).join(", ")
                     : guestLikes
                         .slice(0, 3)
@@ -277,14 +277,14 @@
                         .join(", ")
                 }}
                 <span
-                  v-if="guestLikes.length > 3 && !showFullGuestLikes"
+                  v-if="guestLikes.length > 3 && !showFullGuestLikes && !isDetailPage"
                   class="cursor-pointer hover:text-blue-500"
                   @click="showFullGuestLikes = true"
                 >
                   ...其余{{ guestLikes.length - 3 }}位访客
                 </span>
                 <span
-                  v-if="showFullGuestLikes"
+                  v-if="showFullGuestLikes && !isDetailPage"
                   class="cursor-pointer hover:text-blue-500"
                   @click="showFullGuestLikes = false"
                 >
