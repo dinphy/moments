@@ -9,11 +9,16 @@
     <div
       class="py-5 text-center text-xl font-sans border-b-[1px] border-neutral-[100] dark:border-neutral-800"
     >
-      {{ isLogin ? "用户登录" : "账号注册" }}
+      {{ isLogin ? "用户登录" : "注册用户" }}
     </div>
     <div class="p-5">
-      <UForm class="space-y-4" size="sm" :state="state" @keyup.enter="submit">
-        <UFormGroup label="账号" name="username">
+      <UForm
+        class="space-y-4"
+        size="sm"
+        :state="state"
+        @keyup.enter="doLoginReg"
+      >
+        <UFormGroup label="用户名" name="username">
           <UInput v-model="state.username" />
         </UFormGroup>
 
@@ -26,7 +31,7 @@
         </UFormGroup>
 
         <UButtonGroup size="sm" class="flex justify-center items-center">
-          <UButton @click="submit" :disabled="pending" :loading="pending">
+          <UButton @click="doLoginReg" :disabled="pending" :loading="pending">
             {{ isLogin ? "登录" : "注册" }}
           </UButton>
           <UButton
@@ -61,12 +66,7 @@ const state = reactive({
 
 const pending = ref(false);
 
-const submit = async () => {
-  if (!isLogin.value && state.password !== state.repeatPassword) {
-    toast.warning("两次密码输入不一致");
-    return;
-  }
-
+const doLoginReg = async () => {
   pending.value = true;
   try {
     if (isLogin.value) {
@@ -75,9 +75,25 @@ const submit = async () => {
       loginReg.value = false;
       location.reload();
     } else {
+      if (state.username.length < 3) {
+        toast.warning("用户名最少3个字符");
+        return;
+      }
+      if (state.password !== state.repeatPassword) {
+        toast.warning("两次密码输入不一致");
+        return;
+      }
       await useMyFetch("/user/reg", state);
       toast.success("注册成功，请登录");
       isLogin.value = true;
+    }
+  } catch (warning: any) {
+    if (isLogin.value) {
+      toast.warning("用户不存在或密码不正确");
+      return;
+    } else {
+      toast.warning("注册失败，用户名已存在");
+      return;
     }
   } finally {
     pending.value = false;
