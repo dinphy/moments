@@ -31,7 +31,7 @@
         </UFormGroup>
 
         <UButtonGroup size="sm" class="flex justify-center items-center">
-          <UButton @click="doLoginReg" :disabled="pending" :loading="pending">
+          <UButton @click="doLoginReg" :disabled="pending" :loading="pending" class="px-10">
             {{ isLogin ? "登录" : "注册" }}
           </UButton>
           <UButton
