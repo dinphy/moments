@@ -28,6 +28,7 @@ export type  MemoVO = {
     content: string
     location: string
     imgs: string
+    imgConfigs?: any;
     userId: number
     createdAt: string
     updatedAt: string
@@ -41,6 +42,7 @@ export type  MemoVO = {
     comments: Array<CommentVO>
     tags: string
     displayYear?: string | null
+    displayDate?: string | null
 }
 
 export type UserVO = {
