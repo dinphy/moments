@@ -2,15 +2,17 @@
   <UModal
     v-model="loginReg"
     :ui="{
-      container:
-        'fixed mx-auto max-w-[300px] top-0 left-0 right-0 bottom-0 flex justify-center items-center backdrop-blur',
+      overlay: {
+        base: 'backdrop-blur',
+      },
+      container: 'flex justify-center items-center max-w-72 mx-auto',
     }"
   >
-    <div
-      class="py-5 text-center text-xl font-sans border-b-[1px] border-neutral-[100] dark:border-neutral-800"
-    >
-      {{ isLogin ? "用户登录" : "注册用户" }}
-    </div>
+  <div
+        class="py-3 text-center text-lg font-sans border-b-[1px] border-neutral-[100] dark:border-neutral-800"
+      >
+        {{ isLogin ? "用户登录" : "注册用户" }}
+      </div>
     <div class="p-5">
       <UForm
         class="space-y-4"
@@ -31,7 +33,12 @@
         </UFormGroup>
 
         <UButtonGroup size="sm" class="flex justify-center items-center">
-          <UButton @click="doLoginReg" :disabled="pending" :loading="pending" class="px-10">
+          <UButton
+            @click="doLoginReg"
+            :disabled="pending"
+            :loading="pending"
+            class="px-10"
+          >
             {{ isLogin ? "登录" : "注册" }}
           </UButton>
           <UButton
