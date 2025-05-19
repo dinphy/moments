@@ -32,7 +32,7 @@
           <UInput type="password" v-model="state.repeatPassword" />
         </UFormGroup>
 
-        <UButtonGroup size="sm" class="flex justify-center items-center">
+        <UButtonGroup size="sm" class="rounded-none shadow-none flex justify-center items-center">
           <UButton
             @click="doLoginReg"
             :disabled="pending"
