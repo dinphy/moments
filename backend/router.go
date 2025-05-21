@@ -58,6 +58,8 @@ func setupRouter(injector do.Injector) {
 
 	fileGroup := apiGroup.Group("/file")
 	fileGroup.POST("/upload", fileHandler.Upload)
+	fileGroup.POST("/uploadImage", fileHandler.UploadImage)
+	fileGroup.POST("/deleteNoRelImage", fileHandler.DeleteNoRelImage)
 	fileGroup.POST("/s3PreSigned", fileHandler.S3PreSigned)
 
 	uploadGroup := e.Group("/upload")

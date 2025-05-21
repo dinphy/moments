@@ -133,6 +133,19 @@
         <span class="text-sm mt-1">用户</span>
       </div>
       <div
+        v-if="$route.path === '/sys/settings' && global.userinfo.id === 1"
+        class="flex flex-col items-center"
+        @click="$emit('del-image')"
+        title="清理未使用图片"
+      >
+        <span
+          class="flex items-center bg-gray-200/75 dark:bg-gray-800/75 p-3 rounded-full"
+        >
+          <UIcon name="i-carbon-no-image" class="w-6 h-6 cursor-pointer" />
+        </span>
+        <span class="text-sm mt-1">清理</span>
+      </div>
+      <div
         v-if="$route.path === '/user/settings' && global.userinfo.token"
         class="flex flex-col items-center"
         title="登出"

@@ -1,5 +1,5 @@
 <template>
-  <Header :user="currentUser"/>
+  <Header :user="currentUser" @del-image="showDeleteImageModal = true" />
   <div class="space-y-4  flex flex-col p-4 my-4 dark:bg-neutral-800">
     <div class="flex flex-col items-end text-xs text-gray-400">
       <div v-if="version" class="w-32">版本号: {{ version }}</div>
@@ -112,13 +112,32 @@
         <UInput v-model="state.smtpPassword" type="password"/>
       </UFormGroup>
       </template>
-    
+
     <UButton class="justify-center" @click="save">保存</UButton>
   </div>
+
+  <UModal
+    v-model="showDeleteImageModal"
+    :ui="{
+      container:
+        'flex justify-center items-center backdrop-blur',
+    }"
+  >
+    <div class="p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-md">
+      <p class="text-lg font-bold mb-2">谨慎操作</p>
+      <p class="text-gray-600 mb-4">确定要清理未使用的图片吗？此操作不可逆。</p>
+      <div class="flex justify-end gap-2 mt-4">
+        <UButton color="white" @click="showDeleteImageModal = false">取消</UButton>
+        <UButton @click="deleteUnusedImages">确认清理</UButton>
+      </div>
+    </div>
+  </UModal>
+  <MobileNav @del-image="showDeleteImageModal = true" />
 </template>
 
 <script setup lang="ts">
 import type {SysConfigVO, UserVO} from "~/types";
+import MobileNav from '~/components/MobileNav.vue';
 import {toast} from "vue-sonner";
 import {useUpload} from "~/utils";
 
@@ -161,6 +180,8 @@ const state = reactive({
   smtpPassword: "",
 })
 
+const showDeleteImageModal = ref(false)
+
 const reload = async () => {
   const res = await useMyFetch<SysConfigVO>('/sysConfig/getFull')
   if (res) {
@@ -187,6 +208,14 @@ const uploadFavicon = async (files: FileList) => {
   if (result.length) {
     toast.success("上传成功")
     state.favicon = result[0]
+  }
+}
+
+const deleteUnusedImages = async () => {
+  const res = await useMyFetch<{num: number}>('/file/deleteNoRelImage', undefined)
+  if (res) {
+    toast.success(`成功清理 ${res.num} 张未使用的图片`)
+    showDeleteImageModal.value = false
   }
 }
 

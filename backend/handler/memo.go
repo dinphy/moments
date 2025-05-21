@@ -16,6 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/duke-git/lancet/v2/slice"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -134,6 +136,58 @@ func (m MemoHandler) handleImgConfigs(sysConfigVO *vo.FullSysConfigVO, memo *db.
 	}
 
 	memo.ImgConfigs = &imgConfigs
+}
+
+/*
+根据图片路径获取图片ID
+对于本地图片，在上传时已经创建了图片信息
+*/
+func (m MemoHandler) getImageIdsByPaths(tx *gorm.DB, paths []string) ([]int32, error) {
+	if len(paths) == 0 {
+		return []int32{}, nil
+	}
+
+	var localPaths []string
+
+	// 区分本地和远程图片
+	for _, path := range paths {
+		if strings.HasPrefix(path, "/upload/") {
+			localPaths = append(localPaths, path)
+		}
+	}
+	// 获取本地图片的ID
+	var imageIds []int32
+	if err := tx.Raw("SELECT id FROM Image WHERE path IN (?)", localPaths).Scan(&imageIds).Error; err != nil {
+		return nil, err
+	}
+
+	return imageIds, nil
+}
+
+/*
+更新memo的图片关系
+先删除旧的图片关系，再创建新的图片关系
+*/
+func (m MemoHandler) updateImageRel(tx *gorm.DB, memoId int32, imageIds []int32) error {
+	// 删除旧的图片关系
+	if err := tx.Delete(&db.ImageRel{}, "memoId = ?", memoId).Error; err != nil {
+		return err
+	}
+
+	// 创建新的图片关系
+	imageRels := slice.Map(imageIds, func(_ int, imageId int32) db.ImageRel {
+		return db.ImageRel{
+			MemoId:  memoId,
+			ImageId: imageId,
+		}
+	})
+
+	// 批量创建图片关系
+	if err := tx.CreateInBatches(imageRels, 100).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ListMemos godoc
@@ -265,18 +319,9 @@ func (m MemoHandler) RemoveMemo(c echo.Context) error {
 	}
 
 	if memo.Imgs != "" {
-		imgs := strings.Split(memo.Imgs, ",")
-		for _, img := range imgs {
-			if img == "" || !strings.HasPrefix(img, "/upload/") {
-				continue
+		// 删除memo的图片关系
+		_ = m.updateImageRel(m.base.db, memo.Id, []int32{})
 			}
-
-			img := strings.ReplaceAll(img, "/upload/", "")
-			_ = os.Remove(filepath.Join(m.base.cfg.UploadDir, img))
-			thumbImg := strings.ReplaceAll(img+"_thumb", "/upload/", "")
-			_ = os.Remove(filepath.Join(m.base.cfg.UploadDir, thumbImg))
-		}
-	}
 
 	return SuccessResp(c, h{})
 }
@@ -648,9 +693,29 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 	memo.Ext = extJson
 	memo.ShowType = req.ShowType
 
-	m.base.log.Info().Msgf("memo is %+v", memo)
-	m.base.db.Save(&memo)
+	// 事务处理
+	err = m.base.db.Transaction(func(tx *gorm.DB) error {
+		// 获取图片ID
+		imageIds, err := m.getImageIdsByPaths(tx, req.Imgs)
+		if err != nil {
+			return err
+		}
 
+		// 创建memo
+	m.base.log.Info().Msgf("memo is %+v", memo)
+		if err := tx.Save(&memo).Error; err != nil {
+			return err
+		}
+
+		// 更新图片关系
+		if err := m.updateImageRel(tx, memo.Id, imageIds); err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return FailRespWithMsg(c, Fail, err.Error())
+	}
 	return SuccessResp(c, h{})
 }
 

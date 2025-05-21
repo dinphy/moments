@@ -8,8 +8,11 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
+
+	fs_util "github.com/kingwrcy/moments/util"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -92,6 +95,165 @@ func (f FileHandler) Upload(c echo.Context) error {
 		result = append(result, "/upload/"+img_filename)
 	}
 	return SuccessResp(c, result)
+}
+
+// UploadImage godoc
+//
+//	@Tags		File
+//	@Summary	上传图片
+//	@Accept		json
+//	@Produce	json
+//	@Param		x-api-token	header	string	true	"登录TOKEN"
+//	@Success	200
+//	@Router		/api/file/uploadImage [post]
+func (f FileHandler) UploadImage(c echo.Context) error {
+	var (
+		result []string
+		images []db.Image
+	)
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		f.base.log.Error().Msgf("读取上传图片异常:%s", err)
+		return FailRespWithMsg(c, Fail, "上传图片异常")
+	}
+
+	if err := os.MkdirAll(f.base.cfg.UploadDir, 0755); err != nil {
+		f.base.log.Error().Msgf("创建父级目录异常:%s", err)
+		return FailRespWithMsg(c, Fail, "创建父级目录异常")
+	}
+
+	files := form.File["files"]
+	for _, file := range files {
+		// 原始图片
+		src, err := file.Open()
+		if err != nil {
+			f.base.log.Error().Msgf("打开上传图片异常:%s", err)
+			return FailRespWithMsg(c, Fail, "上传图片异常")
+		}
+		defer src.Close()
+
+		// 计算图片hash
+		hash, err := fs_util.CalHash(src)
+		if err != nil {
+			f.base.log.Error().Msgf("计算图片hash异常:%s", err)
+			return FailRespWithMsg(c, Fail, "上传图片异常")
+		}
+
+		var image db.Image
+		err = f.base.db.Where("hash = ?", hash).First(&image).Error
+		// 如果图片不存在，则创建图片
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 创建原始图片
+			img_filename := strings.ReplaceAll(uuid.NewString(), "-", "")
+			img_filepath := path.Join(f.base.cfg.UploadDir, img_filename)
+			dst, err := os.Create(img_filepath)
+			if err != nil {
+				f.base.log.Error().Msgf("打开目标图片异常:%s", err)
+				return FailRespWithMsg(c, Fail, "上传图片异常")
+			}
+			defer dst.Close()
+
+			// 重置文件指针到开头
+			if seeker, ok := src.(io.Seeker); ok {
+				if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+					f.base.log.Error().Msgf("重置文件指针异常:%s", err)
+					return FailRespWithMsg(c, Fail, "上传图片异常")
+				}
+			}
+
+			// 保存图片
+			if _, err = io.Copy(dst, src); err != nil {
+				f.base.log.Error().Msgf("复制图片异常:%s", err)
+				return FailRespWithMsg(c, Fail, "上传图片异常")
+			}
+
+			// 生成并保存缩略图
+			thumb_filename := img_filename + "_thumb"
+			thumb_filepath := path.Join(f.base.cfg.UploadDir, thumb_filename)
+			if err := CompressImage(f, img_filepath, thumb_filepath, 30); err != nil {
+				f.base.log.Error().Msgf("压缩图片异常:%s", err)
+			}
+
+			// 保存图片信息
+			image = db.Image{
+				Hash: hash,
+				Path: "/upload/" + img_filename,
+			}
+			images = append(images, image)
+		}
+		result = append(result, image.Path)
+	}
+
+	if err := f.base.db.CreateInBatches(images, 100).Error; err != nil {
+		f.base.log.Error().Msgf("创建图片信息异常:%s", err)
+		return FailRespWithMsg(c, Fail, "上传图片异常")
+	}
+
+	return SuccessResp(c, result)
+}
+
+// DeleteNoRelImage godoc
+//
+//	@Tags		File
+//	@Summary	删除没有关联的图片
+//	@Accept		json
+//	@Produce	json
+//	@Success	200
+//	@Router		/api/file/deleteNoRelImage [post]
+func (f FileHandler) DeleteNoRelImage(c echo.Context) error {
+	var (
+		data []struct {
+			Id   int32  `json:"id,omitempty"`
+			Path string `json:"path,omitempty"`
+		}
+		paths    []string
+		imageIds []int32
+	)
+
+	// 查询没有关联的图片
+	if err := f.base.db.Table("Image AS i").
+		Joins("LEFT JOIN ImageRel AS ir ON i.id = ir.imageId").
+		Select("i.id, i.path, COUNT(ir.memoId) AS relCount").
+		Group("i.id").
+		Having("relCount = 0").
+		Find(&data).Error; err != nil {
+		f.base.log.Error().Msgf("查询图片信息异常:%s", err)
+		return FailRespWithMsg(c, Fail, "查询图片信息异常")
+	}
+
+	if len(data) == 0 {
+		return SuccessResp(c, h{
+			"num": 0,
+		})
+	}
+
+	// 删除没有关联的图片文件
+	for _, d := range data {
+		img := d.Path
+		if img == "" || !strings.HasPrefix(img, "/upload/") {
+			continue
+		}
+		paths = append(paths, img)
+		imageIds = append(imageIds, d.Id)
+
+		img = strings.ReplaceAll(img, "/upload/", "")
+		_ = os.Remove(filepath.Join(f.base.cfg.UploadDir, img))
+		thumbImg := strings.ReplaceAll(img+"_thumb", "/upload/", "")
+		_ = os.Remove(filepath.Join(f.base.cfg.UploadDir, thumbImg))
+	}
+
+	// 删除没有关联的图片信息
+	if err := f.base.db.Delete(&db.Image{}, imageIds).Error; err != nil {
+		f.base.log.Error().Msgf("删除图片信息异常:%s", err)
+		return FailRespWithMsg(c, Fail, "删除图片信息异常")
+	}
+
+	f.base.log.Info().Msgf("删除本地图片: %v", paths)
+
+	return SuccessResp(c, h{
+		"num": len(paths),
+	})
 }
 
 type PreSignedReq struct {

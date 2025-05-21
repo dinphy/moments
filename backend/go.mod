@@ -10,6 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/deckarep/golang-set/v2 v2.8.0
 	github.com/disintegration/imaging v1.6.2
+	github.com/duke-git/lancet/v2 v2.3.5
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6
 	github.com/emersion/go-smtp v0.22.0
 	github.com/glebarez/sqlite v1.11.0
@@ -88,6 +89,7 @@ require (
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vanng822/css v0.0.0-20190504095207-a21e860bcd04 // indirect
 	github.com/vanng822/go-premailer v0.0.0-20191214114701-be27abe028fe // indirect
+	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/image v0.27.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect

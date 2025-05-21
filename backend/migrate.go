@@ -4,8 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
+
+	fs_util "github.com/kingwrcy/moments/util"
 
 	"github.com/kingwrcy/moments/db"
 	"github.com/kingwrcy/moments/handler"
@@ -258,4 +262,86 @@ func migrateIframeVideoUrl(tx *gorm.DB, log zerolog.Logger) {
 			log.Error().Msgf("迁移 memo id: %d 失败, 原因：%v", memo.Id, err)
 		}
 	}
+}
+
+// migrageImage 迁移图片数据
+func migrageImage(tx *gorm.DB, log zerolog.Logger, uploadDir string) {
+	var (
+		count int64     // 图片信息表记录数
+		memos []db.Memo // 需要处理的memo列表
+	)
+
+	// 检查图片信息表是否已有数据
+	err := tx.Table("Image").Count(&count).Error
+	if err != nil {
+		log.Error().Msgf("查询图片信息表: %v", err)
+		return
+	}
+	if count != 0 {
+		// 如果图片信息表已存在数据, 则跳过迁移
+		return
+	}
+
+	// 查询所有包含图片的memo记录
+	if err := tx.Where("imgs is not null AND imgs != ''").Find(&memos).Error; err != nil {
+		log.Error().Msgf("查询memo表错误: %v", err)
+		return
+	}
+	if len(memos) == 0 {
+		log.Info().Msg("memo表中没有需要迁移的图片")
+		return
+	}
+
+	// 遍历每个memo处理其中的图片
+	for _, memo := range memos {
+		if memo.Imgs == "" {
+			continue
+		}
+
+		// 将图片字符串分割为单个图片路径
+		imgs := strings.Split(memo.Imgs, ",")
+		for _, img := range imgs {
+			// 只处理上传到本地的图片
+			if strings.HasPrefix(img, "/upload/") {
+				path := img
+				// 构建完整的文件路径
+				filePath := filepath.Join(uploadDir, strings.ReplaceAll(img, "/upload/", ""))
+
+				// 打开图片文件
+				file, err := os.Open(filePath)
+				if err != nil {
+					log.Error().Msgf("打开图片 %s 错误: %v", img, err)
+					continue
+				}
+				defer file.Close()
+				// 计算图片的hash值
+				hash, err := fs_util.CalHash(file)
+				if err != nil {
+					log.Error().Msgf("计算图片 %s 的 hash 错误: %v", img, err)
+					continue
+				}
+
+				// 创建图片记录
+				image := db.Image{
+					Path: path,
+					Hash: hash,
+				}
+				if err := tx.Create(&image).Error; err != nil {
+					log.Error().Msgf("创建图片 %s 信息错误: %v", img, err)
+					continue
+				}
+
+				// 记录图片与memo的关联关系
+				imageRel := db.ImageRel{
+					MemoId:  memo.Id,
+					ImageId: image.Id,
+				}
+				if err := tx.Create(&imageRel).Error; err != nil {
+					log.Error().Msgf("创建图片 %s 与 memo %d 的关系错误: %v", img, memo.Id, err)
+				}
+			}
+		}
+	}
+
+	log.Info().Msg("图片数据迁移完成")
 }
