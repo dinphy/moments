@@ -135,7 +135,10 @@
       <div
         v-if="$route.path === '/sys/settings' && global.userinfo.id === 1"
         class="flex flex-col items-center"
-        @click="$emit('del-image')"
+        @click="
+          showDeleteImage = true;
+          open = false;
+        "
         title="清理未使用图片"
       >
         <span
@@ -171,6 +174,7 @@ const sysConfig = useState<SysConfigVO>("sysConfig");
 const global = useGlobalState();
 const mode = useColorMode();
 const open = useState<boolean>("sidebarOpen", () => false);
+const showDeleteImage = useState<boolean>("showDeleteImage", () => false);
 const toggleMode = () => {
   if (mode.preference === "system") {
     mode.preference = "dark";

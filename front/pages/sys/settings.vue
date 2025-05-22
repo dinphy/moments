@@ -132,12 +132,10 @@
       </div>
     </div>
   </UModal>
-  <MobileNav @del-image="showDeleteImageModal = true" />
 </template>
 
 <script setup lang="ts">
 import type {SysConfigVO, UserVO} from "~/types";
-import MobileNav from '~/components/MobileNav.vue';
 import {toast} from "vue-sonner";
 import {useUpload} from "~/utils";
 
@@ -180,7 +178,7 @@ const state = reactive({
   smtpPassword: "",
 })
 
-const showDeleteImageModal = ref(false)
+const showDeleteImageModal = useState<boolean>("showDeleteImage", () => false);
 
 const reload = async () => {
   const res = await useMyFetch<SysConfigVO>('/sysConfig/getFull')
