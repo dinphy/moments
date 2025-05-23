@@ -3,7 +3,7 @@
     class="flex flex-row text-sm w-full hover:bg-slate-200 hover:dark:bg-neutral-700"
     :class="{ 'bg-slate-100 dark:bg-neutral-800': props.memo.pinned }"
   >
-    <div class="flex flex-col w-24 pt-2">
+    <div class="flex flex-col w-24 p-2 text-center">
       <template v-if="!isPinned">
         <div v-if="props.memo.displayDate" class="flex justify-center">
           <span class="text-xl font-bold">{{ $dayjs(props.memo.createdAt).format("DD") }}</span>
@@ -103,14 +103,11 @@
 </template>
 
 <script setup lang="ts">
-import type { ExtDTO, MemoVO, SysConfigVO } from "~/types";
+import type { ExtDTO, MemoVO } from "~/types";
 import { md } from "~/utils";
 import { computed } from "vue";
 import { toast } from "vue-sonner";
-import { useRouter } from "vue-router";
 
-const router = useRouter();
-const sysConfig = useState<SysConfigVO>("sysConfig");
 const props = defineProps<{
   memo: MemoVO;
 }>();
