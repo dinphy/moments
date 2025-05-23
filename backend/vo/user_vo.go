@@ -12,11 +12,12 @@ type RegReq struct {
 }
 
 type ProfileReq struct {
-	ID        int    `json:"id,omitempty"`        //用户ID
-	Nickname  string `json:"nickname,omitempty"`  //昵称
-	AvatarUrl string `json:"avatarUrl,omitempty"` //头像URL
-	Slogan    string `json:"slogan,omitempty"`    //标语
-	CoverUrl  string `json:"coverUrl,omitempty"`  //封面URL
-	Password  string `json:"password,omitempty"`  //密码,不修改不要填写
-	Email     string `json:"email,omitempty"`     //邮箱
+	ID          int    `json:"id,omitempty"`
+	Nickname    string `json:"nickname,omitempty"`    //昵称
+	AvatarUrl   string `json:"avatarUrl,omitempty"`   //头像URL
+	Slogan      string `json:"slogan,omitempty"`      //标语
+	CoverUrl    string `json:"coverUrl,omitempty"`    //封面URL
+	Password    string `json:"password,omitempty"`    //密码,不修改不要填写
+	Email       string `json:"email,omitempty"`       //邮箱
+	HomepageUrl string `json:"homepageUrl,omitempty"` // 主页字段
 }
