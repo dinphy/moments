@@ -54,7 +54,6 @@ export type UserVO = {
     slogan: string
     coverUrl: string
     email: string
-    homepageUrl: string
 }
 export type SysConfigVO = {
     version: string,

@@ -29,9 +29,6 @@
     <UFormGroup label="邮箱" name="email" :ui="{label:{base:'font-bold'}}">
       <UInput v-model="state.email" type="email" placeholder="若管理员启用了邮件通知，将在收到评论时发送邮件通知"/>
     </UFormGroup>
-    <UFormGroup label="我的主页" name="homepageUrl" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.homepageUrl" type="url" placeholder="评论时跳转的链接, 如: https://example.com"/>
-    </UFormGroup>
     <UButton class="justify-center" @click="save">保存</UButton>
   </div>
 </template>
@@ -51,7 +48,6 @@ const state = reactive({
   avatarUrl: "",
   coverUrl: "",
   email: "",
-  homepageUrl: "",
   css: "",
   js: "",
 })
