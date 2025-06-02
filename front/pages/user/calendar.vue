@@ -13,15 +13,24 @@
               class="flex-1"
               :ui="{ base: 'rounded-r-none pr-3 z-10' }"
           />
-          <USelectMenu
-              v-model="state.showType"
-              name="showType"
-              :options="[{ label: '所有', value: -1 }, { label: '公开', value: 1 }, { label: '私密', value: 0 }]"
-              option-attribute="label"
-              value-attribute="value"
-              size="xl"
-              :ui="{ base: 'rounded-l-none' }"
-          />
+          <USelectMenu 
+            v-model="state.showType"
+            :options="[
+              { label: '所有', value: -1 }, 
+              { label: '公开', value: 1 }, 
+              { label: '私密', value: 0 }
+            ]"
+            option-attribute="label"
+            value-attribute="value"
+            size="xl"
+            :ui="{ base: 'rounded-l-none' }"
+          >
+            <template #label>
+              <span v-if="state.showType === -1">所有</span>
+              <span v-else-if="state.showType === 1">公开</span>
+              <span v-else>私密</span>
+            </template>
+          </USelectMenu>
           </UButtonGroup>
           <UButton @click="reload" class="ml-2 px-4">搜索</UButton>
       </div>
