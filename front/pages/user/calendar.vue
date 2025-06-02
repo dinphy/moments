@@ -6,7 +6,7 @@
       <UFormGroup label="日期范围" name="contentContains" :ui="{label:{base:'font-bold'}}">
         <UPopover :popper="{ placement: 'bottom-start' }">
           <UButton icon="i-heroicons-calendar-days-20-solid" color="white" variant="solid" class="w-full">
-            从 {{ format(state.range.start, 'yyy-MM-dd') }} 到 {{ format(state.range.end, 'yyy-MM-dd') }}
+            从 {{ format(state.range.start, 'yyyy-MM-dd') }} 到 {{ format(state.range.end, 'yyyy-MM-dd') }}
           </UButton>
 
           <template #panel="{ close }">
