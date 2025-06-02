@@ -3,50 +3,98 @@
     <Header :user="currentUser"/>
 
     <div class="p-4 space-y-4">
-      <UFormGroup label="日期范围" name="contentContains" :ui="{label:{base:'font-bold'}}">
-        <UPopover :popper="{ placement: 'bottom-start' }">
-          <UButton icon="i-heroicons-calendar-days-20-solid" color="white" variant="solid" class="w-full">
-            从 {{ format(state.range.start, 'yyyy-MM-dd') }} 到 {{ format(state.range.end, 'yyyy-MM-dd') }}
-          </UButton>
+      <div class="flex items-center justify-between gap-2">
+          <UButtonGroup class="flex-1 flex">
+          <UInput
+              v-model="state.contentContains"
+              placeholder="请输入关键词..."
+              size="xl"
+              name="contentContains"
+              class="flex-1"
+              :ui="{ base: 'rounded-r-none pr-3 z-10' }"
+          />
+          <USelectMenu
+              v-model="state.showType"
+              name="showType"
+              :options="[{ label: '所有', value: -1 }, { label: '公开', value: 1 }, { label: '私密', value: 0 }]"
+              option-attribute="label"
+              value-attribute="value"
+              size="xl"
+              :ui="{ base: 'rounded-l-none' }"
+          />
+          </UButtonGroup>
+          <UButton @click="reload" class="ml-2 px-4">搜索</UButton>
+      </div>
+      <div
+          class="flex items-center text-sm text-gray-500 gap-1 border-b pb-4"
+          :class="[state.contentContains ? 'justify-between' : 'justify-end']"
+      >
+          <span v-if="state.contentContains">
+          正在检索<UBadge class="text-neutral mx-1" variant="outline">{{ state.contentContains }}</UBadge>相关内容
+          </span>
+          <span class="flex items-center">
+          高级：<UToggle v-model="openSwitch" />
+          </span>
+      </div>
+      <div v-if="openSwitch" class="space-y-4">
+          <UFormGroup
+          label="日期范围"
+          name="contentContains"
+          :ui="{ label: { base: 'font-bold' } }"
+          >
+          <UPopover :popper="{ placement: 'bottom-start' }">
+              <UButton
+              icon="i-heroicons-calendar-days-20-solid"
+              color="white"
+              variant="solid"
+              class="w-full"
+              >
+              从 {{ format(state.range.start, "yyyy-MM-dd") }} 到
+              {{ format(state.range.end, "yyyy-MM-dd") }}
+              </UButton>
 
-          <template #panel="{ close }">
-            <div class="flex flex-col items-center sm:divide-x divide-gray-200 dark:divide-gray-800">
-              <div class="hidden sm:flex flex-row py-4">
-                <UButton
-                    v-for="(range, index) in ranges"
-                    :key="index"
-                    :label="range.label"
-                    color="gray"
-                    variant="ghost"
-                    class="rounded-none px-6"
-                    :class="[isRangeSelected(range.duration) ? 'bg-gray-100 dark:bg-gray-800' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50']"
-                    truncate
-                    @click="selectRange(range.duration)"
-                />
+              <template #panel="{ close }">
+              <div
+                  class="flex flex-col items-center sm:divide-x divide-gray-200 dark:divide-gray-800"
+              >
+                  <div class="hidden sm:flex flex-row py-4">
+                  <UButton
+                      v-for="(range, index) in ranges"
+                      :key="index"
+                      :label="range.label"
+                      color="gray"
+                      variant="ghost"
+                      class="rounded-none px-6"
+                      :class="[
+                      isRangeSelected(range.duration)
+                          ? 'bg-gray-100 dark:bg-gray-800'
+                          : 'hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                      ]"
+                      truncate
+                      @click="selectRange(range.duration)"
+                  />
+                  </div>
+                  <DatePicker v-model="state.range" @close="close" />
               </div>
-              <DatePicker v-model="state.range" @close="close"/>
-            </div>
-          </template>
-        </UPopover>
-      </UFormGroup>
+              </template>
+          </UPopover>
+          </UFormGroup>
 
-      <UFormGroup label="包含内容" name="contentContains" :ui="{label:{base:'font-bold'}}">
-        <UInput v-model="state.contentContains"/>
-      </UFormGroup>
-      <UFormGroup label="包含标签" name="tagContains" :ui="{label:{base:'font-bold'}}">
-        <USelectMenu multiple v-model="state.tags" searchable :options="tags">
-          <template #label>
-            <span v-if="state.tags.length" class="truncate">{{ state.tags.join(', ') }}</span>
-            <span v-else>选择标签</span>
-          </template>
-        </USelectMenu>
-      </UFormGroup>
-      <UFormGroup label="可见性" name="showType" :ui="{label:{base:'font-bold'}}">
-        <USelectMenu v-model="state.showType"
-                     :options="[{value:-1,label:'所有的'},{value:1,label:'公开的'},{value:0,label:'自己可见'}]"
-                     option-attribute="label" value-attribute="value"/>
-      </UFormGroup>
-      <UButton class="my-2" @click="reload">搜索</UButton>
+          <UFormGroup
+          label="包含标签"
+          name="tagContains"
+          :ui="{ label: { base: 'font-bold' } }"
+          >
+          <USelectMenu multiple v-model="state.tags" searchable :options="tags">
+              <template #label>
+              <span v-if="state.tags.length" class="truncate">{{
+                  state.tags.join(", ")
+              }}</span>
+              <span v-else>选择标签</span>
+              </template>
+          </USelectMenu>
+          </UFormGroup>
+      </div>
     </div>
 
     <div class="flex flex-col divide-y divide-[#C0BEBF]/20 ">
@@ -88,6 +136,7 @@ const state = reactive({
     end: add(new Date(), {days: 1})
   }
 })
+const openSwitch = ref(false)
 
 function isRangeSelected(duration: Duration) {
   return isSameDay(state.range.start, sub(new Date(), duration)) && isSameDay(state.range.end, new Date())
