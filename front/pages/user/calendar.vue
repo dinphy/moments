@@ -11,7 +11,7 @@
               size="xl"
               name="contentContains"
               class="flex-1"
-              :ui="{ base: 'rounded-r-none pr-3 z-10' }"
+              :ui="{ base: 'rounded-r-none pr-3 z-[1]' }"
           />
           <USelectMenu 
             v-model="state.showType"
@@ -36,19 +36,24 @@
       </div>
       <div
           class="flex items-center text-sm text-gray-500 gap-1 border-b pb-4"
-          :class="[state.contentContains ? 'justify-between' : 'justify-end']"
+          :class="[state.contentContains || state.total ? 'justify-between' : 'justify-end']"
       >
           <span v-if="state.contentContains">
-          正在检索<UBadge class="text-neutral mx-1" variant="outline">{{ state.contentContains }}</UBadge>相关内容
+            正在检索<UBadge class="text-neutral mx-1" variant="outline">{{ state.contentContains }}</UBadge>中..
           </span>
+          <span v-else-if="state.total">
+            <UBadge variant="solid" class="ml-2">共 {{ state.total }} 条内容</UBadge>
+          </span>
+          <span v-else class="flex-1 text-sm pl-2">未找到相关内容</span>
           <span class="flex items-center">
           高级：<UToggle v-model="openSwitch" />
           </span>
       </div>
-      <div v-if="openSwitch" class="space-y-4">
+      <div v-if="openSwitch" class="flex flex-wrap gap-4">
           <UFormGroup
-          label="日期范围"
+          label="按时间"
           name="contentContains"
+          class="flex-1"
           :ui="{ label: { base: 'font-bold' } }"
           >
           <UPopover :popper="{ placement: 'bottom-start' }">
@@ -58,40 +63,35 @@
               variant="solid"
               class="w-full"
               >
-              从 {{ format(state.range.start, "yyyy-MM-dd") }} 到
-              {{ format(state.range.end, "yyyy-MM-dd") }}
+              {{ isRangeSelected(null) ? '日期不限' : ranges.find(r => isRangeSelected(r.duration))?.label }}
               </UButton>
 
               <template #panel="{ close }">
-              <div
-                  class="flex flex-col items-center sm:divide-x divide-gray-200 dark:divide-gray-800"
-              >
-                  <div class="hidden sm:flex flex-row py-4">
-                  <UButton
-                      v-for="(range, index) in ranges"
-                      :key="index"
-                      :label="range.label"
-                      color="gray"
-                      variant="ghost"
-                      class="rounded-none px-6"
-                      :class="[
-                      isRangeSelected(range.duration)
-                          ? 'bg-gray-100 dark:bg-gray-800'
-                          : 'hover:bg-gray-50 dark:hover:bg-gray-800/50',
-                      ]"
-                      truncate
-                      @click="selectRange(range.duration)"
-                  />
-                  </div>
-                  <DatePicker v-model="state.range" @close="close" />
-              </div>
+                <div class="flex flex-col py-4 space-y-2">
+                    <UButton
+                        v-for="(range, index) in ranges"
+                        :key="index"
+                        :label="range.label"
+                        color="gray"
+                        variant="ghost"
+                        class="px-6"
+                        :class="[
+                        isRangeSelected(range.duration)
+                            ? 'bg-gray-100 dark:bg-gray-800'
+                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                        ]"
+                        truncate
+                        @click="selectRange(range.duration); close()"
+                    />
+                </div>
               </template>
           </UPopover>
           </UFormGroup>
 
           <UFormGroup
-          label="包含标签"
+          label="按标签"
           name="tagContains"
+          class="flex-1"
           :ui="{ label: { base: 'font-bold' } }"
           >
           <USelectMenu multiple v-model="state.tags" searchable :options="tags">
@@ -126,11 +126,12 @@ import {memoChangedEvent, memoReloadEvent} from "~/event";
 import {useElementVisibility} from '@vueuse/core'
 
 const ranges = [
-  {label: '一周内', duration: {days: 7}},
-  {label: '一月内', duration: {days: 31}},
-  {label: '三月内', duration: {days: 90}},
-  {label: '本年', duration: {months: 12}},
-  {label: '近三年', duration: {years: 3}},
+  {label: '日期不限', duration: null},
+  {label: '最近一周', duration: {days: 7}},
+  {label: '一个月内', duration: {days: 31}},
+  {label: '三个月内', duration: {days: 90}},
+  {label: '一年以内', duration: {months: 12}},
+  {label: '最近三年', duration: {years: 3}},
 ]
 const tags = ref<string[]>([])
 const currentUser = useState<UserVO>('userinfo')
@@ -140,19 +141,29 @@ const state = reactive({
   contentContains: "",
   tags: [],
   showType: -1,
+  total: 0,
   range: {
-    start: sub(new Date(), {days: 31}),
-    end: add(new Date(), {days: 1})
+    start: new Date(1970, 0, 1),
+    end: new Date(2100, 0, 1)
   }
 })
 const openSwitch = ref(false)
 
-function isRangeSelected(duration: Duration) {
-  return isSameDay(state.range.start, sub(new Date(), duration)) && isSameDay(state.range.end, new Date())
+function isRangeSelected(duration: Duration | null) {
+  if (!duration) {
+    return isSameDay(state.range.start, new Date(1970, 0, 1)) && 
+           isSameDay(state.range.end, new Date(2100, 0, 1))
+  }
+  return isSameDay(state.range.start, sub(new Date(), duration)) && 
+         isSameDay(state.range.end, new Date())
 }
 
-function selectRange(duration: Duration) {
-  state.range = {start: sub(new Date(), duration), end: new Date()}
+function selectRange(duration: Duration | null) {
+  if (!duration) {
+    state.range = {start: new Date(1970, 0, 1), end: new Date(2100, 0, 1)}
+  } else {
+    state.range = {start: sub(new Date(), duration), end: new Date()}
+  }
 }
 
 const loadTags = async () => {
@@ -162,7 +173,6 @@ const loadTags = async () => {
   tags.value = res.tags
 }
 
-
 const loadMoreEle = ref(null)
 const targetIsVisible = useElementVisibility(loadMoreEle)
 watch(targetIsVisible, async (visible) => {
@@ -171,7 +181,6 @@ watch(targetIsVisible, async (visible) => {
   }
 })
 const hasNext = ref(false)
-
 
 const memos = ref<Array<MemoVO>>([])
 onMounted(async () => {
@@ -196,6 +205,8 @@ const reload = async () => {
   })
   memos.value = res.list
   hasNext.value = res.hasNext
+  state.total = res.total
+  state.contentContains = ''
 }
 
 const loadMore = async () => {
@@ -215,6 +226,7 @@ const loadMore = async () => {
   })
   memos.value = [...memos.value, ...res.list]
   hasNext.value = res.hasNext
+  state.total = res.total
 }
 
 memoReloadEvent.on(async () => {
