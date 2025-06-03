@@ -42,9 +42,9 @@
             正在检索<UBadge class="text-neutral mx-1" variant="outline">{{ state.contentContains }}</UBadge>中..
           </span>
           <span v-else-if="state.total">
-            <UBadge variant="solid" class="ml-2">共 {{ state.total }} 条内容</UBadge>
+            <UBadge variant="solid">共 {{ state.total }} 条内容</UBadge>
           </span>
-          <span v-else class="flex-1 text-sm pl-2">未找到相关内容</span>
+          <span v-else class="flex-1">暂无相关内容</span>
           <span class="flex items-center">
           高级：<UToggle v-model="openSwitch" />
           </span>
