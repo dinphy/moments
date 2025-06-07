@@ -126,7 +126,7 @@ import {memoChangedEvent, memoReloadEvent} from "~/event";
 import {useElementVisibility} from '@vueuse/core'
 
 const ranges = [
-  {label: '日期不限', duration: null},
+  {label: '日期不限', duration: null as null | Duration},
   {label: '最近一周', duration: {days: 7}},
   {label: '一个月内', duration: {days: 31}},
   {label: '三个月内', duration: {days: 90}},

@@ -264,16 +264,16 @@
             <div class="text-[#576b95]">
               <UIcon name="i-carbon-favorite" class="mr-1 relative top-[1px]" />
               <span v-if="loggedLikes.length > 0">
-                {{ loggedLikes.map((info) => info.name).join(", ") }}
+                {{ loggedLikes.map((info) => info.name || info.id).join(", ") }}
                 <span v-if="guestLikes.length > 0">, </span>
               </span>
               <template v-if="guestLikes.length > 0">
                 {{
                   (isDetailPage || showFullGuestLikes)
-                    ? guestLikes.map((info) => info.name).join(", ")
+                    ? guestLikes.map((info) => info.name || info.id).join(", ")
                     : guestLikes
                         .slice(0, 3)
-                        .map((info) => info.name)
+                        .map((info) => info.name || info.id)
                         .join(", ")
                 }}
                 <span
@@ -326,6 +326,7 @@ import { memoChangedEvent, memoReloadEvent } from "~/event";
 import Comment from "~/components/Comment.vue";
 import { useGlobalState } from "~/store";
 import { md, getGuestId } from "~/utils";
+import {useStorage} from '@vueuse/core'
 
 const showMore = ref(false);
 const showMoreClicked = ref(false);
@@ -424,10 +425,14 @@ const setPinned = async (id: number) => {
 };
 
 const liked = ref(false);
-const likeInfo = ref<{ id: number; name: string }[] | null>(null);
+const likeInfo = ref<{ id: number | string; name: string }[] | null>(null);
 const likeNum = ref(0);
 const isLoading = ref(false);
-
+const localCommentUserinfo = useStorage('localCommentUserinfo', {
+  username: "",
+  website: "",
+  email: "",
+})
 const doLike = async (params: string) => {
   showToolbar.value = false;
   try {
@@ -447,6 +452,10 @@ const likeMemo = async (id: number) => {
     const guestId = await getGuestId();
     if (!guestId) return;
     let params = `id=${id}&guest_id=${guestId}`;
+    const guestName = localCommentUserinfo.value.username;
+    if (guestName) {
+      params += `&guest_name=${guestName}`;
+    }
 
     if (sysConfig.value.enableGoogleRecaptcha) {
       await new Promise<void>((resolve) => {
@@ -497,6 +506,10 @@ const unlikeMemo = async (id: number) => {
     const guestId = await getGuestId();
     if (!guestId) return;
     let params = `id=${id}&guest_id=${guestId}`;
+    const guestName = localCommentUserinfo.value.username;
+    if (guestName) {
+      params += `&guest_name=${guestName}`;
+    }
 
     if (sysConfig.value.enableGoogleRecaptcha) {
       await new Promise<void>((resolve) => {
@@ -539,9 +552,10 @@ const getLike = async (id: number) => {
   const guestId = await getGuestId();
   if (!guestId) return;
   let params = `id=${id}&guest_id=${guestId}`;
+
   try {
     const response = await useMyFetch<{
-      likes: { id: number; name: string }[];
+      likes: { id: number | string; name: string }[];
       total: number;
     }>(`/memo/getLike?${params}`);
     likeInfo.value = response.likes;
@@ -550,8 +564,12 @@ const getLike = async (id: number) => {
       const userId = global.value.userinfo.id;
       liked.value = likeInfo.value?.some((info) => info.id === userId) || false;
     } else {
-      liked.value =
-        likeInfo.value?.some((info) => info.name === guestId) || false;
+      const guestName = localCommentUserinfo.value.username;
+      if (guestName) {
+        liked.value = likeInfo.value?.some((info) => info.name === guestName) || false;
+      } else {
+        liked.value = likeInfo.value?.some((info) => info.id === guestId) || false; 
+      }
     }
     return true;
   } catch (error) {

@@ -379,6 +379,7 @@ func (m MemoHandler) LikeMemo(c echo.Context) error {
 	currentUser := (&ctx).CurrentUser()
 
 	var guestID string
+	var guestName string
 	if currentUser != nil {
 		userId := int(currentUser.Id)
 		if err = m.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; err == nil {
@@ -390,12 +391,14 @@ func (m MemoHandler) LikeMemo(c echo.Context) error {
 		}
 	} else {
 		guestID = c.QueryParam("guest_id")
+		guestName = c.QueryParam("guest_name")
 		if err = m.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; err == nil {
 			return FailRespWithMsg(c, Fail, "您已经点赞过了")
 		}
 		like = db.Like{
-			MemoID:  id,
-			GuestID: guestID,
+			MemoID:    id,
+			GuestID:   guestID,
+			GuestName: guestName,
 		}
 	}
 
@@ -462,7 +465,8 @@ func (m MemoHandler) GetLike(c echo.Context) error {
 				info["name"] = user.Nickname
 			}
 		} else {
-			info["name"] = like.GuestID
+			info["id"] = like.GuestID
+            info["name"] = like.GuestName
 		}
 		likeInfo = append(likeInfo, info)
 	}
