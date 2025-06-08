@@ -270,10 +270,10 @@
                 @click="likeShowAll = !likeShowAll" 
                 class="cursor-pointer"
               >
-              <span v-if="likeNum > 3">
-                <span v-if="likeShowAll" class="text-gray-400">[收起]</span>
-                <span v-else>等{{ likeNum }}位称赞</span>
-              </span>
+                <span v-if="likeNum > 3">
+                  <span v-if="likeShowAll" class="text-gray-400">[收起]</span>
+                  <span v-else>等{{ likeNum }}位称赞</span>
+                </span>
               </span>
             </div>
           </div>
