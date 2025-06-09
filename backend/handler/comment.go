@@ -146,21 +146,18 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	if context, ok := ctx.(CustomContext); ok {
 		currentUser := context.CurrentUser()
 		if currentUser == nil {
-			// 未登录用户必须提供guest_id
 			if req.GuestID == "" {
-				return FailRespWithMsg(ctx, ParamError, "未登录用户必须提供guest_id")
+				return FailRespWithMsg(ctx, ParamError, "访客ID必填,请先登录或注册")
 			}
 			comment.GuestID = req.GuestID
 
-			// 优先使用用户自定义输入的信息
 			if req.Username != "" {
-				// 验证访客输入的姓名是否与注册用户的用户名或昵称重复
+				// 检查访客是否输入了注册时相同的用户名，如果相同则在用户名后添加随机后缀
 				var userCount int64
 				c.base.db.Model(&db.User{}).Where("username = ? OR nickname = ?", req.Username, req.Username).Count(&userCount)
 				if userCount > 0 {
-					// 生成 6 位 UUID 后缀
 					suffix := uuid.New().String()[:6]
-					req.Username = fmt.Sprintf("%s_%s", req.Username, suffix)
+					req.Username = fmt.Sprintf("%s%s", req.Username, suffix)
 				}
 				comment.Username = req.Username
 			} else {
@@ -176,7 +173,6 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 		}
 	}
 
-	// 其他字段处理
 	comment.Content = req.Content
 	comment.CreatedAt = &now
 	comment.UpdatedAt = &now

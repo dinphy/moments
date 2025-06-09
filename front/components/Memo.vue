@@ -437,10 +437,10 @@ const likeMemo = async (id: number) => {
   try {
     const guestId = await getGuestId();
     if (!guestId) return;
-    let params = `id=${id}&guest_id=${guestId}`;
+    let params = `id=${id}&guestId=${guestId}`;
     const guestName = localCommentUserinfo.value.username;
     if (guestName) {
-      params += `&guest_name=${guestName}`;
+      params += `&guestName=${guestName}`;
     }
 
     if (sysConfig.value.enableGoogleRecaptcha) {
@@ -492,10 +492,10 @@ const unlikeMemo = async (id: number) => {
   try {
     const guestId = await getGuestId();
     if (!guestId) return;
-    let params = `id=${id}&guest_id=${guestId}`;
+    let params = `id=${id}&guestId=${guestId}`;
     const guestName = localCommentUserinfo.value.username;
     if (guestName) {
-      params += `&guest_name=${guestName}`;
+      params += `&guestName=${guestName}`;
     }
 
     if (sysConfig.value.enableGoogleRecaptcha) {
@@ -529,7 +529,7 @@ const unlikeMemo = async (id: number) => {
 const getLike = async (id: number) => {
   const guestId = await getGuestId();
   if (!guestId) return;
-  let params = `id=${id}&guest_id=${guestId}`;
+  let params = `id=${id}&guestId=${guestId}`;
 
   try {
     const response = await useMyFetch<{

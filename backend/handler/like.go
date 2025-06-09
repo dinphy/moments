@@ -86,7 +86,7 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 	var guestName string
 	if currentUser != nil {
 		userId := int(currentUser.Id)
-		if err = l.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; err == nil {
+		if err = l.base.db.Where("memoId = ? AND userId = ?", id, userId).First(&like).Error; err == nil {
 			return FailRespWithMsg(c, Fail, "您已经点赞过了")
 		}
 		like = db.Like{
@@ -94,9 +94,21 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 			UserID: &userId,
 		}
 	} else {
-		guestID = c.QueryParam("guest_id")
-		guestName = c.QueryParam("guest_name")
-		if err = l.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; err == nil {
+		guestID = c.QueryParam("guestId")
+		// 检查是否存在关联评论，如果存在则使用评论的用户名，否则使用guestID作为默认名称
+		var comment db.Comment
+		err := l.base.db.Where("guestId = ?", guestID).Order("createdAt DESC").First(&comment).Error
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				guestName = guestID
+			} else {
+				return FailRespWithMsg(c, Fail, "查询评论失败")
+			}
+		} else {
+			// 使用评论处理后的用户名
+			guestName = comment.Username
+		}
+		if err = l.base.db.Where("memoId = ? AND guestId = ?", id, guestID).First(&like).Error; err == nil {
 			return FailRespWithMsg(c, Fail, "您已经点赞过了")
 		}
 		like = db.Like{
@@ -106,7 +118,6 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 		}
 	}
 
-	// 开启事务
 	tx := l.base.db.Begin()
 	if tx.Error != nil {
 		l.base.log.Error().Err(tx.Error).Msg("开启事务失败")
@@ -114,12 +125,10 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 	}
 
 	if err = tx.Create(&like).Error; err != nil {
-		// 回滚事务
 		tx.Rollback()
 		return FailRespWithMsg(c, Fail, "点赞失败")
 	}
 
-	// 提交事务
 	if err = tx.Commit().Error; err != nil {
 		return FailRespWithMsg(c, Fail, "提交事务失败")
 	}
@@ -139,7 +148,7 @@ func (l LikeHandler) GetLike(c echo.Context) error {
 		return FailResp(c, ParamError)
 	}
 
-	if err = l.base.db.Where("memo_id = ?", id).Find(&likes).Error; err != nil {
+	if err = l.base.db.Where("memoId = ?", id).Find(&likes).Error; err != nil {
 		return FailRespWithMsg(c, Fail, "获取点赞信息失败")
 	}
 
@@ -170,7 +179,7 @@ func (l LikeHandler) GetLike(c echo.Context) error {
 			}
 		} else {
 			info["id"] = like.GuestID
-            info["name"] = like.GuestName
+			info["name"] = like.GuestName
 		}
 		likeInfo = append(likeInfo, info)
 	}
@@ -223,29 +232,26 @@ func (l LikeHandler) RemoveLike(c echo.Context) error {
 
 	if currentUser != nil {
 		userId := int(currentUser.Id)
-		if err = l.base.db.Where("memo_id = ? AND user_id = ?", id, userId).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		if err = l.base.db.Where("memoId = ? AND userId = ?", id, userId).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			return FailRespWithMsg(c, Fail, "您还没有点赞过")
 		}
 	} else {
-		guestID := c.QueryParam("guest_id")
-		if err = l.base.db.Where("memo_id = ? AND guest_id = ?", id, guestID).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		guestID := c.QueryParam("guestId")
+		if err = l.base.db.Where("memoId = ? AND guestId = ?", id, guestID).First(&like).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 			return FailRespWithMsg(c, Fail, "您还没有点赞过")
 		}
 	}
 
-	// 开启事务
 	tx := l.base.db.Begin()
 	if tx.Error != nil {
 		return FailRespWithMsg(c, Fail, "开启事务失败")
 	}
 
 	if err = tx.Delete(&like).Error; err != nil {
-		// 回滚事务
 		tx.Rollback()
 		return FailRespWithMsg(c, Fail, "取消点赞失败")
 	}
 
-	// 提交事务
 	if err = tx.Commit().Error; err != nil {
 		return FailRespWithMsg(c, Fail, "提交事务失败")
 	}
@@ -255,8 +261,7 @@ func (l LikeHandler) RemoveLike(c echo.Context) error {
 
 // @Router /api/like/setGuestId [post]
 func (l LikeHandler) SetGuestId(c echo.Context) error {
-	// 从 cookie 中获取访客信息
-	cookie, err := c.Cookie("guest_info")
+	cookie, err := c.Cookie("guestInfo")
 	if err == nil {
 		decodedValue, err := url.QueryUnescape(cookie.Value)
 		if err == nil {
@@ -269,26 +274,22 @@ func (l LikeHandler) SetGuestId(c echo.Context) error {
 		}
 	}
 
-	// 生成新的访客 ID
-	newGuestId := fmt.Sprintf("访客_%s", uuid.New().String()[:6])
+	newGuestId := fmt.Sprintf("访客%s", uuid.New().String()[:6])
 	data := vo.GuestInfo{
 		GuestId:   newGuestId,
 		TimeStamp: time.Now().Unix(),
 	}
 
-	// 构建并设置新的 cookie
+	// 将数据编码为 JSON 字符串，并将其转义以安全存储在 Cookie 中
 	cookieData, err := json.Marshal(data)
 	if err != nil {
 		l.base.log.Error().Msgf("Failed to marshal guest data: %v", err)
 	}
 
 	encodedValue := url.QueryEscape(string(cookieData))
-
-	// 根据请求协议动态设置 Secure 属性
 	secure := c.Scheme() == "https"
-
 	c.SetCookie(&http.Cookie{
-		Name:     "guest_info",
+		Name:     "guestInfo",
 		Value:    encodedValue,
 		Path:     "/",
 		Expires:  time.Now().Add(7 * 24 * time.Hour),

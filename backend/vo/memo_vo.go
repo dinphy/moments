@@ -82,6 +82,6 @@ type ImgConfig struct {
 }
 
 type GuestInfo struct {
-    GuestId   string `json:"guestId"`
-    TimeStamp int64  `json:"timestamp"`
+    GuestId   string `json:"guestId,omitempty"`
+    TimeStamp int64  `json:"timestamp,omitempty"`
 }
