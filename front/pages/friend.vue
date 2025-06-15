@@ -169,14 +169,15 @@ const addFriend = async () => {
     showAddModal.value = false;
     friend.value = { ...DEFAULT_FRIEND };
   } catch (error) {
-    toast.error(`${message}` || "添加友情链接失败");
+    toast.error(`${onmessage}` || "添加友情链接失败");
   }
 };
 
 const getFriendList = async () => {
   try {
     const response = await useMyFetch("/friend/list");
-    friendList.value = response.list as Friend[];
+    const typedResponse = response as { list: Friend[] };
+    friendList.value = typedResponse.list;
   } catch (error) {
     friendList.value = [];
   }
@@ -207,7 +208,7 @@ const deleteFriend = async (id: number) => {
     await getFriendList();
     showDeleteModal.value = false;
   } catch (error) {
-    toast.error(`${message}` || "删除友情链接失败");
+    toast.error(`${onmessage}` || "删除友情链接失败");
   }
 };
 
