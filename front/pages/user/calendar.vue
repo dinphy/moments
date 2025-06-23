@@ -36,12 +36,12 @@
       </div>
       <div
           class="flex items-center text-sm text-gray-500 gap-1 border-b pb-4"
-          :class="[state.contentContains || state.total ? 'justify-between' : 'justify-end']"
+          :class="[(state.isSearching || state.total !== undefined) ? 'justify-between' : 'justify-end']"
       >
-          <span v-if="state.contentContains">
+          <span v-if="state.isSearching">
             正在检索<UBadge class="text-neutral mx-1" variant="outline">{{ state.contentContains }}</UBadge>中..
           </span>
-          <span v-else-if="state.total">
+          <span v-else-if="state.total !== undefined">
             <UBadge variant="solid">共 {{ state.total }} 条内容</UBadge>
           </span>
           <span v-else class="flex-1">暂无相关内容</span>
@@ -109,7 +109,7 @@
     <div class="flex flex-col divide-y divide-[#C0BEBF]/20 ">
       <Memo v-bind:memo="m" v-for="m in memos" :key="m.id"/>
     </div>
-    <div ref="loadMoreEle" class="text-xs text-center text-gray-500 py-2" @click="loadMore" v-if="hasNext">
+    <div ref="loadMoreEle" class="text-xs text-center text-gray-500 py-2 cursor-pointer" @click="loadMore" v-if="hasNext">
       点击加载更多
     </div>
     <div class="text-xs text-center text-gray-500 py-2" @click="loadMore" v-else>
@@ -119,8 +119,9 @@
 </template>
 
 <script setup lang="ts">
-import type {MemoVO, UserVO} from "~/types";
-import {add, format, isSameDay, sub} from "date-fns";
+import type {MemoVO, UserVO, SysConfigVO} from "~/types";
+
+import {isSameDay, sub} from "date-fns";
 import Memo from "~/components/Memo.vue";
 import {memoChangedEvent, memoReloadEvent} from "~/event";
 import {useElementVisibility} from '@vueuse/core'
@@ -142,6 +143,7 @@ const state = reactive({
   tags: [],
   showType: -1,
   total: 0,
+  isSearching: false,
   range: {
     start: new Date(1970, 0, 1),
     end: new Date(2100, 0, 1)
@@ -175,11 +177,13 @@ const loadTags = async () => {
 
 const loadMoreEle = ref(null)
 const targetIsVisible = useElementVisibility(loadMoreEle)
+const sysConfig = useState<SysConfigVO>("sysConfig")
+
 watch(targetIsVisible, async (visible) => {
-  if (visible) {
+  if (visible && sysConfig.value?.enableAutoLoadNextPage) {
     await loadMore()
   }
-})
+});
 const hasNext = ref(false)
 
 const memos = ref<Array<MemoVO>>([])
@@ -190,12 +194,12 @@ onMounted(async () => {
 
 const reload = async () => {
   state.page = 1
+  state.isSearching = true
   const res = await useMyFetch<{
     list: Array<MemoVO>,
     total: number,
     hasNext: boolean
   }>('/memo/list', {
-    page: state.page,
     size: state.size,
     start: state.range.start,
     end: state.range.end,
@@ -206,7 +210,7 @@ const reload = async () => {
   memos.value = res.list
   hasNext.value = res.hasNext
   state.total = res.total
-  state.contentContains = ''
+  state.isSearching = false
 }
 
 const loadMore = async () => {
