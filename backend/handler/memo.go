@@ -428,17 +428,28 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 
 	// 处理自定义时间
 	if req.CustomTime != "" {
-		// 前端发送的时间格式为"2006-01-02T15:04"或"2006-01-02 15:04:05"
-		customTime, err := time.ParseInLocation("2006-01-02T15:04", req.CustomTime, time.Local)
-		if err != nil {
-			// 尝试另一种格式
-			customTime, err = time.ParseInLocation("2006-01-02 15:04:05", req.CustomTime, time.Local)
-			if err != nil {
-				m.base.log.Error().Msgf("解析自定义时间失败: %v, 输入: %s", err, req.CustomTime)
-				return FailRespWithMsg(c, ParamError, "自定义时间格式错误，请输入类似'2023-01-01 12:00:00'或'2023-01-01T12:00'的格式")
+		var customTime time.Time
+		var err error
+		timeFormats := []string{
+			"2006-01-02T15:04",
+			"2006-01-02 15:04:05",
+			"2006-01-02 15:04",
+			"2006-01-02T15:04:05",
+			time.RFC3339,
+		}
+
+		for _, format := range timeFormats {
+			customTime, err = time.ParseInLocation(format, req.CustomTime, time.Local)
+			if err == nil {
+				break
 			}
 		}
-		// 转换为UTC时间存储
+
+		if err != nil {
+			m.base.log.Error().Msgf("解析自定义时间失败: %v, 输入: %s", err, req.CustomTime)
+			return FailRespWithMsg(c, ParamError, "自定义时间格式错误, 请使用正确的格式: 2006-01-02T15:04 或其他支持的格式")
+		}
+
 		utcTime := customTime.UTC()
 		memo.CustomTime = &utcTime
 	} else {
