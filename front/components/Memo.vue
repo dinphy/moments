@@ -131,8 +131,8 @@
           <div class="flex text-xs text-[#9DA4B0]">
             {{
               sysConfig.timeFormat === "timeAgo"
-                ? $dayjs(item.createdAt).fromNow()
-                : $dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss")
+                ? $dayjs(item.customTime || item.createdAt).utc().local().fromNow()
+                : $dayjs(item.customTime || item.createdAt).utc().local().format("YYYY-MM-DD HH:mm:ss")
             }}
           </div>
           <div

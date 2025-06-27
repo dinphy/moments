@@ -230,10 +230,10 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	})
 
 	if req.Start != nil {
-		tx = tx.Where("createdAt >= ?", req.Start)
+		tx = tx.Where("COALESCE(customTime, createdAt) >= ?", req.Start)
 	}
 	if req.End != nil {
-		tx = tx.Where("createdAt <= ?", req.End)
+		tx = tx.Where("COALESCE(customTime, createdAt) <= ?", req.End)
 	}
 	if req.ContentContains != "" {
 		tx = tx.Where("content like ?", "%"+req.ContentContains+"%")
@@ -266,7 +266,7 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	if req.UserId != nil {
 		tx = tx.Where("userId = ?", req.UserId)
 	}
-	tx.Session(&gorm.Session{}).Order("pinned desc, createdAt desc").Limit(req.Size).Offset(offset).Find(&list)
+	tx.Session(&gorm.Session{}).Order("pinned desc, COALESCE(customTime, createdAt) desc").Limit(req.Size).Offset(offset).Find(&list)
 	tx.Session(&gorm.Session{}).Count(&total)
 
 	for i, memo := range list {
@@ -320,7 +320,7 @@ func (m MemoHandler) RemoveMemo(c echo.Context) error {
 	if memo.Imgs != "" {
 		// 删除memo的图片关系
 		_ = m.updateImageRel(m.base.db, memo.Id, []int32{})
-			}
+	}
 
 	return SuccessResp(c, h{})
 }
@@ -426,6 +426,25 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 	memo.Ext = extJson
 	memo.ShowType = req.ShowType
 
+	// 处理自定义时间
+	if req.CustomTime != "" {
+		// 前端发送的时间格式为"2006-01-02T15:04"或"2006-01-02 15:04:05"
+		customTime, err := time.ParseInLocation("2006-01-02T15:04", req.CustomTime, time.Local)
+		if err != nil {
+			// 尝试另一种格式
+			customTime, err = time.ParseInLocation("2006-01-02 15:04:05", req.CustomTime, time.Local)
+			if err != nil {
+				m.base.log.Error().Msgf("解析自定义时间失败: %v, 输入: %s", err, req.CustomTime)
+				return FailRespWithMsg(c, ParamError, "自定义时间格式错误，请输入类似'2023-01-01 12:00:00'或'2023-01-01T12:00'的格式")
+			}
+		}
+		// 转换为UTC时间存储
+		utcTime := customTime.UTC()
+		memo.CustomTime = &utcTime
+	} else {
+		memo.CustomTime = nil
+	}
+
 	// 事务处理
 	err = m.base.db.Transaction(func(tx *gorm.DB) error {
 		// 获取图片ID
@@ -435,7 +454,7 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 		}
 
 		// 创建memo
-	m.base.log.Info().Msgf("memo is %+v", memo)
+		m.base.log.Info().Msgf("memo is %+v", memo)
 		if err := tx.Save(&memo).Error; err != nil {
 			return err
 		}

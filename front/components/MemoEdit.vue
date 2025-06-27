@@ -64,7 +64,21 @@
         </UPopover>
       </div>
 
-      <div class="flex gap-1 text-gray-500 gap-4">
+      <div class="flex gap-1 text-gray-500">
+        <div class="flex gap-1 items-center">
+          <UIcon name="i-carbon-time" class="w-4 h-4"/>
+          <UPopover :popper="{ arrow: true }" mode="click">
+            <div class="cursor-pointer">
+              <span>{{ state.customTime !== undefined ? $dayjs(state.customTime).format("YYYY-MM-DD HH:mm:ss") : '默认时间' }}</span>
+            </div>
+            <template #panel="{close}">
+              <div class="p-4">
+                <UInput type="datetime-local" v-model="state.customTime"/>
+                <UButton @click="state.customTime = undefined; close()" color="white" variant="solid" class="mt-2">重置为默认</UButton>
+              </div>
+            </template>
+          </UPopover>
+        </div>
         <div class="flex gap-1 items-center">
           <span>{{ state.showType ? '公开' : '私密' }}</span>
           <UToggle v-model="state.showType"/>
@@ -103,6 +117,7 @@ import type {
 import {toast} from "vue-sonner";
 import UploadImage from "~/components/UploadImage.vue";
 import Emoji from "~/components/Emoji.vue";
+import dayjs from "dayjs";
 
 const doubanType = ref<'book' | 'movie'>('book')
 const doubanData = ref<DoubanBook | DoubanMovie>({})
@@ -119,6 +134,7 @@ const defaultState = {
   externalTitle: "",
   externalUrl: "",
   imgs: "",
+  customTime: undefined as string | undefined,
   music: {
     id: '',
     api: 'https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r',
@@ -248,6 +264,9 @@ onMounted(async () => {
     doubanType.value = ext.doubanBook && ext.doubanBook.title ? 'book' : 'movie'
     doubanData.value = doubanType.value === 'book' ? ext.doubanBook : ext.doubanMovie
     selectedLabel.value = res.tags ? res.tags.substring(0,res.tags.length-1).split(',') : []
+    state.customTime = dayjs(res.createdAt).locale("zh-cn").format("YYYY-MM-DD HH:mm")
+  } else {
+    state.customTime = dayjs().locale("zh-cn").format("YYYY-MM-DD HH:mm")
   }
   await loadTags()
 })
@@ -277,6 +296,7 @@ const saveMemo = async () => {
     imgs: state.imgs.split(",").filter(Boolean),
     location: state.location,
     tags: selectedLabel.value,
+    customTime: state.customTime,
   })
   toast.success("保存成功!")
   await navigateTo('/')

@@ -27,6 +27,7 @@ type Memo struct {
 	Comments        []Comment        `json:"comments,omitempty"`
 	Tags            *string          `json:"tags,omitempty"`
 	ImgConfigs      *[]*vo.ImgConfig `gorm:"-" json:"imgConfigs,omitempty"`
+	CustomTime      *time.Time       `gorm:"column:customTime" json:"customTime,omitempty"`
 }
 
 func (m *Memo) TableName() string {
