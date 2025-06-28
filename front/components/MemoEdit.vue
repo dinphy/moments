@@ -16,6 +16,15 @@
       <music v-bind="state.music" @confirm="updateMusic"/>
       <upload-video @confirm="handleVideo" v-bind="state.video"/>
       <douban-edit v-model:type="doubanType" v-model:data="doubanData"/>
+      <UPopover :popper="{ arrow: true }" mode="click">
+        <UIcon name="i-carbon-alarm" class="w-6 h-6" title="自定义时间"/>
+        <template #panel="{close}">
+          <div class="p-4">
+            <UInput type="datetime-local" v-model="state.customTime"/>
+            <UButton @click="state.customTime = undefined; close()" color="white" variant="solid" class="mt-2">重置为默认</UButton>
+          </div>
+        </template>
+      </UPopover>
       <UIcon name="i-carbon-text-clear-format" @click="reset" class="w-6 h-6 cursor-pointer" title="清空"></UIcon>
     </div>
 
@@ -65,20 +74,6 @@
       </div>
 
       <div class="flex gap-1 text-gray-500">
-        <div class="flex gap-1 items-center">
-          <UIcon name="i-carbon-time" class="w-4 h-4"/>
-          <UPopover :popper="{ arrow: true }" mode="click">
-            <div class="cursor-pointer">
-              <span>{{ state.customTime !== undefined ? $dayjs(state.customTime).format("YYYY-MM-DD HH:mm:ss") : '默认时间' }}</span>
-            </div>
-            <template #panel="{close}">
-              <div class="p-4">
-                <UInput type="datetime-local" v-model="state.customTime"/>
-                <UButton @click="state.customTime = undefined; close()" color="white" variant="solid" class="mt-2">重置为默认</UButton>
-              </div>
-            </template>
-          </UPopover>
-        </div>
         <div class="flex gap-1 items-center">
           <span>{{ state.showType ? '公开' : '私密' }}</span>
           <UToggle v-model="state.showType"/>

@@ -10,7 +10,7 @@
     title="到顶部"
     v-if="y > 200"
     @click="y = 0"
-    class="hidden sm:block bottom-[20%] sm:right-[20%] md:right-[10%] lg:right-[15%] xl:right-[20%] 2xl:right-[28%] fixed flex items-center justify-center"
+    class="hidden sm:block bottom-[20%] sm:right-[20%] md:right-[10%] lg:right-[15%] xl:right-[20%] 2xl:right-[28%] fixed items-center justify-center"
   >
     <UIcon
       name="i-lets-icons-expand-top-stop"
