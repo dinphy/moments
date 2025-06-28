@@ -73,11 +73,9 @@
         </UPopover>
       </div>
 
-      <div class="flex gap-1 text-gray-500">
-        <div class="flex gap-1 items-center">
-          <span>{{ state.showType ? '公开' : '私密' }}</span>
-          <UToggle v-model="state.showType"/>
-        </div>
+      <div class="flex gap-1 text-gray-500 items-center">
+        <span>{{ state.showType ? '公开' : '私密' }}</span>
+        <UToggle v-model="state.showType"/>
       </div>
     </div>
     
