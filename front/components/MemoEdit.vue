@@ -165,6 +165,11 @@ const selectedLabel = computed({
 const state = reactive({
   ...defaultState
 })
+
+if (!props.id) {
+  state.customTime = dayjs().format('YYYY-MM-DDTHH:mm');
+}
+
 const existTags = ref<string[]>([])
 const reset = () => {
   Object.assign(state, defaultState)
