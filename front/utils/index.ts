@@ -148,7 +148,7 @@ const uploadFile2Server = async (
     try {
       const file = files[i]
       const urlList = await uploadFile2ServerWithProgress(
-        "/api/file/uploadImage",
+        "/api/file/upload",
         file,
         progress => {
           if (onProgress) {
