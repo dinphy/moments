@@ -37,18 +37,18 @@ type Video struct {
 }
 
 type SaveMemoReq struct {
-	ID              int      `json:"id,omitempty"`              //Memo's ID
-	Content         string   `json:"content,omitempty"`         //正文
-	Ext             MemoExt  `json:"ext"`                       //扩展
-	Pinned          *bool    `json:"pinned,omitempty"`          //是否置顶
-	ShowType        *int32   `json:"showType,omitempty"`        //是否公开,1:公开,0:私有
-	ExternalFavicon string   `json:"externalFavicon,omitempty"` //外部站点favicon
-	ExternalTitle   string   `json:"externalTitle,omitempty"`   //外部站点标题
-	ExternalUrl     string   `json:"externalUrl,omitempty"`     //外部站点URL
-	Imgs            []string `json:"imgs,omitempty"`            //图片列表,最多9张
-	Location        string   `json:"location,omitempty"`        //地理位置
-	Tags            []string `json:"tags,omitempty"`            //标签数组
-	CustomTime      string   `json:"customTime,omitempty"`      //自定义时间
+	ID              int        `json:"id,omitempty"`              //Memo's ID
+	Content         string     `json:"content,omitempty"`         //正文
+	Ext             MemoExt    `json:"ext"`                       //扩展
+	Pinned          *bool      `json:"pinned,omitempty"`          //是否置顶
+	ShowType        *int32     `json:"showType,omitempty"`        //是否公开,1:公开,0:私有
+	ExternalFavicon string     `json:"externalFavicon,omitempty"` //外部站点favicon
+	ExternalTitle   string     `json:"externalTitle,omitempty"`   //外部站点标题
+	ExternalUrl     string     `json:"externalUrl,omitempty"`     //外部站点URL
+	Imgs            []string   `json:"imgs,omitempty"`            //图片列表,最多9张
+	Location        string     `json:"location,omitempty"`        //地理位置
+	Tags            []string   `json:"tags,omitempty"`            //标签数组
+	CreatedAt       *time.Time `json:"createdAt,omitempty"`       //创建时间
 }
 
 type DoubanMovie struct {

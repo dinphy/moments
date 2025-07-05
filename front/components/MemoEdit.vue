@@ -17,12 +17,16 @@
       <upload-video @confirm="handleVideo" v-bind="state.video"/>
       <douban-edit v-model:type="doubanType" v-model:data="doubanData"/>
       <UPopover :popper="{ arrow: true }" mode="click">
-        <UIcon name="i-carbon-alarm" class="w-6 h-6" title="自定义时间"/>
+        <UIcon name="i-carbon-calendar" class="w-6 h-6" title="自定义时间"/>
         <template #panel="{close}">
-          <div class="p-4">
-            <UInput type="datetime-local" v-model="state.customTime"/>
-            <UButton @click="state.customTime = undefined; close()" color="white" variant="solid" class="mt-2">重置为默认</UButton>
-          </div>
+          <DatePicker
+            v-model="state.createdAt"
+            mode="datetime"
+            is24hr
+            :time-accuracy="2"
+            :rules="{ seconds: 0 }"
+            @close="close"
+          />
         </template>
       </UPopover>
       <UIcon name="i-carbon-text-clear-format" @click="reset" class="w-6 h-6 cursor-pointer" title="清空"></UIcon>
@@ -43,7 +47,6 @@
           <span v-else>选择标签</span>
         </template>
       </USelectMenu>
-      
 
       <UContextMenu v-model="isOpen" :virtual-element="virtualElement">
         <div class="px-2 py-1 flex flex-col gap-2 text-xs">
@@ -78,7 +81,7 @@
         <UToggle v-model="state.showType"/>
       </div>
     </div>
-    
+
     <div class="flex flex-col gap-2">
       <external-url-preview :favicon="state.externalFavicon" :title="state.externalTitle" :url="state.externalUrl"/>
       <upload-image-preview :imgs="state.imgs" @remove-image="handleRemoveImage" @drag-image="handleDragImage"/>
@@ -118,6 +121,7 @@ const contentRef = ref(null)
 const props = defineProps<{ id?: number }>()
 const defaultState = {
   id: props.id || 0,
+  createdAt: '' as string,
   content: "",
   ext: "",
   pinned: false,
@@ -127,7 +131,6 @@ const defaultState = {
   externalTitle: "",
   externalUrl: "",
   imgs: "",
-  customTime: undefined as string | undefined,
   music: {
     id: '',
     api: 'https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r',
@@ -165,11 +168,6 @@ const selectedLabel = computed({
 const state = reactive({
   ...defaultState
 })
-
-if (!props.id) {
-  state.customTime = dayjs().format('YYYY-MM-DDTHH:mm');
-}
-
 const existTags = ref<string[]>([])
 const reset = () => {
   Object.assign(state, defaultState)
@@ -262,8 +260,7 @@ onMounted(async () => {
     doubanType.value = ext.doubanBook && ext.doubanBook.title ? 'book' : 'movie'
     doubanData.value = doubanType.value === 'book' ? ext.doubanBook : ext.doubanMovie
     selectedLabel.value = res.tags ? res.tags.substring(0,res.tags.length-1).split(',') : []
-    state.customTime = res.customTime ? dayjs(res.customTime).format("YYYY-MM-DD HH:mm") : 
-                                      (res.createdAt ? dayjs(res.createdAt).format("YYYY-MM-DD HH:mm") : '')
+    state.createdAt = dayjs(res.createdAt).format()
   }
   await loadTags()
 })
@@ -293,7 +290,7 @@ const saveMemo = async () => {
     imgs: state.imgs.split(",").filter(Boolean),
     location: state.location,
     tags: selectedLabel.value,
-    customTime: state.customTime,
+    createdAt: state.createdAt || dayjs().format(),
   })
   toast.success("保存成功!")
   await navigateTo('/')

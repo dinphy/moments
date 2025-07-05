@@ -55,7 +55,7 @@
     </UFormGroup>
     <UFormGroup label="日期格式" name="timeFormat" :ui="{label:{base:'font-bold'}}">
       <USelectMenu v-model="state.timeFormat"
-                   :options="[{label:'几分钟前',value:'timeAgo'},{label:'2024-07-24 09:56:55',value:'time'}]"
+                   :options="[{label:'几分钟前',value:'timeAgo'},{label:$dayjs().format('YYYY-MM-DD HH:mm'),value:'time'}]"
                    value-attribute="value" option-attribute="label"></USelectMenu>
     </UFormGroup>
       <UFormGroup label="是否启用Google Recaptcha" name="enableGoogleRecaptcha" :ui="{label:{base:'font-bold'}}">
@@ -112,7 +112,7 @@
         <UInput v-model="state.smtpPassword" type="password"/>
       </UFormGroup>
       </template>
-    
+
     <UButton class="justify-center" @click="save">保存</UButton>
   </div>
 </template>

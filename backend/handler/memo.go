@@ -176,10 +176,10 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	})
 
 	if req.Start != nil {
-		tx = tx.Where("COALESCE(customTime, createdAt) >= ?", req.Start)
+		tx = tx.Where("createdAt >= ?", req.Start)
 	}
 	if req.End != nil {
-		tx = tx.Where("COALESCE(customTime, createdAt) <= ?", req.End)
+		tx = tx.Where("createdAt <= ?", req.End)
 	}
 	if req.ContentContains != "" {
 		tx = tx.Where("content like ?", "%"+req.ContentContains+"%")
@@ -189,8 +189,10 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	}
 	if currentUser == nil {
 		tx = tx.Where("showType = 1")
+		tx = tx.Where("createdAt <= ?", time.Now())
 	} else {
 		tx = tx.Where("userId = ? or (userId <> ? and showType = 1)", currentUser.Id, currentUser.Id)
+		tx = tx.Where("userId = ? or createdAt <= ?", currentUser.Id, time.Now())
 	}
 	if req.Tag != "" {
 		if strings.Contains(req.Tag, ",") {
@@ -212,7 +214,7 @@ func (m MemoHandler) ListMemos(c echo.Context) error {
 	if req.UserId != nil {
 		tx = tx.Where("userId = ?", req.UserId)
 	}
-	tx.Session(&gorm.Session{}).Order("pinned desc, COALESCE(customTime, createdAt) desc").Limit(req.Size).Offset(offset).Find(&list)
+	tx.Session(&gorm.Session{}).Order("pinned desc, createdAt desc").Limit(req.Size).Offset(offset).Find(&list)
 	tx.Session(&gorm.Session{}).Count(&total)
 
 	for i, memo := range list {
@@ -382,34 +384,9 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 	memo.ShowType = req.ShowType
 
 	// 处理自定义时间
-	if req.CustomTime != "" {
-		var customTime time.Time
-		var err error
-		timeFormats := []string{
-			"2006-01-02T15:04",
-			"2006-01-02 15:04:05",
-			"2006-01-02 15:04",
-			"2006-01-02T15:04:05",
-			time.RFC3339,
+	if req.CreatedAt != nil {
+		*memo.CreatedAt = req.CreatedAt.Local()
 		}
-
-		for _, format := range timeFormats {
-			customTime, err = time.ParseInLocation(format, req.CustomTime, time.Local)
-			if err == nil {
-				break
-			}
-		}
-
-		if err != nil {
-			m.base.log.Error().Msgf("解析自定义时间失败: %v, 输入: %s", err, req.CustomTime)
-			return FailRespWithMsg(c, ParamError, "自定义时间格式错误, 请使用正确的格式: 2006-01-02T15:04 或其他支持的格式")
-		}
-
-		utcTime := customTime.UTC()
-		memo.CustomTime = &utcTime
-	} else {
-		memo.CustomTime = nil
-	}
 
 	m.base.log.Info().Msgf("memo is %+v", memo)
 	m.base.db.Save(&memo)

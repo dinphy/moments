@@ -5,7 +5,7 @@ import 'v-calendar/dist/style.css'
 
 const props = defineProps({
   modelValue: {
-    type: [Date, Object] as PropType<DatePickerDate | DatePickerRangeObject | null>,
+    type: null as DatePickerDate | DatePickerRangeObject,
     default: null
   }
 })
@@ -13,10 +13,17 @@ const props = defineProps({
 const emit = defineEmits(['update:model-value', 'close'])
 
 const date = computed({
-  get: () => props.modelValue,
+  get: () => {
+    let value = props.modelValue
+    if (!value) {
+      value = new Date()
+      emit('update:model-value', value)
+    }
+
+    return value
+  },
   set: (value) => {
     emit('update:model-value', value)
-    emit('close')
   }
 })
 
@@ -33,7 +40,7 @@ const columns = document.body.clientWidth < 520 ? 1 : 2
 </script>
 
 <template>
-  <VCalendarDatePicker v-if="date && (typeof date === 'object')" v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />
+  <VCalendarDatePicker v-if="date.start && date.end" v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />
   <VCalendarDatePicker v-else v-model="date" v-bind="{ ...attrs, ...$attrs }" />
 </template>
 
@@ -65,6 +72,6 @@ const columns = document.body.clientWidth < 520 ? 1 : 2
 }
 
 .vc-container{
-  width:100%;
+  width: 100%;
 }
 </style>
