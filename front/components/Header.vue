@@ -156,6 +156,7 @@
         </div>
       </div>
     </div>
+    <MessageBox v-if="$route.path === '/' && global.userinfo.token" />
     <LoginReg v-model="loginReg" />
   </div>
 </template>

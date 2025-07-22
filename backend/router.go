@@ -18,6 +18,7 @@ func setupRouter(injector do.Injector) {
 	fileHandler := handler.NewFileHandler(injector)
 	tagHandler := handler.NewTagHandler(injector)
 	rssHandler := handler.NewRssHandler(injector)
+	messageHandler := handler.NewMessageHandler(injector)
 	e := do.MustInvoke[*echo.Echo](injector)
 	cfg := do.MustInvoke[*vo.AppConfig](injector)
 
@@ -79,6 +80,11 @@ func setupRouter(injector do.Injector) {
 	friendGroup.POST("/list", friendHandler.GetFriendList)
 	friendGroup.POST("/add", friendHandler.AddFriend)
 	friendGroup.POST("/delete", friendHandler.DeleteFriend)
+
+	messageGroup := apiGroup.Group("/message")
+	messageGroup.GET("/unread", messageHandler.GetUnreadMessages)
+	messageGroup.POST("/read", messageHandler.MarkMessageAsRead)
+	messageGroup.POST("/read-all", messageHandler.MarkAllMessagesAsRead)
 
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)

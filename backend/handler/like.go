@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -135,6 +136,40 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 		return FailRespWithMsg(c, Fail, "提交事务失败")
 	}
 
+	// 创建消息通知
+	var fromUserId int32
+	var fromGuestId string
+	var fromName string
+
+	if currentUser != nil {
+		fromUserId = currentUser.Id
+		fromName = currentUser.Nickname
+	} else {
+		fromGuestId = guestID
+		fromName = guestName
+	}
+
+	// 创建消息
+	content := fmt.Sprintf("点赞了动态 #%d", like.MemoID)
+	now := time.Now()
+	message := db.Message{
+		UserId:      memo.UserId,
+		Type:        "like",
+		Content:     content,
+		RelatedId:   int32(like.Id),
+		MemoId:      int32(id),
+		IsRead:      false,
+		CreatedAt:   &now,
+		FromUserId:  fromUserId,
+		FromGuestId: fromGuestId,
+		FromName:    fromName,
+	}
+
+	// 保存消息
+	if err := l.base.db.Save(&message).Error; err != nil {
+		l.base.log.Error().Err(err).Msg("保存消息失败")
+	}
+
 	return SuccessResp(c, h{})
 }
 
@@ -249,6 +284,20 @@ func (l LikeHandler) RemoveLike(c echo.Context) error {
 		return FailRespWithMsg(c, Fail, "开启事务失败")
 	}
 
+	// 查找对应的点赞消息
+	var message db.Message
+	if err = tx.Where("type = ? AND related_id = ? AND memo_id = ?", "like", like.Id, id).First(&message).Error; err != nil {
+		// 如果没有找到消息，继续执行，不影响取消点赞操作
+		l.base.log.Warn().Err(err).Msg("未找到对应的点赞消息")
+	} else {
+		// 删除消息
+		if err = tx.Delete(&message).Error; err != nil {
+			tx.Rollback()
+			return FailRespWithMsg(c, Fail, "删除点赞消息失败")
+		}
+	}
+
+	// 删除点赞记录
 	if err = tx.Delete(&like).Error; err != nil {
 		tx.Rollback()
 		return FailRespWithMsg(c, Fail, "取消点赞失败")

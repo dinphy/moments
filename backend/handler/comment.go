@@ -63,6 +63,13 @@ func (c CommentHandler) RemoveComment(ctx echo.Context) error {
 	if c.base.db.Delete(&comment).RowsAffected != 1 {
 		return FailRespWithMsg(ctx, Fail, "删除失败")
 	}
+
+	// 删除对应的评论消息
+	var message db.Message
+	if err := c.base.db.Where("type = ? AND related_id = ? AND memo_id = ?", "comment", comment.Id, comment.MemoId).Delete(&message).Error; err != nil {
+		c.base.log.Error().Err(err).Msg("删除评论消息失败")
+	}
+
 	return SuccessResp(ctx, h{})
 }
 
@@ -201,6 +208,44 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	comment.MemoId = req.MemoID
 
 	if err = c.base.db.Save(&comment).Error; err == nil {
+		// 创建消息通知
+		var memo db.Memo
+		if err := c.base.db.First(&memo, comment.MemoId).Error; err == nil {
+			var fromUserId int32
+			var fromGuestId string
+			var fromName string
+
+			if context, ok := ctx.(CustomContext); ok {
+				currentUser := context.CurrentUser()
+				if currentUser != nil {
+					fromUserId = currentUser.Id
+					fromName = currentUser.Nickname
+				} else {
+					fromGuestId = comment.GuestID
+					fromName = comment.Username
+				}
+			}
+
+			// 创建消息
+			message := db.Message{
+				UserId:      memo.UserId,
+				Type:        "comment",
+				Content:     comment.Content,
+				RelatedId:   comment.Id,
+				MemoId:      comment.MemoId,
+				IsRead:      false,
+				CreatedAt:   &now,
+				FromUserId:  fromUserId,
+				FromGuestId: fromGuestId,
+				FromName:    fromName,
+			}
+
+			// 保存消息
+			if err := c.base.db.Save(&message).Error; err != nil {
+				c.base.log.Error().Err(err).Msg("保存消息失败")
+			}
+		}
+
 		go func() {
 			frontendHost := fmt.Sprintf("%s://%s", ctx.Scheme(), ctx.Request().Host)
 			if err = c.commentEmailNotification(comment, frontendHost); err != nil {
