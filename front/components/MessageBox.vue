@@ -66,32 +66,37 @@
               {{ message.fromName.charAt(0) }}
             </span>
           </div>
-          <div class="flex-grow">
-            <div class="flex justify-between items-center">
+          <div class="flex-grow mr-3">
+            <div class="flex flex-wrap items-center gap-2">
               <span
                 class="text-sm font-medium text-gray-800 dark:text-gray-200"
               >
                 {{ message.fromName }}
               </span>
               <span class="text-xs text-gray-500 dark:text-gray-400">
-                {{
-                  sysConfig.timeFormat === "timeAgo"
-                    ? $dayjs(message.createdAt).fromNow()
-                    : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm")
-                }}
+                {{ sysConfig.timeFormat === "timeAgo" ? $dayjs(message.createdAt).fromNow() : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm") }}
               </span>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {{
-                message.type === "comment" && message.content.length > 20
-                  ? message.content.substring(0, 20) + "..."
-                  : message.content
-              }}
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
+              {{ message.content }}
             </p>
+          </div>
+          <div class="flex-shrink-0 w-16 h-16 rounded overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center">
+            <img
+              v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
+              :src="memoImages[message.memoId][0]"
+              alt="Message image"
+              class="w-full h-full object-cover"
+            />
+            <span v-else-if="memoContents[message.memoId]" class="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
+            </span>
+            <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
+              无内容
+            </span>
           </div>
           <div
             v-if="!message.isRead"
-            class="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 ml-2"
+            class="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 ml-2 mt-2"
           ></div>
         </div>
       </div>
@@ -103,6 +108,7 @@
 import { useGlobalState } from "~/store";
 import type { SysConfigVO } from "~/types";
 import { messageChangedEvent } from "~/event";
+import { md } from "~/utils";
 
 const global = useGlobalState();
 const sysConfig = useState<SysConfigVO>("sysConfig");
@@ -110,6 +116,10 @@ const showMessageBox = ref(false);
 const messages = ref<any[]>([]);
 const unreadCount = ref(0);
 const fetching = ref(false);
+const memoImages = ref<Record<number, string[]>>({});
+const memoContents = ref<Record<number, string>>({});
+const fetchingMemoImages = ref<Record<number, boolean>>({});
+const showMoreClicked = ref(false);
 
 const toggleMessageBox = () => {
   showMessageBox.value = !showMessageBox.value;
@@ -137,6 +147,8 @@ const fetchUnreadMessages = async () => {
       if (data.code === 0) {
         messages.value = data.data.list;
         unreadCount.value = data.data.total;
+        // 获取相关动态的图片
+        fetchMemoImages();
       }
     }
   } catch (error) {
@@ -144,6 +156,45 @@ const fetchUnreadMessages = async () => {
   } finally {
     fetching.value = false;
   }
+};
+
+// 渲染markdown内容
+const renderMarkdown = (content: string) => {
+  if (content.length > 20 && !showMoreClicked.value) {
+    const truncated = content.substring(0, 20) + '...';
+    return md.render(truncated);
+  }
+  return md.render(content);
+}
+
+// 获取动态图片
+const fetchMemoImages = () => {
+  if (!messages.value || messages.value.length === 0) return;
+
+  messages.value.forEach(async (message) => {
+    if (message.memoId && !fetchingMemoImages.value[message.memoId] && !memoImages.value[message.memoId]) {
+      fetchingMemoImages.value[message.memoId] = true;
+      try {
+        // 获取单个动态数据，将id作为查询参数传递
+        const memo = await useMyFetch<any>(`/memo/get?id=${message.memoId}`);
+
+        if (memo) {
+          // 存储memo内容
+          memoContents.value[message.memoId] = memo.content || '';
+          
+          // 解析图片字符串为数组
+          if (memo.imgs) {
+            const imgs = memo.imgs.split(',').filter((img: string) => img.trim() !== '');
+            memoImages.value[message.memoId] = imgs;
+          }
+        }
+      } catch (error) {
+        console.error(`获取动态 ${message.memoId} 图片失败:`, error);
+      } finally {
+        fetchingMemoImages.value[message.memoId] = false;
+      }
+    }
+  });
 };
 
 // 标记消息为已读
