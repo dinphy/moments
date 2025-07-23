@@ -26,7 +26,7 @@
     </span>
     
   </div>
-  <CommentBox :memo-id="props.memoId" :reply-to="props.comment.username" :comment-id="props.comment.id" :reply-email="props.comment.email"/>
+  <CommentBox :memo-id="props.memoId" :reply-to="props.comment.username" :comment-id="props.comment.id" :reply-email="props.comment.email" :memo-user-id="props.memoUserId"/>
 </template>
 
 <script setup lang="ts">
@@ -55,7 +55,9 @@ const removeComment = async () => {
   await useMyFetch('/comment/remove?id=' + props.comment.id)
   toast.success("删除成功!")
   memoChangedEvent.emit(props.memoId)
-  messageChangedEvent.emit(-1)
+  if (global.value.userinfo.id !== props.comment.author) {
+    messageChangedEvent.emit(-1)
+  }
 }
 const formatWebsite = (website: string) => {
   if (/^https?:\/\//i.test(website)) {

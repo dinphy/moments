@@ -64,10 +64,24 @@ func (c CommentHandler) RemoveComment(ctx echo.Context) error {
 		return FailRespWithMsg(ctx, Fail, "删除失败")
 	}
 
-	// 删除对应的评论消息
+	// 只有当评论者不是动态发布者时，才尝试删除对应的消息
 	var message db.Message
-	if err := c.base.db.Where("type = ? AND related_id = ? AND memo_id = ?", "comment", comment.Id, comment.MemoId).Delete(&message).Error; err != nil {
-		c.base.log.Error().Err(err).Msg("删除评论消息失败")
+	var fromUserId int32
+	var fromGuestId string
+	
+	// 获取评论者信息
+	if comment.Author != "" {
+		authorId, _ := strconv.ParseInt(comment.Author, 10, 32)
+		fromUserId = int32(authorId)
+	} else {
+		fromGuestId = comment.GuestID
+	}
+	
+	// 检查评论者是否是动态发布者
+	if (fromUserId > 0 && fromUserId != memo.UserId) || (fromGuestId != "") {
+		if err := c.base.db.Where("type = ? AND related_id = ? AND memo_id = ?", "comment", comment.Id, comment.MemoId).Delete(&message).Error; err != nil {
+			c.base.log.Error().Err(err).Msg("删除评论消息失败")
+		}
 	}
 
 	return SuccessResp(ctx, h{})
@@ -226,23 +240,26 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 				}
 			}
 
-			// 创建消息
-			message := db.Message{
-				UserId:      memo.UserId,
-				Type:        "comment",
-				Content:     comment.Content,
-				RelatedId:   comment.Id,
-				MemoId:      comment.MemoId,
-				IsRead:      false,
-				CreatedAt:   &now,
-				FromUserId:  fromUserId,
-				FromGuestId: fromGuestId,
-				FromName:    fromName,
-			}
+			// 只有当评论者不是动态发布者时才创建消息
+			if (fromUserId > 0 && fromUserId != memo.UserId) || (fromGuestId != "") {
+				// 创建消息
+				message := db.Message{
+					UserId:      memo.UserId,
+					Type:        "comment",
+					Content:     comment.Content,
+					RelatedId:   comment.Id,
+					MemoId:      comment.MemoId,
+					IsRead:      false,
+					CreatedAt:   &now,
+					FromUserId:  fromUserId,
+					FromGuestId: fromGuestId,
+					FromName:    fromName,
+				}
 
-			// 保存消息
-			if err := c.base.db.Save(&message).Error; err != nil {
-				c.base.log.Error().Err(err).Msg("保存消息失败")
+				// 保存消息
+				if err := c.base.db.Save(&message).Error; err != nil {
+					c.base.log.Error().Err(err).Msg("保存消息失败")
+				}
 			}
 		}
 

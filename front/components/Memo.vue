@@ -281,7 +281,7 @@
             </div>
           </div>
           <div class="flex flex-col gap-1" v-if="sysConfig.enableComment">
-            <CommentBox :comment-id="0" :memo-id="item.id" />
+            <CommentBox :comment-id="0" :memo-id="item.id" :memo-user-id="item.user.id" />
             <div
               class="space-y-1"
               :class="[item.comments && item.comments.length > 0 ? 'py-2' : '']"
@@ -464,7 +464,9 @@ const likeMemo = async (id: number) => {
       await doLike(params);
       await getLike(id);
       memoChangedEvent.emit(id);
-      messageChangedEvent.emit(1);
+      if (global.value.userinfo.id !== item.value.userId) {
+        messageChangedEvent.emit(1);
+      }
     }
   } finally {
     isLoading.value = false;
@@ -513,7 +515,9 @@ const unlikeMemo = async (id: number) => {
               if (success) {
                 await getLike(id);
                 memoChangedEvent.emit(id);
-                messageChangedEvent.emit(-1);
+                if (global.value.userinfo.id !== item.value.userId) {
+                  messageChangedEvent.emit(-1);
+                }
               }
               resolve();
             });
@@ -524,7 +528,9 @@ const unlikeMemo = async (id: number) => {
       if (success) {
         await getLike(id);
         memoChangedEvent.emit(id);
-        messageChangedEvent.emit(-1);
+        if (global.value.userinfo.id !== item.value.userId) {
+          messageChangedEvent.emit(-1);
+        }
       }
     }
   } finally {

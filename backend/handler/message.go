@@ -34,7 +34,7 @@ func (m MessageHandler) GetUnreadMessages(ctx echo.Context) error {
 	}
 
 	var messages []db.Message
-	result := m.base.db.Where("user_id = ? AND is_read = ?", currentUser.Id, false).
+	result := m.base.db.Where("user_id = ? AND is_read = ? AND from_user_id != ?", currentUser.Id, false, currentUser.Id).
 		Order("created_at DESC").
 		Find(&messages)
 

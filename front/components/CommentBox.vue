@@ -31,6 +31,7 @@ import { getGuestId } from "~/utils";
 const props = defineProps<{
   commentId: number
   memoId: number
+  memoUserId: number
   replyTo?: string
   replyEmail?: string
 }>()
@@ -95,7 +96,10 @@ const doComment = async (token?: string) => {
   currentCommentBox.value = ''
   state.content = ''
   memoChangedEvent.emit(props.memoId)
-  messageChangedEvent.emit(1)
+  // 只有当评论用户不是动态发布者时才更新消息计数
+  if (global.value.userinfo.id !== props.memoUserId) {
+    messageChangedEvent.emit(1)
+  }
 }
 
 const toggleUser = () => {

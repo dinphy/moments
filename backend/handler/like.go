@@ -149,25 +149,28 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 		fromName = guestName
 	}
 
-	// 创建消息
-	content := fmt.Sprintf("点赞了动态 #%d", like.MemoID)
-	now := time.Now()
-	message := db.Message{
-		UserId:      memo.UserId,
-		Type:        "like",
-		Content:     content,
-		RelatedId:   int32(like.Id),
-		MemoId:      int32(id),
-		IsRead:      false,
-		CreatedAt:   &now,
-		FromUserId:  fromUserId,
-		FromGuestId: fromGuestId,
-		FromName:    fromName,
-	}
+	// 只有当点赞者不是动态发布者时才创建消息
+	if (currentUser != nil && currentUser.Id != memo.UserId) || (currentUser == nil && guestID != "") {
+		// 创建消息
+		content := fmt.Sprintf("点赞了动态 #%d", like.MemoID)
+		now := time.Now()
+		message := db.Message{
+			UserId:      memo.UserId,
+			Type:        "like",
+			Content:     content,
+			RelatedId:   int32(like.Id),
+			MemoId:      int32(id),
+			IsRead:      false,
+			CreatedAt:   &now,
+			FromUserId:  fromUserId,
+			FromGuestId: fromGuestId,
+			FromName:    fromName,
+		}
 
 	// 保存消息
 	if err := l.base.db.Save(&message).Error; err != nil {
 		l.base.log.Error().Err(err).Msg("保存消息失败")
+		}
 	}
 
 	return SuccessResp(c, h{})
@@ -284,17 +287,24 @@ func (l LikeHandler) RemoveLike(c echo.Context) error {
 		return FailRespWithMsg(c, Fail, "开启事务失败")
 	}
 
-	// 查找对应的点赞消息
+	// 只有当点赞者不是动态发布者时，才尝试删除对应的消息
 	var message db.Message
-	if err = tx.Where("type = ? AND related_id = ? AND memo_id = ?", "like", like.Id, id).First(&message).Error; err != nil {
-		// 如果没有找到消息，继续执行，不影响取消点赞操作
-		l.base.log.Warn().Err(err).Msg("未找到对应的点赞消息")
-	} else {
-		// 删除消息
-		if err = tx.Delete(&message).Error; err != nil {
-			tx.Rollback()
-			return FailRespWithMsg(c, Fail, "删除点赞消息失败")
+	var memo db.Memo
+	if err = l.base.db.First(&memo, id).Error; err == nil {
+		if (currentUser != nil && currentUser.Id != memo.UserId) || (currentUser == nil && like.GuestID != "") {
+			if err = tx.Where("type = ? AND related_id = ? AND memo_id = ?", "like", like.Id, id).First(&message).Error; err != nil {
+				// 如果没有找到消息，继续执行，不影响取消点赞操作
+				l.base.log.Warn().Err(err).Msg("未找到对应的点赞消息")
+			} else {
+				// 删除消息
+				if err = tx.Delete(&message).Error; err != nil {
+					tx.Rollback()
+					return FailRespWithMsg(c, Fail, "删除点赞消息失败")
+				}
+			}
 		}
+	} else {
+		l.base.log.Warn().Err(err).Msg("获取动态信息失败")
 	}
 
 	// 删除点赞记录
