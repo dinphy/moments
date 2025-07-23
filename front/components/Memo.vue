@@ -309,7 +309,7 @@
 <script setup lang="ts">
 import type { ExtDTO, MemoVO, SysConfigVO } from "~/types";
 import { toast } from "vue-sonner";
-import { memoChangedEvent, memoReloadEvent } from "~/event";
+import { memoChangedEvent, memoReloadEvent, messageChangedEvent } from "~/event";
 import Comment from "~/components/Comment.vue";
 import { useGlobalState } from "~/store";
 import { md, getGuestId } from "~/utils";
@@ -464,6 +464,7 @@ const likeMemo = async (id: number) => {
       await doLike(params);
       await getLike(id);
       memoChangedEvent.emit(id);
+      messageChangedEvent.emit(1);
     }
   } finally {
     isLoading.value = false;
@@ -512,6 +513,7 @@ const unlikeMemo = async (id: number) => {
               if (success) {
                 await getLike(id);
                 memoChangedEvent.emit(id);
+                messageChangedEvent.emit(-1);
               }
               resolve();
             });
@@ -522,6 +524,7 @@ const unlikeMemo = async (id: number) => {
       if (success) {
         await getLike(id);
         memoChangedEvent.emit(id);
+        messageChangedEvent.emit(-1);
       }
     }
   } finally {

@@ -23,12 +23,14 @@
       <div
         @click="unreadCount > 0 ? markAllAsRead() : null"
         :class="{
-          'text-[#9fc84a] cursor-pointer': unreadCount > 0,
+          'text-blue-500 cursor-pointer': unreadCount > 0,
           'text-gray-400 cursor-not-allowed': unreadCount === 0,
         }"
         class="flex items-center text-sm"
       >
-        <UIcon name="i-carbon-checkmark-outline" class="w-4 h-4 mr-1" />全部已读
+        <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
+        <span v-if="unreadCount > 0">标为已读({{ unreadCount }})</span>
+        <span v-else>全部已读</span>
       </div>
     </div>
 
@@ -100,6 +102,7 @@
 <script setup lang="ts">
 import { useGlobalState } from "~/store";
 import type { SysConfigVO } from "~/types";
+import { messageChangedEvent } from "~/event";
 
 const global = useGlobalState();
 const sysConfig = useState<SysConfigVO>("sysConfig");
@@ -164,6 +167,8 @@ const markAsRead = async (messageId: number) => {
           if (index !== -1) {
             messages.value[index].isRead = true;
             unreadCount.value--;
+            // 触发消息数量变化事件
+            messageChangedEvent.emit(-1);
           }
         }
       }
@@ -194,7 +199,10 @@ const markAllAsRead = async () => {
           messages.value.forEach((msg) => {
             msg.isRead = true;
           });
+          const change = -unreadCount.value;
           unreadCount.value = 0;
+          // 触发消息数量变化事件
+          messageChangedEvent.emit(change);
         }
       }
     }
@@ -216,14 +224,25 @@ const handleMessageClick = (message: any) => {
 };
 
 onMounted(() => {
-  // 可以在这里初始化获取一次未读消息数量
+  // 初始化获取一次未读消息数量
   if (global.value.userinfo.token) {
     fetchUnreadMessages();
   }
+
+  // 监听消息数量变化事件
+  const unsubscribe = messageChangedEvent.on((change) => {
+    // 根据变化量更新未读数量
+    unreadCount.value = Math.max(0, unreadCount.value + change);
+  });
+
+  // 存储取消订阅函数，以便在组件卸载时调用
+  onUnmounted(() => {
+    unsubscribe();
+  });
 });
 
 onUnmounted(() => {
-  // 可以在这里清理定时器等
+  // 组件卸载时的清理工作
 });
 </script>
 

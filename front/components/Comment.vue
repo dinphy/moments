@@ -33,7 +33,7 @@
 import type {CommentVO, UserVO} from "~/types";
 import CommentBox from "~/components/CommentBox.vue";
 import {toast} from "vue-sonner";
-import {memoChangedEvent} from "~/event";
+import {memoChangedEvent, messageChangedEvent} from "~/event";
 import {useGlobalState} from "~/store";
 
 const global = useGlobalState()
@@ -55,6 +55,7 @@ const removeComment = async () => {
   await useMyFetch('/comment/remove?id=' + props.comment.id)
   toast.success("删除成功!")
   memoChangedEvent.emit(props.memoId)
+  messageChangedEvent.emit(-1)
 }
 const formatWebsite = (website: string) => {
   if (/^https?:\/\//i.test(website)) {

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import {toast} from "vue-sonner";
-import {memoChangedEvent} from "~/event";
+import {memoChangedEvent, messageChangedEvent} from "~/event";
 import Emoji from "~/components/Emoji.vue";
 import {useGlobalState} from "~/store";
 import {useStorage} from '@vueuse/core'
@@ -95,6 +95,7 @@ const doComment = async (token?: string) => {
   currentCommentBox.value = ''
   state.content = ''
   memoChangedEvent.emit(props.memoId)
+  messageChangedEvent.emit(1)
 }
 
 const toggleUser = () => {
