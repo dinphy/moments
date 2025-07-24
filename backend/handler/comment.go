@@ -254,6 +254,7 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 					FromUserId:  fromUserId,
 					FromGuestId: fromGuestId,
 					FromName:    fromName,
+					ReplyTo:     comment.ReplyTo,
 				}
 
 				// 保存消息

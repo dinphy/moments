@@ -15,6 +15,7 @@ type MessageVO struct {
 	FromUserId     int32      `json:"fromUserId,omitempty"`
 	FromName       string     `json:"fromName,omitempty"`
 	FromUserAvatar string     `json:"fromUserAvatar,omitempty"`
+	ReplyTo        string     `json:"replyTo,omitempty"`
 }
 
 type MessageListResp struct {

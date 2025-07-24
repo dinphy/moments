@@ -62,6 +62,7 @@ func (m MessageHandler) GetUnreadMessages(ctx echo.Context) error {
 			FromUserId:     msg.FromUserId,
 			FromName:       msg.FromName,
 			FromUserAvatar: msg.FromUserAvatar,
+			ReplyTo:        msg.ReplyTo,
 		})
 	}
 

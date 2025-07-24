@@ -78,6 +78,11 @@
               </span>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
+              <template v-if="message.replyTo">
+                <span class="mr-1">回复</span>
+                <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
+                <span class="mr-1">:</span>
+              </template>
               {{ message.content }}
             </p>
           </div>

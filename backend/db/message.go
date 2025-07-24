@@ -17,6 +17,7 @@ type Message struct {
 	FromGuestId    string     `gorm:"column:from_guest_id" json:"fromGuestId,omitempty"`       // 发送访客ID
 	FromName       string     `gorm:"column:from_name;NOT NULL" json:"fromName,omitempty"`     // 发送者名称
 	FromUserAvatar string     `gorm:"column:from_user_avatar" json:"fromUserAvatar,omitempty"` // 发送用户头像
+	ReplyTo        string     `gorm:"column:reply_to" json:"replyTo,omitempty"`                 // 回复的用户名称
 }
 
 func (m *Message) TableName() string {
