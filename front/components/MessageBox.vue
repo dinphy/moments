@@ -51,7 +51,7 @@
       >
         <div class="flex items-start">
           <div
-            class="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3"
+            class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3"
           >
             <img
               v-if="message.fromUserAvatar"
@@ -67,7 +67,7 @@
             </span>
           </div>
           <div class="flex-grow mr-3">
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex flex-wrap items-center justify-between">
               <span
                 class="text-sm font-medium text-gray-800 dark:text-gray-200"
               >
@@ -77,18 +77,18 @@
                 {{ sysConfig.timeFormat === "timeAgo" ? $dayjs(message.createdAt).fromNow() : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm") }}
               </span>
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
+            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
               {{ message.content }}
             </p>
           </div>
-          <div class="flex-shrink-0 w-16 h-16 rounded overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center">
+          <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center">
             <img
               v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
               :src="memoImages[message.memoId][0]"
               alt="Message image"
               class="w-full h-full object-cover"
             />
-            <span v-else-if="memoContents[message.memoId]" class="text-xs text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
+            <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
             </span>
             <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
               无内容
