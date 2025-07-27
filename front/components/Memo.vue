@@ -456,6 +456,9 @@ const likeMemo = async (id: number) => {
               await doLike(params);
               await getLike(id);
               memoChangedEvent.emit(id);
+              if (global.value.userinfo.id !== item.value.userId) {
+                messageChangedEvent.emit(1);
+              }
               resolve();
             });
         });

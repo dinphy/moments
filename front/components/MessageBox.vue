@@ -389,19 +389,14 @@ onMounted(() => {
   }
 
   // 监听消息数量变化事件
-  const unsubscribe = messageChangedEvent.on((change) => {
-    // 根据变化量更新未读数量
-    unreadCount.value = Math.max(0, unreadCount.value + change);
+  const unsubscribe = messageChangedEvent.on(() => {
+    fetchAllMessages();
   });
 
   // 存储取消订阅函数，以便在组件卸载时调用
   onUnmounted(() => {
     unsubscribe();
   });
-});
-
-onUnmounted(() => {
-  // 组件卸载时的清理工作
 });
 </script>
 
