@@ -169,14 +169,18 @@ const fetchUnreadMessages = async () => {
     if (response.ok) {
       const data = await response.json();
       if (data.code === 0) {
-        messages.value = data.data.list;
+        messages.value = data.data.list || [];
         unreadCount.value = data.data.total;
-        // 获取相关动态的图片
         fetchMemoImages();
+      } else {
+        messages.value = [];
       }
+    } else {
+      messages.value = [];
     }
   } catch (error) {
     console.error("获取未读消息失败:", error);
+    messages.value = [];
   } finally {
     fetching.value = false;
   }
@@ -314,13 +318,18 @@ const fetchAllMessages = async () => {
     if (response.ok) {
       const data = await response.json();
       if (data.code === 0) {
-        messages.value = data.data.list;
-        unreadCount.value = data.data.list.filter((msg: any) => !msg.isRead).length;
+        messages.value = data.data.list || [];
+        unreadCount.value = messages.value.filter((msg: any) => !msg.isRead).length;
         fetchMemoImages();
+      } else {
+        messages.value = [];
       }
+    } else {
+      messages.value = [];
     }
   } catch (error) {
     console.error("获取所有消息失败:", error);
+    messages.value = [];
   } finally {
     fetching.value = false;
   }
