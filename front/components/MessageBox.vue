@@ -1,11 +1,11 @@
 <template>
   <div
-    v-if="unreadCount > 0"
     class="absolute top-4 left-4 cursor-pointer z-10"
     @click="toggleMessageBox"
   >
     <UIcon name="i-carbon-notification" class="text-[#9fc84a] w-5 h-5" />
     <span
+      v-if="unreadCount > 0"
       class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
     >
       {{ unreadCount }}
@@ -20,17 +20,30 @@
   >
     <div class="flex justify-between items-center p-5">
       <h3 class="font-medium">消息盒子</h3>
-      <div
-        @click="unreadCount > 0 ? markAllAsRead() : null"
-        :class="{
-          'text-blue-500 cursor-pointer': unreadCount > 0,
-          'text-gray-400 cursor-not-allowed': unreadCount === 0,
-        }"
-        class="flex items-center text-sm"
-      >
-        <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
-        <span v-if="unreadCount > 0">标为已读({{ unreadCount }})</span>
-        <span v-else>全部已读</span>
+      <div class="flex space-x-4">
+        <div
+          @click="unreadCount > 0 ? markAllAsRead() : null"
+          :class="{
+            'text-blue-500 cursor-pointer': unreadCount > 0,
+            'text-gray-400 cursor-not-allowed': unreadCount === 0,
+          }"
+          class="flex items-center text-sm"
+        >
+          <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
+          <span v-if="unreadCount > 0">未读({{ unreadCount }})</span>
+          <span v-else>全部已读</span>
+        </div>
+        <div
+          @click="messages.length > 0 ? deleteAllMessages() : null"
+          :class="{
+            'text-red-500 cursor-pointer': messages.length > 0,
+            'text-gray-400 cursor-not-allowed': messages.length === 0,
+          }"
+          class="flex items-center text-sm"
+        >
+          <UIcon name="i-carbon-trash-can" class="w-4 h-4 mr-1" />
+          <span>清空</span>
+        </div>
       </div>
     </div>
 
@@ -51,7 +64,7 @@
       >
         <div class="flex items-start">
           <div
-            class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3"
+            class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative"
           >
             <img
               v-if="message.fromUserAvatar"
@@ -65,6 +78,10 @@
             >
               {{ message.fromName.charAt(0) }}
             </span>
+            <div
+              v-if="!message.isRead"
+              class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500"
+            ></div>
           </div>
           <div class="flex-grow mr-3">
             <div class="flex flex-wrap items-center justify-between">
@@ -86,7 +103,7 @@
               {{ message.content }}
             </p>
           </div>
-          <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center">
+          <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group">
             <img
               v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
               :src="memoImages[message.memoId][0]"
@@ -98,11 +115,13 @@
             <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
               无内容
             </span>
+            <button
+              @click.stop="deleteMessage(message.id)"
+              class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            >
+              <UIcon name="i-carbon-trash-can" class="w-5 h-5 text-white" />
+            </button>
           </div>
-          <div
-            v-if="!message.isRead"
-            class="flex-shrink-0 w-2 h-2 rounded-full bg-blue-500 ml-2 mt-2"
-          ></div>
         </div>
       </div>
     </div>
@@ -129,7 +148,7 @@ const showMoreClicked = ref(false);
 const toggleMessageBox = () => {
   showMessageBox.value = !showMessageBox.value;
   if (showMessageBox.value) {
-    fetchUnreadMessages();
+    fetchAllMessages();
   }
 };
 
@@ -279,10 +298,85 @@ const handleMessageClick = (message: any) => {
   }
 };
 
+const fetchAllMessages = async () => {
+  if (fetching.value || !global.value.userinfo.token) return;
+
+  fetching.value = true;
+  try {
+    const response = await fetch("/api/message/all", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-token": global.value.userinfo.token,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.code === 0) {
+        messages.value = data.data.list;
+        unreadCount.value = data.data.list.filter((msg: any) => !msg.isRead).length;
+        fetchMemoImages();
+      }
+    }
+  } catch (error) {
+    console.error("获取所有消息失败:", error);
+  } finally {
+    fetching.value = false;
+  }
+};
+
+const deleteMessage = async (messageId: number) => {
+  if (!global.value.userinfo.token) return;
+
+  try {
+    const response = await fetch(`/api/message/delete?id=${messageId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-token": global.value.userinfo.token,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.code === 0) {
+        messages.value = messages.value.filter(msg => msg.id !== messageId);
+        unreadCount.value = messages.value.filter(msg => !msg.isRead).length;
+      }
+    }
+  } catch (error) {
+    console.error("删除消息失败:", error);
+  }
+};
+
+const deleteAllMessages = async () => {
+  if (!global.value.userinfo.token || messages.value.length === 0) return;
+
+  try {
+    const response = await fetch("/api/message/delete-all", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-token": global.value.userinfo.token,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.code === 0) {
+        messages.value = [];
+        unreadCount.value = 0;
+      }
+    }
+  } catch (error) {
+    console.error("删除所有消息失败:", error);
+  }
+};
+
 onMounted(() => {
-  // 初始化获取一次未读消息数量
   if (global.value.userinfo.token) {
-    fetchUnreadMessages();
+    fetchAllMessages();
   }
 
   // 监听消息数量变化事件

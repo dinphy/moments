@@ -83,8 +83,11 @@ func setupRouter(injector do.Injector) {
 
 	messageGroup := apiGroup.Group("/message")
 	messageGroup.GET("/unread", messageHandler.GetUnreadMessages)
+	messageGroup.GET("/all", messageHandler.GetAllMessages)
 	messageGroup.POST("/read", messageHandler.MarkMessageAsRead)
 	messageGroup.POST("/read-all", messageHandler.MarkAllMessagesAsRead)
+	messageGroup.DELETE("/delete", messageHandler.DeleteMessage)
+	messageGroup.DELETE("/delete-all", messageHandler.DeleteAllMessages)
 
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)
