@@ -54,11 +54,13 @@
         class="hover:shadow-lg transition-shadow duration-200"
       >
         <div class="flex flex-col items-center space-y-3">
-          <UAvatar
-            :src="user.avatarUrl"
-            size="xl"
-            class="ring-2 ring-gray-200 dark:ring-gray-700"
-          />
+          <NuxtLink :to="'/user/' + user.id">
+            <UAvatar
+              :src="user.avatarUrl"
+              size="xl"
+              class="ring-2 ring-gray-200 dark:ring-gray-700"
+            />
+          </NuxtLink>
           <div class="text-center">
             <h3 class="font-semibold text-lg">
               {{ user.nickname || user.username }}
