@@ -80,15 +80,13 @@
               编辑
             </UButton>
             <UButton
+              v-if="user.id !== 1"
               color="red"
               variant="ghost"
               size="xs"
               icon="i-heroicons-trash"
               @click="confirmDelete(user)"
-              :disabled="user.id === currentUser?.id"
-              :title="
-                user.id === currentUser?.id ? '不能删除自己的账户' : '删除用户'
-              "
+              title="删除用户"
             >
               删除
             </UButton>
@@ -144,15 +142,13 @@
               编辑
             </UButton>
             <UButton
+              v-if="row.id !== 1"
               color="red"
               variant="ghost"
               size="xs"
               icon="i-heroicons-trash"
               @click="confirmDelete(row)"
-              :disabled="row.id === currentUser?.id"
-              :title="
-                row.id === currentUser?.id ? '不能删除自己的账户' : '删除用户'
-              "
+              title="删除用户"
             >
               删除
             </UButton>
@@ -181,7 +177,9 @@
         container: 'flex justify-center items-center backdrop-blur',
       }"
     >
-      <UCard>
+      <UCard
+        :ui="{ body: { base: 'max-h-[60vh] sm:max-h-[90vh] overflow-y-auto' } }"
+      >
         <template #header>
           <h3 class="text-lg font-semibold">
             编辑用户 - {{ settingsTargetUser?.username }}
@@ -211,12 +209,6 @@
 
         <p>
           确定要删除用户 "{{ deleteTarget?.username }}" 吗？此操作不可恢复。
-        </p>
-        <p
-          v-if="deleteTarget?.id === currentUser?.id"
-          class="text-red-500 font-medium mt-2"
-        >
-          ⚠️ 警告：您正在尝试删除自己的账户，这是不允许的操作！
         </p>
 
         <div class="flex justify-end space-x-2 mt-4">
@@ -258,7 +250,7 @@ const viewMode = ref<"table" | "card">("card");
 // 分页状态
 const state = reactive({
   page: 1,
-  size: 6,
+  size: 12,
   sort: "desc",
   keyword: "",
 });
@@ -332,9 +324,8 @@ const confirmDelete = (user: UserVO) => {
 const doDelete = async () => {
   if (!deleteTarget.value) return;
 
-  // 防止删除自己的账户
-  if (deleteTarget.value.id === currentUser?.value?.id) {
-    toast.error("不能删除自己的账户");
+  if (deleteTarget.value.id === 1) {
+    toast.warning("不能删除管理员账号");
     showDeleteModal.value = false;
     return;
   }
@@ -361,8 +352,8 @@ const openUserSettings = (user: UserVO) => {
 // 处理用户设置保存完成
 const handleUserSettingsSave = () => {
   showUserSettingsModal.value = false;
-  state.page = 1; // 重置分页
-  loadUsers(); // 重新加载用户列表
+  state.page = 1;
+  loadUsers();
 };
 
 // 切换排序
@@ -371,7 +362,13 @@ const toggleSort = () => {
   loadUsers();
 };
 
-onMounted(() => {
+onMounted(async () => {
+  // 检查是否为管理员
+  if (!currentUser.value || currentUser.value.id !== 1) {
+    toast.warning("无权限访问用户管理页面");
+    navigateTo("/");
+    return;
+  }
   loadUsers();
 });
 </script>
