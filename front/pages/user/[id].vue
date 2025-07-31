@@ -63,16 +63,26 @@ onMounted(async () => {
 
 const reload = async () => {
   state.page = 1;
-  const res = await useMyFetch<{
-    list: Array<MemoVO>;
-    total: number;
-    hasNext: boolean;
-  }>("/memo/list", {
-    ...state,
-    userId: parseInt(userId),
-  });
-  memos.value = res.list;
-  hasNext.value = res.hasNext;
+  try {
+    const res = await useMyFetch<{
+      list: Array<MemoVO>;
+      total: number;
+      hasNext: boolean;
+    }>("/memo/list", {
+      ...state,
+      userId: parseInt(userId),
+    });
+
+    if (!res || typeof res.total === 'undefined') {
+      navigateTo('/404');
+      return;
+    }
+    
+    memos.value = res.list;
+    hasNext.value = res.hasNext;
+  } catch (error) {
+    navigateTo('/404');
+  }
 };
 
 const loadMore = async () => {

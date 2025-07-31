@@ -13,7 +13,16 @@ const route = useRoute()
 const id = route.params.id as any as number
 const memo = ref<MemoVO>()
 const reload = async () => {
-  memo.value = await useMyFetch<MemoVO>('/memo/get?id=' + id)
+  try {
+    const res = await useMyFetch<MemoVO>('/memo/get?id=' + id)
+    if (!res) {
+      navigateTo('/404');
+      return;
+    }
+    memo.value = res;
+  } catch (error) {
+    navigateTo('/404');
+  }
 }
 
 memoChangedEvent.on(async () => {
