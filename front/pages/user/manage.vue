@@ -43,6 +43,20 @@
       </div>
     </div>
 
+    <!-- 加载骨架屏 -->
+    <div v-if="loading && users.length === 0" class="space-y-4">
+      <div
+        v-if="viewMode === 'card'"
+        class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+      >
+        <USkeleton v-for="i in 6" :key="i" class="h-64" />
+      </div>
+      <div v-else class="space-y-2">
+        <USkeleton class="h-12" />
+        <USkeleton v-for="i in 5" :key="i" class="h-16" />
+      </div>
+    </div>
+
     <!-- 卡片视图 -->
     <div
       v-if="viewMode === 'card'"
@@ -51,8 +65,21 @@
       <UCard
         v-for="user in users"
         :key="user.id"
-        class="hover:shadow-lg transition-shadow duration-200"
+        class="hover:shadow-lg transition-shadow duration-200 relative group"
       >
+        <div class="absolute top-2 right-2 z-10">
+          <UTooltip text="编辑用户">
+            <UButton
+              color="primary"
+              variant="ghost"
+              size="xs"
+              icon="i-heroicons-pencil-square"
+              @click="openUserSettings(user)"
+              class="opacity-100 group-hover:opacity-100 transition-opacity"
+            />
+          </UTooltip>
+        </div>
+
         <div class="flex flex-col items-center space-y-3">
           <NuxtLink :to="'/user/' + user.id">
             <UAvatar
@@ -70,25 +97,35 @@
           <div class="text-xs text-gray-500">
             注册于 {{ $dayjs(user.createdAt).format("YYYY-MM-DD") }}
           </div>
-          <div class="flex justify-center items-center space-x-2">
-            <UButton
-              color="blue"
-              variant="ghost"
-              size="xs"
-              icon="i-heroicons-pencil"
-              @click="openUserSettings(user)"
-              :title="'编辑用户'"
+          <div class="flex items-center space-x-1">
+            <div
+              class="w-2 h-2 rounded-full"
+              :class="user.id === 1 ? 'bg-green-500' : 'bg-blue-500'"
+            ></div>
+            <span
+              class="text-xs font-medium"
+              :class="
+                user.id === 1
+                  ? 'text-green-700 dark:text-green-400'
+                  : 'text-blue-700 dark:text-blue-400'
+              "
             >
-              编辑
-            </UButton>
+              {{ user.id === 1 ? "管理员" : "普通用户" }}
+            </span>
+          </div>
+          <div
+            class="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-auto"
+          >
             <UButton
               v-if="user.id !== 1"
-              color="red"
-              variant="ghost"
-              size="xs"
+              color="primary"
+              variant="soft"
+              size="sm"
               icon="i-heroicons-trash"
               @click="confirmDelete(user)"
               title="删除用户"
+              class="w-full justify-center"
+              block
             >
               删除
             </UButton>
@@ -96,64 +133,88 @@
         </div>
       </UCard>
     </div>
+
     <!-- 列表视图 -->
-    <div v-else-if="viewMode === 'table'" class="overflow-x-auto">
+    <div
+      v-else-if="viewMode === 'table'"
+      class="border rounded-lg overflow-x-auto"
+    >
       <UTable
         :columns="columns"
         :rows="users"
         :loading="loading"
         class="w-full"
+        :ui="{
+          tbody: 'divide-y divide-gray-200 dark:divide-gray-700',
+          tr: {
+            base: 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150',
+            selected: 'bg-gray-100 dark:bg-gray-700',
+          },
+          th: {
+            base: 'bg-gray-50 dark:bg-gray-800/50 transition-colors duration-150',
+          },
+        }"
       >
         <template #id-data="{ row }">
-          <span class="text-sm">{{ row.id }}</span>
-        </template>
-
-        <template #avatarUrl-data="{ row }">
-          <UAvatar :src="row.avatarUrl" size="sm" />
+          <span
+            class="text-sm font-mono font-medium text-gray-900 dark:text-gray-100"
+            >{{ row.id }}</span
+          >
         </template>
 
         <template #username-data="{ row }">
-          <div class="space-y-2">
-            <div class="font-medium">{{ row.username }}</div>
-          </div>
-        </template>
-
-        <template #nickname-data="{ row }">
-          <div class="text-sm text-gray-500">{{ row.nickname }}</div>
-        </template>
-
-        <template #email-data="{ row }">
-          <span class="text-sm">{{ row.email || "-" }}</span>
+          <UTooltip :text="row.id === 1 ? '管理员' : '普通用户'">
+            <div class="space-y-1">
+              <div class="font-semibold text-gray-900 dark:text-gray-100">
+                {{ row.nickname }}
+              </div>
+              <div
+                class="text-sm"
+                :class="
+                  row.id === 1
+                    ? 'text-gray-500 dark:text-green-500'
+                    : 'text-blue-500 dark:text-gray-500'
+                "
+              >
+                @{{ row.username || "-" }}
+              </div>
+            </div>
+          </UTooltip>
         </template>
 
         <template #createdAt-data="{ row }">
-          <span class="text-sm">
-            {{ $dayjs(row.createdAt).format("YYYY-MM-DD HH:mm") }}
-          </span>
+          <div class="text-sm">
+            <div class="text-gray-900 dark:text-gray-100">
+              {{ $dayjs(row.createdAt).format("YYYY-MM-DD") }}
+            </div>
+            <div class="text-xs text-gray-500">
+              {{ $dayjs(row.createdAt).format("HH:mm") }}
+            </div>
+          </div>
         </template>
 
         <template #actions-data="{ row }">
-          <div class="flex items-center space-x-2">
-            <UButton
-              color="blue"
-              variant="ghost"
-              size="xs"
-              icon="i-heroicons-pencil"
-              @click="openUserSettings(row)"
-            >
-              编辑
-            </UButton>
-            <UButton
-              v-if="row.id !== 1"
-              color="red"
-              variant="ghost"
-              size="xs"
-              icon="i-heroicons-trash"
-              @click="confirmDelete(row)"
-              title="删除用户"
-            >
-              删除
-            </UButton>
+          <div class="flex items-center space-x-1">
+            <UTooltip text="编辑用户">
+              <UButton
+                color="primary"
+                variant="ghost"
+                size="sm"
+                icon="i-heroicons-pencil-square"
+                @click="openUserSettings(row)"
+                class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
+              />
+            </UTooltip>
+            <UTooltip v-if="row.id !== 1" text="删除用户">
+              <UButton
+                color="red"
+                variant="ghost"
+                size="sm"
+                icon="i-heroicons-trash"
+                @click="confirmDelete(row)"
+                class="hover:bg-red-50 dark:hover:bg-red-900/20"
+              />
+            </UTooltip>
           </div>
         </template>
       </UTable>
@@ -234,13 +295,10 @@ const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
 // 表格配置
 const columns = [
-  { key: "id", label: "ID" },
-  { key: "avatarUrl", label: "头像", width: "60px" },
-  { key: "username", label: "登录名" },
-  { key: "nickname", label: "昵称" },
-  { key: "email", label: "邮箱" },
-  { key: "createdAt", label: "注册时间" },
-  { key: "actions", label: "操作" },
+  { key: "id", label: "ID", class: "w-12 md:w-16 flex-shrink-0" },
+  { key: "username", label: "用户信息", class: "w-16 md:w-20 flex-shrink-0" },
+  { key: "createdAt", label: "创建时间", class: "w-16 md:w-20 flex-shrink-0" },
+  { key: "actions", label: "操作", class: "w-16 md:w-20 flex-shrink-0" },
 ];
 
 // 列表数据
