@@ -137,87 +137,159 @@
     <!-- 列表视图 -->
     <div
       v-else-if="viewMode === 'table'"
-      class="border rounded-lg overflow-x-auto"
+      class="border rounded-lg overflow-hidden"
     >
-      <UTable
-        :columns="columns"
-        :rows="users"
-        :loading="loading"
-        class="w-full"
-        :ui="{
-          tbody: 'divide-y divide-gray-200 dark:divide-gray-700',
-          tr: {
-            base: 'hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150',
-            selected: 'bg-gray-100 dark:bg-gray-700',
-          },
-          th: {
-            base: 'bg-gray-50 dark:bg-gray-800/50 transition-colors duration-150',
-          },
-        }"
-      >
-        <template #id-data="{ row }">
-          <span
-            class="text-sm font-mono font-medium text-gray-900 dark:text-gray-100"
-            >{{ row.id }}</span
-          >
-        </template>
-
-        <template #username-data="{ row }">
-          <UTooltip :text="row.id === 1 ? '管理员' : '普通用户'">
-            <div class="space-y-1">
-              <div class="font-semibold text-gray-900 dark:text-gray-100">
-                {{ row.nickname }}
+      <!-- 移动端优化视图 -->
+      <div class="sm:hidden">
+        <div
+          v-for="user in users"
+          :key="user.id"
+          class="p-4 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 last:border-b-0"
+        >
+          <div class="flex items-center space-x-3">
+            <UAvatar
+              :src="user.avatarUrl"
+              size="md"
+              class="ring-2 ring-gray-200 dark:ring-gray-700 flex-shrink-0"
+            />
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div
+                    class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                  >
+                    {{ user.nickname || user.username }}
+                  </div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    @{{ user.username }}
+                  </div>
+                </div>
+                <span
+                  :class="[
+                    'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
+                    user.id === 1
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                  ]"
+                >
+                  {{ user.id === 1 ? "管理员" : "普通用户" }}
+                </span>
               </div>
-              <div
-                class="text-sm"
-                :class="
-                  row.id === 1
-                    ? 'text-gray-500 dark:text-green-500'
-                    : 'text-blue-500 dark:text-gray-500'
-                "
-              >
-                @{{ row.username || "-" }}
+              <div class="mt-2 flex items-center justify-between">
+                <div class="text-xs text-gray-500">
+                  注册于 {{ $dayjs(user.createdAt).format("YYYY-MM-DD") }}
+                </div>
+                <div class="flex space-x-1">
+                  <UTooltip v-if="user.id !== 1" text="删除用户">
+                    <UButton
+                      color="red"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-heroicons-trash"
+                      @click="confirmDelete(user)"
+                      class="hover:bg-red-50 dark:hover:bg-red-900/20"
+                    />
+                  </UTooltip>
+                  <UTooltip text="编辑用户">
+                    <UButton
+                      color="primary"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-heroicons-pencil-square"
+                      @click="openUserSettings(user)"
+                      class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                    />
+                  </UTooltip>
+                </div>
               </div>
-            </div>
-          </UTooltip>
-        </template>
-
-        <template #createdAt-data="{ row }">
-          <div class="text-sm">
-            <div class="text-gray-900 dark:text-gray-100">
-              {{ $dayjs(row.createdAt).format("YYYY-MM-DD") }}
-            </div>
-            <div class="text-xs text-gray-500">
-              {{ $dayjs(row.createdAt).format("HH:mm") }}
             </div>
           </div>
-        </template>
+        </div>
+      </div>
 
-        <template #actions-data="{ row }">
-          <div class="flex items-center space-x-1">
-            <UTooltip text="编辑用户">
-              <UButton
-                color="primary"
-                variant="ghost"
+      <!-- 桌面端表格视图 -->
+      <div class="hidden sm:block">
+        <UTable
+          :columns="columns"
+          :rows="users"
+          :loading="loading"
+          class="w-full"
+          :ui="tableUi"
+        >
+          <template #id-data="{ row }">
+            <span
+              class="text-sm font-mono font-medium text-gray-900 dark:text-gray-100"
+              >{{ row.id }}</span
+            >
+          </template>
+
+          <template #username-data="{ row }">
+            <div class="flex items-center">
+              <UAvatar
+                :src="row.avatarUrl"
                 size="sm"
-                icon="i-heroicons-pencil-square"
-                @click="openUserSettings(row)"
-                class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                class="ring-2 ring-gray-200 dark:ring-gray-700"
               />
-            </UTooltip>
-            <UTooltip v-if="row.id !== 1" text="删除用户">
-              <UButton
-                color="red"
-                variant="ghost"
-                size="sm"
-                icon="i-heroicons-trash"
-                @click="confirmDelete(row)"
-                class="hover:bg-red-50 dark:hover:bg-red-900/20"
-              />
-            </UTooltip>
-          </div>
-        </template>
-      </UTable>
+              <div class="ml-3">
+                <div
+                  class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                >
+                  {{ row.nickname || row.username }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <span class="flex items-center">
+                    @{{ row.username || "-" }}
+                    <span
+                      :class="[
+                        'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium',
+                        row.id === 1
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                      ]"
+                    >
+                      {{ row.id === 1 ? "管理员" : "普通用户" }}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <template #createdAt-data="{ row }">
+            <div class="text-sm text-gray-900 dark:text-gray-100">
+              <div>{{ $dayjs(row.createdAt).format("YYYY-MM-DD") }}</div>
+              <div class="text-xs text-gray-500">
+                {{ $dayjs(row.createdAt).format("HH:mm") }}
+              </div>
+            </div>
+          </template>
+
+          <template #actions-data="{ row }">
+            <div class="flex items-center justify-end space-x-1">
+              <UTooltip v-if="row.id !== 1" text="删除用户">
+                <UButton
+                  color="red"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-heroicons-trash"
+                  @click="confirmDelete(row)"
+                  class="hover:bg-red-50 dark:hover:bg-red-900/20"
+                />
+              </UTooltip>
+              <UTooltip text="编辑用户">
+                <UButton
+                  color="primary"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-heroicons-pencil-square"
+                  @click="openUserSettings(row)"
+                  class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                />
+              </UTooltip>
+            </div>
+          </template>
+        </UTable>
+      </div>
     </div>
     <div class="flex justify-center text-md text-gray-500 py-4">
       已加载 {{ users.length }} 个用户
@@ -293,13 +365,30 @@ import { useElementVisibility } from "@vueuse/core";
 
 const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
-// 表格配置
+// 表格配置 - 优化响应式设计
 const columns = [
-  { key: "id", label: "ID", class: "w-12 md:w-16 flex-shrink-0" },
-  { key: "username", label: "用户信息", class: "w-16 md:w-20 flex-shrink-0" },
-  { key: "createdAt", label: "创建时间", class: "w-16 md:w-20 flex-shrink-0" },
-  { key: "actions", label: "操作", class: "w-16 md:w-20 flex-shrink-0" },
+  { key: "id", label: "ID", class: "w-12 md:w-16 hidden sm:table-cell" },
+  { key: "username", label: "用户信息", class: "min-w-[200px] flex-1" },
+  { key: "createdAt", label: "创建时间", class: "w-28 hidden sm:table-cell" },
+  { key: "actions", label: "操作", class: "w-24 text-right" },
 ];
+
+// 表格UI配置
+const tableUi = {
+  base: "divide-y divide-gray-200 dark:divide-gray-700",
+  thead: "bg-gray-50 dark:bg-gray-800/50",
+  tbody: "divide-y divide-gray-200 dark:divide-gray-700",
+  tr: {
+    base: "hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-150",
+    selected: "bg-gray-100 dark:bg-gray-700",
+  },
+  th: {
+    base: "px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+  },
+  td: {
+    base: "px-3 py-4 whitespace-nowrap",
+  },
+};
 
 // 列表数据
 const users = ref<UserVO[]>([]);
