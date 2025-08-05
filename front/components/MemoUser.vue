@@ -6,8 +6,12 @@
     <div class="flex flex-col w-24 p-2 text-center">
       <template v-if="!isPinned">
         <div v-if="props.memo.displayDate" class="flex justify-center">
-          <span class="text-xl font-bold">{{ $dayjs(props.memo.createdAt).format("DD") }}</span>
-          <span class="flex items-end text-xs">{{ $dayjs(props.memo.createdAt).format("MM") }}月</span>
+          <span v-if="$dayjs(props.memo.createdAt).isSame($dayjs(), 'day')" class="text-lg font-bold">今天</span>
+          <span v-else-if="$dayjs(props.memo.createdAt).isSame($dayjs().subtract(1, 'day'), 'day')" class="text-lg font-bold">昨天</span>
+          <template v-else>
+            <span class="text-xl font-bold">{{ $dayjs(props.memo.createdAt).format("DD") }}</span>
+            <span class="flex items-end text-xs">{{ $dayjs(props.memo.createdAt).format("MM") }}月</span>
+          </template>
         </div>
         <div class="flex justify-center text-[#576b95] font-medium dark:text-white text-xs mt-2 select-none">
           {{ location }}
