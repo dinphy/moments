@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import type {MetingJSDTO} from "@/types";
+import type {MusicDTO} from "@/types";
 
-const props = defineProps<MetingJSDTO>()
+const props = defineProps<MusicDTO>()
 </script>
 
 <style scoped>
