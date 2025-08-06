@@ -1,18 +1,12 @@
 <template>
   <UPopover :popper="{ arrow: true }" mode="click">
-    <div class="relative group">
-      <UIcon name="i-carbon-image" class="cursor-pointer w-6 h-6 text-gray-600 transition-colors duration-200" />
-      <div v-if="imgList.length > 0" class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-        {{ imgList.length }}
-      </div>
+    <UIcon name="i-carbon-image" class="cursor-pointer w-6 h-6 text-gray-600 transition-colors duration-200" />
+    <div v-if="imgList.length > 0" class="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+      {{ imgList.length }}
     </div>
-    
+
     <template #panel="{ close }">
-      <div class="w-96 max-w-[90vw] bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700">
-        <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-          <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">本地图片</h3>
-        </div>
-        
+      <div class="w-72 max-w-72 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700">       
         <div class="p-4 space-y-4">
           <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors duration-200">
             <UIcon name="i-carbon-cloud-upload" class="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2 cursor-pointer hover:text-blue-500 transition-colors duration-200" @click="openFileDialog" />
@@ -38,7 +32,7 @@
           </div>
 
           <div v-if="imgList.length > 0" class="space-y-3 max-h-56 overflow-y-auto">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">已添加图片</h4>
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">已添加 {{ imgList.length }} 图</h4>
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <div v-for="(img, index) in imgList" :key="index" class="relative group">
                 <img :src="img" class="w-full h-20 object-cover rounded-md border border-gray-200 dark:border-gray-600" />
@@ -50,7 +44,6 @@
           </div>
 
           <div class="space-y-2">
-            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">网络图片</h4>
             <div class="flex gap-2">
               <UInput v-model="imgUrlToAdd" placeholder="输入图片URL" class="flex-1" size="sm" />
               <UButton @click="addImg" size="sm" color="primary" variant="ghost">
@@ -59,14 +52,10 @@
             </div>
           </div>
 
-          <div class="flex justify-end gap-2 pt-2">
-            <UButton @click="clear(close)" size="sm" color="gray" variant="ghost">
-              清空
-            </UButton>
-            <UButton @click="close" size="sm" color="primary">
-              完成
-            </UButton>
-          </div>
+          <UButtonGroup>
+            <UButton @click="close">确定</UButton>
+            <UButton color="white" @click="clear(close)">清空</UButton>
+          </UButtonGroup>
         </div>
       </div>
     </template>
