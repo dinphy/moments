@@ -68,7 +68,7 @@ func (c CommentHandler) RemoveComment(ctx echo.Context) error {
 	var message db.Message
 	var fromUserId int32
 	var fromGuestId string
-	
+
 	// 获取评论者信息
 	if comment.Author != "" {
 		authorId, _ := strconv.ParseInt(comment.Author, 10, 32)
@@ -76,7 +76,7 @@ func (c CommentHandler) RemoveComment(ctx echo.Context) error {
 	} else {
 		fromGuestId = comment.GuestID
 	}
-	
+
 	// 检查评论者是否是动态发布者
 	if (fromUserId > 0 && fromUserId != memo.UserId) || (fromGuestId != "") {
 		if err := c.base.db.Where("type = ? AND related_id = ? AND memo_id = ?", "comment", comment.Id, comment.MemoId).Delete(&message).Error; err != nil {
@@ -289,6 +289,18 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 
 	// 未开启邮件通知
 	if !sysConfigVO.EnableEmail {
+		return nil
+	}
+
+	// 检查评论者是否是动态发布者
+	var commenterUserId int32
+	if comment.Author != "" {
+		authorId, _ := strconv.ParseInt(comment.Author, 10, 32)
+		commenterUserId = int32(authorId)
+	}
+
+	// 如果评论者是动态发布者，则不发送邮件通知
+	if commenterUserId > 0 && commenterUserId == memo.UserId {
 		return nil
 	}
 
