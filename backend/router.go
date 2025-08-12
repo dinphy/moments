@@ -30,7 +30,7 @@ func setupRouter(injector do.Injector) {
 	userGroup.POST("/profile", userHandler.Profile)
 	userGroup.POST("/profile/:username", userHandler.ProfileForUser)
 	userGroup.POST("/saveProfile", userHandler.SaveProfile)
-	
+
 	userGroup.POST("/list", userHandler.UserList)
 	userGroup.POST("/:id", userHandler.GetUser)
 	userGroup.POST("/update", userHandler.UpdateUser)
@@ -84,6 +84,7 @@ func setupRouter(injector do.Injector) {
 	friendGroup := apiGroup.Group("/friend")
 	friendGroup.POST("/list", friendHandler.GetFriendList)
 	friendGroup.POST("/add", friendHandler.AddFriend)
+	friendGroup.POST("/update", friendHandler.UpdateFriend)
 	friendGroup.POST("/delete", friendHandler.DeleteFriend)
 
 	messageGroup := apiGroup.Group("/message")

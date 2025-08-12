@@ -54,8 +54,7 @@ func (n FriendHandler) AddFriend(c echo.Context) error {
 	}
 
 	validUrl, _ := util.ValidHttpUrl(friend.Url)
-	validIcon, _ := util.ValidHttpUrl(friend.Icon)
-	if !validUrl || !validIcon {
+	if !validUrl {
 		return FailRespWithMsg(c, Fail, "请检查地址格式")
 	}
 
@@ -84,6 +83,53 @@ func (n FriendHandler) DeleteFriend(c echo.Context) error {
 	if err := n.base.db.Delete(&db.Friend{}, id).Error; err != nil {
 		n.base.log.Error().Msgf("删除友情链接失败, %v", err)
 		return FailRespWithMsg(c, Fail, "删除友情链接失败")
+	}
+
+	return SuccessResp(c, h{})
+}
+
+// 更新友情链接
+// @Router /api/friend/update [post]
+func (n FriendHandler) UpdateFriend(c echo.Context) error {
+	context := c.(CustomContext)
+	currentUser := context.CurrentUser()
+	if currentUser == nil || currentUser.Id != 1 {
+		return FailRespWithMsg(c, Fail, "你没有权限更新友情链接")
+	}
+
+	var req struct {
+		Id   int32  `json:"id"`
+		Name string `json:"name"`
+		Icon string `json:"icon"`
+		Url  string `json:"url"`
+		Desc string `json:"desc"`
+	}
+	if err := c.Bind(&req); err != nil {
+		return FailResp(c, ParamError)
+	}
+
+	if req.Name == "" || req.Url == "" || req.Icon == "" {
+		return FailRespWithMsg(c, Fail, "请输入必填项")
+	}
+
+	validUrl, _ := util.ValidHttpUrl(req.Url)
+	if !validUrl {
+		return FailRespWithMsg(c, Fail, "请检查地址格式")
+	}
+
+	var friend db.Friend
+	if err := n.base.db.First(&friend, req.Id).Error; err != nil {
+		return FailRespWithMsg(c, Fail, "友情链接不存在")
+	}
+
+	friend.Name = req.Name
+	friend.Icon = req.Icon
+	friend.Url = req.Url
+	friend.Desc = req.Desc
+
+	if err := n.base.db.Save(&friend).Error; err != nil {
+		n.base.log.Error().Msgf("更新友情链接失败, %v", err)
+		return FailRespWithMsg(c, Fail, "更新友情链接失败")
 	}
 
 	return SuccessResp(c, h{})
