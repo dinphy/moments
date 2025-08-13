@@ -1,6 +1,16 @@
 <template>
-  <div class="flex flex-col gap-2 mt-2" :class="replyTo ? 'p-0' : 'p-3'" v-if="currentCommentBox === pid">
-    <div class="relative flex items-start gap-2">
+  <div 
+    :class="[
+      'flex flex-col gap-2',
+      'fixed inset-x-0 bottom-0 bg-white border-t border-gray-200 shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
+      replyTo ? 'p-3 sm:p-0' : 'p-3'
+    ]"
+    v-if="currentCommentBox === pid"
+  >
+    <div :class="[
+      'relative flex items-start gap-2',
+      'sm:p-2 py-2 sm:bg-transparent'
+    ]">
       <UTextarea 
         :rows="1" 
         :maxrows="4"
@@ -15,11 +25,11 @@
           placeholder: 'placeholder:text-gray-400'
         }"
       />
-      <div class="flex gap-1 items-start flex-shrink-0">
-        <UIcon v-if="!global.userinfo.token" class="text-[#9fc84a] w-6 h-6 cursor-pointer mt-1" name="i-carbon-user-avatar" @click="toggleUser"/>
-        <UIcon class="text-[#9fc84a] w-6 h-6 cursor-pointer select-none mt-1" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
+      <div class="flex gap-1 items-center flex-shrink-0">
+        <UIcon v-if="!global.userinfo.token" class="text-gray-400 w-7 h-7 cursor-pointer" name="i-carbon-user-avatar" @click="toggleUser"/>
+        <UIcon class="text-gray-400 w-7 h-7 cursor-pointer select-none" name="i-carbon-face-activated" @click="toggleEmoji"/>
         <UButton 
-          class="cursor-pointer text-xs mt-0.5" 
+          class="cursor-pointer text-sm" 
           :color="state.content.trim() ? 'primary' : 'white'" 
           :disabled="!state.content.trim()"
           @click="comment">
@@ -28,7 +38,9 @@
       </div>
     </div>
     <Emoji v-if="emojiShow" @selected="emojiSelected"/>
-    <div v-if="userShow" class="flex gap-1">
+    <div v-if="userShow" :class="[
+      'flex gap-1 flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'
+    ]">
       <template v-if="!global.userinfo.token">
         <UInput placeholder="姓名" v-model="state.username"/>
         <UInput placeholder="网站" v-model="state.website"/>
@@ -133,5 +145,5 @@ const emojiSelected = (emoji: string) => {
 </script>
 
 <style scoped>
-
+/* 保持样式简洁，主要使用Tailwind类 */
 </style>
