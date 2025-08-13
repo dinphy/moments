@@ -2,7 +2,7 @@
   <div 
     :class="[
       'flex flex-col gap-2',
-      'fixed inset-x-0 bottom-0 bg-white border-t border-gray-200 shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
+      'fixed inset-x-0 bottom-0 bg-white dark:bg-[#202020] border-t border-gray-200 dark:border-[#303030] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
       replyTo ? 'p-3 sm:p-1' : 'p-3'
     ]"
     v-if="currentCommentBox === pid"
@@ -14,7 +14,7 @@
     ]">
       <UTextarea 
         :rows="1" 
-        :maxrows="4"
+        :maxrows="3"
         autoresize
         autofocus 
         :placeholder="replyTo ? `回复${replyTo}:` : '说点什么...'" 
@@ -22,7 +22,7 @@
         class="flex-1 min-h-[32px] text-sm"
         :ui="{
           base: 'transition-all duration-200',
-          rounded: 'rounded',
+          rounded: 'rounded-lg',
           placeholder: 'placeholder:text-gray-400'
         }"
       />
@@ -154,5 +154,5 @@ const emojiSelected = (emoji: string) => {
 </script>
 
 <style scoped>
-/* 保持样式简洁，主要使用Tailwind类 */
+
 </style>

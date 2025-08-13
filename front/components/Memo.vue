@@ -296,6 +296,7 @@
                   :comment="c"
                   :memo-id="item.id"
                   :memo-user-id="item.user.id"
+                  :is-detail-page="isDetailPage"
                 />
               </div>
             </div>
