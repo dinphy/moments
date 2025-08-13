@@ -6,6 +6,7 @@
       replyTo ? 'p-3 sm:p-0' : 'p-3'
     ]"
     v-if="currentCommentBox === pid"
+    ref="commentBoxRef"
   >
     <div :class="[
       'relative flex items-start gap-2',
@@ -79,6 +80,14 @@ const userShow = ref(false)
 const emojiShow = ref(false)
 const currentCommentBox = useState('currentCommentBox')
 const sysConfig = useState<SysConfigVO>('sysConfig')
+const commentBoxRef = ref<HTMLElement>()
+
+onClickOutside(commentBoxRef, () => {
+  if (currentCommentBox.value === pid.value) {
+    currentCommentBox.value = ''
+  }
+})
+
 const state = reactive({
   content: "",
   memoId: props.memoId,
