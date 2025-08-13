@@ -290,7 +290,7 @@
                 v-if="item.comments && item.comments.length > 0"
                 v-for="c in item.comments"
                 :key="c.id"
-                class="px-4 relative flex-col text-sm"
+                class="px-2 relative flex-col text-sm"
               >
                 <Comment
                   :comment="c"
