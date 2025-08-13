@@ -1,12 +1,25 @@
 <template>
-  <div class="px-4 py-2 flex flex-col gap-2 mt-2" v-if="currentCommentBox === pid">
-    <div class="relative">
-      <UTextarea :rows="4" autofocus :placeholder="replyTo ? `回复${replyTo}:` : ''" v-model="state.content"/>
-      <div class="flex gap-2 absolute right-3 bottom-2">
-        <UIcon v-if="!global.userinfo.token" class="text-[#9fc84a] w-6 h-6 cursor-pointer" name="i-carbon-user-avatar" @click="toggleUser"/>
-        <UIcon class="text-[#9fc84a] w-6 h-6 cursor-pointer select-none" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
+  <div class="flex flex-col gap-2 mt-2" :class="replyTo ? 'p-0' : 'p-3'" v-if="currentCommentBox === pid">
+    <div class="relative flex items-start gap-2">
+      <UTextarea 
+        :rows="1" 
+        :maxrows="4"
+        autoresize
+        autofocus 
+        :placeholder="replyTo ? `回复${replyTo}:` : '说点什么...'" 
+        v-model="state.content"
+        class="flex-1 min-h-[32px] text-sm"
+        :ui="{
+          base: 'transition-all duration-200',
+          rounded: 'rounded',
+          placeholder: 'placeholder:text-gray-400'
+        }"
+      />
+      <div class="flex gap-1 items-start flex-shrink-0">
+        <UIcon v-if="!global.userinfo.token" class="text-[#9fc84a] w-6 h-6 cursor-pointer mt-1" name="i-carbon-user-avatar" @click="toggleUser"/>
+        <UIcon class="text-[#9fc84a] w-6 h-6 cursor-pointer select-none mt-1" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
         <UButton 
-          class="cursor-pointer text-xs" 
+          class="cursor-pointer text-xs mt-0.5" 
           :color="state.content.trim() ? 'primary' : 'white'" 
           :disabled="!state.content.trim()"
           @click="comment">

@@ -257,7 +257,7 @@
         >
           <div
             v-if="likeInfo && likeInfo.length > 0"
-            class="flex flex-row py-2 px-4 gap-2 items-center text-sm"
+            class="flex flex-row py-2 px-3 gap-2 items-center text-sm"
             :class="[
               item.comments && item.comments.length > 0
                 ? 'border-b-[1px] border-neutral-[100] dark:border-neutral-800'
@@ -290,7 +290,7 @@
                 v-if="item.comments && item.comments.length > 0"
                 v-for="c in item.comments"
                 :key="c.id"
-                class="px-2 relative flex-col text-sm"
+                class="px-3 relative flex-col text-sm"
               >
                 <Comment
                   :comment="c"
