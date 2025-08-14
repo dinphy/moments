@@ -2,7 +2,7 @@
   <UTabs class="mt-2" :items="tabItems"
          :ui="{wrapper: 'space-y-0', list: {height: 'h-8', tab: {height: 'h-6', padding: 'px-1'}}}">
     <template #item="{ item: tabItem }">
-      <div class="flex flex-wrap gap-0.5 text-lg rounded border p-2 shadow-lg select-none mt-2 *:cursor-pointer">
+      <div class="flex flex-wrap gap-1 text-xl rounded border border-gray-200 dark:border-gray-800 p-2 select-none mt-2 *:cursor-pointer">
         <div v-for="icon in tabItem.icons" @click="selectEmoji">{{ icon }}</div>
       </div>
     </template>
