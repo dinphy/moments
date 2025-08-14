@@ -2,7 +2,7 @@
   <div 
     :class="[
       'flex flex-col gap-2',
-      'fixed inset-x-0 bottom-0 bg-white dark:bg-[#202020] border-t border-gray-200 dark:border-[#303030] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
+      'fixed inset-x-0 bottom-0 bg-[#f7f7f7] dark:bg-[#202020] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
       replyTo ? 'p-3 sm:p-1' : 'p-3'
     ]"
     v-if="currentCommentBox === pid"
@@ -10,7 +10,7 @@
   >
     <div :class="[
       'relative flex items-start gap-2',
-      'py-2 sm:bg-transparent'
+      'pb-3 sm:bg-transparent'
     ]">
       <UTextarea 
         :rows="1" 
