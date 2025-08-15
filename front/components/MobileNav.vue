@@ -7,14 +7,18 @@
         'flex justify-center items-end sm:items-end md:items-end backdrop-blur',
     }"
   >
-    <div class="flex justify-between items-center py-4 sm:py-6 mb-6 w-full">
+    <span
+      @click="open = false"
+      class="mx-auto w-12 h-1.5 -mt-1 mb-5 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-lg cursor-pointer"
+    ></span>
+    <div class="flex justify-between items-center pb-4 sm:pb-6 w-full">
       <div class="flex items-center gap-2">
         <img
           :src="global.userinfo.token ? currentUser.avatarUrl : '/avatar.webp'"
           class="avatar w-8 h-8 rounded-md"
           :alt="global.userinfo.token ? '用户头像' : '访客头像'"
         />
-        <div class="flex flex-col">
+        <div class="flex flex-col space-y-0.5">
           <span class="text-sm font-bold">{{
             global.userinfo.token ? currentUser.nickname : guestId
           }}</span>
@@ -85,8 +89,12 @@
             <UIcon name="i-carbon-login" class="w-5 h-5 cursor-pointer" />
           </span>
         </div>
-        <div class="flex flex-col items-center" v-else @click="logout" title="退出登录">
-
+        <div
+          class="flex flex-col items-center"
+          v-else
+          @click="logout"
+          title="退出登录"
+        >
           <span class="flex items-center">
             <UIcon name="i-carbon-logout" class="w-5 h-5 cursor-pointer" />
           </span>
@@ -95,7 +103,7 @@
     </div>
 
     <div
-      class="grid grid-cols-5 gap-3 py-4 sm:py-6 text-gray-500 dark:text-white/80"
+      class="flex justify-between items-center pt-4 sm:pt-6 text-gray-500 dark:text-white/80"
     >
       <div
         v-if="global.userinfo.token"
@@ -226,25 +234,19 @@ const logout = async () => {
   open.value = false;
   global.value.userinfo = {};
   await navigateTo("/");
+  location.reload();
 };
 
-const guestNickname = computed(() => {
-  // 生成随机访客ID，格式为访客+4位随机数字
-  const randomId = Math.floor(1000 + Math.random() * 9000);
-  return `访客${randomId}`;
-});
-
 const guestMood = computed(() => {
-  // 随机心情状态数组
   const moods = [
-    "探索未知世界",
-    "静静欣赏美好",
-    "感受生活温度",
-    "享受此刻宁静",
-    "发现点滴惊喜",
-    "保持好奇之心",
-    "记录美好瞬间",
-    "品味生活诗意",
+    "来，探索未知世界。",
+    "来，静静欣赏美好。",
+    "来，感受生活温度。",
+    "来，享受此刻宁静。",
+    "来，发现点滴惊喜。",
+    "来，保持好奇之心。",
+    "来，记录美好瞬间。",
+    "来，品味生活诗意。",
   ];
   return moods[Math.floor(Math.random() * moods.length)];
 });
