@@ -10,7 +10,7 @@
     title="到顶部"
     v-if="y > 200"
     @click="y = 0"
-    class="hidden sm:block bottom-[20%] sm:right-[20%] md:right-[10%] lg:right-[15%] xl:right-[20%] 2xl:right-[28%] fixed items-center justify-center"
+    class="hidden md:block bottom-[20%] sm:right-[20%] md:right-[10%] lg:right-[15%] xl:right-[20%] 2xl:right-[28%] fixed items-center justify-center"
   >
     <UIcon
       name="i-lets-icons-expand-top-stop"
@@ -18,8 +18,8 @@
     ></UIcon>
   </div>
 
-  <div class="sm:hidden relative">
-    <div class="right-0 bottom-10 fixed flex items-center justify-end">
+  <div class="md:hidden relative">
+    <div class="right-0 bottom-[10%] fixed flex items-center justify-end">
       <div class="flex flex-col items-center gap-2">
         <div
           v-if="y > 300"
@@ -31,13 +31,6 @@
             class="w-6 h-6 text-[#9fc84a] cursor-pointer"
           ></UIcon>
         </div>
-        <NuxtLink
-          to="/new"
-          v-if="global.userinfo.token && $route.path === '/'"
-          class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
-        >
-          <UIcon name="i-carbon-camera" class="w-6 h-6 text-[#9fc84a]"></UIcon>
-        </NuxtLink>
         <div
           class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
           @click="open = true"
@@ -47,16 +40,6 @@
             class="w-6 h-6 text-[#9fc84a] cursor-pointer"
           ></UIcon>
         </div>
-        <NuxtLink
-          @click="mobileloginReg = true"
-          v-if="!global.userinfo.token && $route.path === '/'"
-          class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
-        >
-          <UIcon
-            name="i-carbon-login"
-            class="w-6 h-6 text-[#9fc84a] cursor-pointer"
-          ></UIcon>
-        </NuxtLink>
       </div>
     </div>
 

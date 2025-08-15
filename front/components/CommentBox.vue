@@ -2,15 +2,15 @@
   <div 
     :class="[
       'flex flex-col gap-2',
-      'fixed inset-x-0 bottom-0 bg-[#f7f7f7] dark:bg-[#202020] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain sm:static sm:mt-2 sm:max-h-none sm:border-0 sm:shadow-none sm:bg-transparent',
-      replyTo ? 'p-3 sm:p-1' : 'p-3'
+      'fixed inset-x-0 bottom-0 bg-[#f7f7f7] dark:bg-[#202020] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain md:static md:mt-2 md:max-h-none md:border-0 md:shadow-none md:bg-transparent',
+      replyTo ? 'p-3 md:p-1' : 'p-3'
     ]"
     v-if="currentCommentBox === pid"
     ref="commentBoxRef"
   >
     <div :class="[
       'relative flex items-start gap-2',
-      'pb-3 sm:bg-transparent'
+      'pb-3 md:bg-transparent'
     ]">
       <UTextarea 
         :rows="1" 
@@ -40,7 +40,7 @@
     </div>
     <Emoji v-if="emojiShow" @selected="emojiSelected"/>
     <div v-if="userShow" :class="[
-      'flex gap-1 flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'
+      'flex gap-1 flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2'
     ]">
       <template v-if="!global.userinfo.token">
         <UInput placeholder="姓名" v-model="state.username"/>
