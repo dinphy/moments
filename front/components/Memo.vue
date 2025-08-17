@@ -63,11 +63,17 @@
           >
             {{ getMemoMaxHeightStyle() === "" ? "收起" : "全文" }}
           </div>
-          <div v-if="tags.length > 0" class="flex gap-2 mt-2">
+          <div v-if="tags.length > 0" class="flex flex-wrap gap-2 mt-3">
             <span v-for="(tag, index) in tags" :key="`tag-${index}`">
               <NuxtLink :to="`/tags/${item.user.username}/${tag}`">
-                <UBadge size="xs" color="gray" variant="solid">
-                  {{ tag }}
+                <UBadge 
+                  size="sm" 
+                  color="gray" 
+                  variant="soft"
+                  class="px-3 py-1.5 text-xs transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700/70 dark:hover:to-gray-600/70 border border-gray-200/50 dark:border-gray-600/30"
+                >
+                  <UIcon name="i-carbon-hashtag" />
+                  <span class="text-gray-700 dark:text-gray-200">{{ tag }}</span>
                 </UBadge>
               </NuxtLink>
             </span>
