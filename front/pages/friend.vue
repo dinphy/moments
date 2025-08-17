@@ -102,7 +102,7 @@
                     class="hidden"
                   />
                   <div
-                    class="w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
+                    class="flex-col w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
                   >
                     <svg
                       class="w-8 h-8"
@@ -117,6 +117,7 @@
                         d="M12 4v16m8-8H4"
                       ></path>
                     </svg>
+                    <span class="text-xs">上传图标</span>
                   </div>
                 </label>
                 <UAvatar :src="friendForm.icon" size="lg" />

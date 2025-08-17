@@ -25,8 +25,33 @@
       </div>
       <div v-show="showFavicon" class="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-neutral-700">
         <div class="space-y-3 pt-3">
-          <UInput type="file" size="sm" icon="i-heroicons-photo" @change="uploadFavicon" accept="image/*"/>
-          <UInput v-model="state.favicon" placeholder="或输入favicon地址" size="sm"/>
+          <UInput v-model="state.favicon" placeholder="输入地址或上传" size="sm"/>
+          <label class="cursor-pointer group space-y-3">
+            <UInput
+              type="file"
+              @change="uploadFavicon"
+              accept="image/*"
+              class="hidden"
+            />
+            <div
+              class="flex-col w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
+            >
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                ></path>
+              </svg>
+              <span class="text-xs">上传图标</span>
+            </div>
+          </label>
         </div>
       </div>
     </UFormGroup>
