@@ -29,12 +29,17 @@
           }"
           class="flex items-center text-sm"
         >
-          <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
-          <span v-if="unreadCount > 0">未读({{ unreadCount }})</span>
-          <span v-else>全部已读</span>
+          <span v-if="unreadCount > 0" class="flex items-center">
+            <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
+            未读({{ unreadCount }})
+          </span>
+          <span v-else class="flex items-center">
+            <UIcon name="i-carbon-list-checked" class="w-4 h-4 mr-1" />
+            全部已读
+          </span>
         </div>
         <div
-          @click="messages.length > 0 ? deleteAllMessages() : null"
+          @click="messages.length > 0 ? handleDeleteAllMessages() : null"
           :class="{
             'text-red-500 cursor-pointer': messages.length > 0,
             'text-gray-400 cursor-not-allowed': messages.length === 0,
@@ -49,7 +54,7 @@
 
     <div
       v-if="!messages || messages.length === 0"
-      class="p-4 text-center text-gray-500 dark:text-gray-400"
+      class="py-10 text-center text-gray-500 dark:text-gray-400"
     >
       暂无消息
     </div>
@@ -123,6 +128,34 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+  </UModal>
+
+  <!-- 确认清空对话框 -->
+  <UModal v-model="showDeleteConfirm" :ui="{
+    container: 'flex justify-center items-center backdrop-blur',
+  }">
+    <div class="p-5">
+      <h3 class="font-medium text-lg mb-4">清空提示</h3>
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        确定要清空所有消息吗？此操作不可恢复。
+      </p>
+      <div class="flex justify-end space-x-3">
+        <UButton
+          color="gray"
+          variant="solid"
+          @click="showDeleteConfirm = false"
+        >
+          取消
+        </UButton>
+        <UButton
+          color="primary"
+          variant="solid"
+          @click="confirmDeleteAllMessages"
+        >
+          确认
+        </UButton>
       </div>
     </div>
   </UModal>
@@ -359,7 +392,16 @@ const deleteMessage = async (messageId: number) => {
   }
 };
 
-const deleteAllMessages = async () => {
+const showDeleteConfirm = ref(false);
+
+const handleDeleteAllMessages = () => {
+  if (messages.value.length === 0) return;
+  showDeleteConfirm.value = true;
+};
+
+// 确认删除所有消息
+const confirmDeleteAllMessages = async () => {
+  showDeleteConfirm.value = false;
   if (!global.value.userinfo.token || messages.value.length === 0) return;
 
   try {
