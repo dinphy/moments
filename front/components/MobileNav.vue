@@ -1,17 +1,25 @@
 <template>
-  <UModal
+  <USlideover
     v-model="open"
+    side="bottom"
     :ui="{
-      base: 'p-6',
-      container:
-        'flex justify-center items-end sm:items-end md:items-end backdrop-blur',
+      base: 'p-6 max-h-[30vh]',
+      background: 'bg-white dark:bg-gray-900',
+      rounded: 'rounded-t-2xl',
+      shadow: 'shadow-2xl shadow-gray-900/20',
+      width: 'w-full',
+      overlay: {
+        background: 'bg-gray-900/60 backdrop-blur-sm',
+      }
     }"
   >
-    <span
-      @click="open = false"
-      class="mx-auto w-12 h-1.5 -mt-1 mb-5 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 hover:dark:bg-gray-700 rounded-lg cursor-pointer"
-    ></span>
-    <div class="flex justify-between items-center pb-4 sm:pb-6 w-full">
+    <div class="flex justify-center pt-2 pb-2">
+      <span
+        @click="open = false"
+        class="mx-auto w-12 h-1.5 -mt-1 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 hover:dark:bg-gray-600 rounded-full cursor-pointer"
+      ></span>
+    </div>
+    <div class="flex justify-between items-center py-4 w-full">
       <div class="flex items-center gap-2">
         <img
           :src="global.userinfo.token ? currentUser.avatarUrl : '/avatar.webp'"
@@ -103,7 +111,7 @@
     </div>
 
     <div
-      class="flex justify-between items-center pt-4 sm:pt-6 text-gray-500 dark:text-white/80"
+      class="flex justify-between items-center pt-8 text-gray-500 dark:text-white/80"
     >
       <div
         v-if="global.userinfo.token"
@@ -190,7 +198,7 @@
         <span class="text-xs mt-1">用户</span>
       </div>
     </div>
-  </UModal>
+  </USlideover>
 </template>
 
 <script setup lang="ts">
