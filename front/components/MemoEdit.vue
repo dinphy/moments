@@ -1,8 +1,8 @@
 <template>
   <div class="px-4 space-y-2">
     <div class="flex justify-between items-center pt-4 text-gray-600">
-      <NuxtLink class="flex items-center" title="返回主页">
-        <UIcon @click="navigateTo('/')" name="i-carbon-chevron-left" class="w-5 h-5 cursor-pointer mr-4"/>
+      <NuxtLink class="flex items-center" title="返回">
+        <UIcon @click="goBack" name="i-carbon-chevron-left" class="w-5 h-5 cursor-pointer mr-4"/>
         <span v-if="$route.path==='/new'">新增内容</span>
         <span v-else>修改内容</span>
       </NuxtLink>
@@ -93,8 +93,6 @@
       <video-preview v-if="state.video.type === 'online' && state.video.value" :url="state.video.value"/>
     </div>
   </div>
-
-
 </template>
 
 <script setup lang="ts">
@@ -249,6 +247,17 @@ const clickTag = (tag: string) => {
   //@ts-ignore
   (contentRef.value?.textarea as HTMLTextAreaElement).focus()
 }
+
+const router = useRouter();
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    navigateTo("/");
+  }
+};
+
 onMounted(async () => {
   if (state.id > 0) {
     const res = await useMyFetch<MemoVO>('/memo/get?id=' + state.id)

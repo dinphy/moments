@@ -4,9 +4,9 @@
       :class="{ 'bg-[#4c4c4c]/80 z-10': y > 100 }"
       class="flex fixed justify-between items-center p-4 w-full md:w-[567px] text-white top-0"
     >
-      <NuxtLink class="flex items-center" title="返回主页">
+      <NuxtLink class="flex items-center" title="返回">
         <UIcon
-          @click="navigateTo('/')"
+          @click="goBack"
           name="i-carbon-chevron-left"
           class="w-5 h-5 cursor-pointer mr-4"
         />
@@ -330,6 +330,7 @@ const isDetailPage = computed(() => {
 const contentRef = ref<HTMLDivElement | null>(null);
 const sysConfig = useState<SysConfigVO>("sysConfig");
 const route = useRoute();
+const router = useRouter();
 const { y } = useWindowScroll();
 
 const getMemoMaxHeightStyle = () => {
@@ -600,6 +601,13 @@ const content = computed(() => {
   }
   return "";
 });
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    navigateTo("/");
+  }
+};
 </script>
 
 <style lang="scss" scoped></style>

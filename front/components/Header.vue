@@ -8,9 +8,9 @@
       :class="{ 'bg-[#4c4c4c]/80 z-10': y > 100 }"
       class="flex fixed justify-between items-center p-4 w-full md:w-[567px] text-white top-0"
     >
-      <NuxtLink class="flex items-center" title="返回主页">
+      <NuxtLink class="flex items-center" title="返回">
         <UIcon
-          @click="navigateTo('/')"
+          @click="goBack"
           name="i-carbon-chevron-left"
           class="w-5 h-5 cursor-pointer mr-4"
         />
@@ -178,6 +178,7 @@ import { useGlobalState } from "~/store";
 
 const global = useGlobalState();
 const route = useRoute();
+const router = useRouter();
 
 const props = defineProps<{ user: UserVO }>();
 const mode = useColorMode();
@@ -186,6 +187,14 @@ const loginReg = useState<boolean>("loginReg", () => false);
 const logout = async () => {
   global.value.userinfo = {};
   await navigateTo("/");
+};
+
+const goBack = () => {
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    navigateTo("/");
+  }
 };
 
 const toggleMode = () => {
