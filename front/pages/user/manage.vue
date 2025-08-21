@@ -313,11 +313,12 @@
     <UModal
       v-model="showUserSettingsModal"
       :ui="{
-        container: 'flex justify-center items-center backdrop-blur',
+        container: 'flex justify-center items-start sm:items-center backdrop-blur-sm',
+
       }"
     >
       <UCard
-        :ui="{ body: { base: 'max-h-[60vh] sm:max-h-[90vh] overflow-y-auto' } }"
+        :ui="{ body: { base: 'max-h-[64vh] sm:max-h-[96vh] overflow-y-auto !p-2' } }"
       >
         <template #header>
           <h3 class="text-lg font-semibold">
@@ -338,7 +339,7 @@
     <UModal
       v-model="showDeleteModal"
       :ui="{
-        container: 'flex justify-center items-center backdrop-blur',
+        container: 'flex justify-center items-center backdrop-blur-sm',
       }"
     >
       <UCard>
@@ -352,8 +353,8 @@
 
         <div class="flex justify-end space-x-2 mt-4">
           <UButton color="gray" @click="showDeleteModal = false">取消</UButton>
-          <UButton color="red" :loading="deleting" @click="doDelete"
-            >删除</UButton
+          <UButton :loading="deleting" @click="doDelete"
+            >确认</UButton
           >
         </div>
       </UCard>

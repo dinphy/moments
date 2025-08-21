@@ -15,7 +15,7 @@
   <UModal
     v-model="showMessageBox"
     :ui="{
-      container: 'flex justify-center items-center backdrop-blur',
+      container: 'flex justify-center items-center backdrop-blur-sm',
     }"
   >
     <div class="flex justify-between items-center p-5">
@@ -134,7 +134,7 @@
 
   <!-- 确认清空对话框 -->
   <UModal v-model="showDeleteConfirm" :ui="{
-    container: 'flex justify-center items-center backdrop-blur',
+    container: 'flex justify-center items-center backdrop-blur-sm',
   }">
     <div class="p-5">
       <h3 class="font-medium text-lg mb-4">清空提示</h3>

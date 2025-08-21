@@ -90,7 +90,7 @@
         <div
           class="flex flex-col items-center"
           v-if="!global.userinfo.token"
-          @click="mobileloginReg = true"
+          @click="loginReg = true , open = false"
           title="登录/注册"
         >
           <span class="flex items-center">
@@ -210,7 +210,7 @@ import type { UserVO } from "~/types";
 const global = useGlobalState();
 const mode = useColorMode();
 const open = useState<boolean>("sidebarOpen", () => false);
-const mobileloginReg = useState<boolean>("mobileloginReg", () => false);
+const loginReg = useState<boolean>("loginReg", () => false);
 const currentUser = useState<UserVO>("userinfo");
 const guestId = ref<string>("");
 

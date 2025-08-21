@@ -63,10 +63,10 @@
     v-model="showModal"
     :ui="{
       container:
-        'fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center backdrop-blur',
+        'flex justify-center items-center backdrop-blur-sm',
     }"
   >
-    <div class="p-4">
+    <div class="p-4 sm:p-6">
       <p class="text-center text-lg font-bold mb-2">
         {{ isEditMode ? "编辑友情链接" : "添加友情链接" }}
       </p>
@@ -158,17 +158,23 @@
     v-model="showDeleteModal"
     :ui="{
       container:
-        'fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center backdrop-blur',
+        'fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center backdrop-blur-sm',
     }"
   >
-    <div class="p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-md">
-      <p class="text-center text-lg font-bold mb-2">谨慎操作</p>
-      <p class="text-gray-600 mb-4">你确定要删除这个友情链接吗？</p>
-      <div class="flex justify-end gap-2 mt-4">
-        <UButton color="white" @click="cancelDelete">取消</UButton>
-        <UButton @click="deleteFriend(friendIdToDelete)">确认删除</UButton>
-      </div>
-    </div>
+    <UCard>
+        <template #header>
+          <h3 class="text-lg font-semibold">确认删除</h3>
+        </template>
+
+        <p>
+          确定要删除这个友链吗？此操作不可恢复。
+        </p>
+
+        <div class="flex justify-end space-x-2 mt-4">
+          <UButton color="white" @click="cancelDelete">取消</UButton>
+          <UButton @click="deleteFriend(friendIdToDelete)">确认</UButton>
+        </div>
+      </UCard>
   </UModal>
 </template>
 
