@@ -5,7 +5,7 @@
       overlay: {
         base: 'backdrop-blur-sm bg-gray-900/50 dark:bg-gray-950/70',
       },
-      container: 'flex items-end sm:items-center justify-center min-h-screen p-0 sm:p-2',
+      container: 'flex items-start sm:items-center justify-center min-h-screen',
       width: 'w-full max-w-xs sm:max-w-xs',
       height: 'h-auto max-h-[85dvh] sm:max-h-[80vh]',
     }"
