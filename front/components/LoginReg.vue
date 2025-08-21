@@ -10,125 +10,132 @@
       height: 'h-auto max-h-[85dvh] sm:max-h-[80vh]',
     }"
   >
-    <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-h-[85dvh] sm:max-h-[80vh] flex flex-col">
-      <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-            {{ isLogin ? "欢迎回来" : "创建账户" }}
-          </h3>
-          <UIcon @click="loginReg = false" name="i-heroicons-x-mark" class="text-gray-400 hover:text-gray-500 p-2 cursor-pointer" />
+    <div
+      v-if="loginReg"
+      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      @click.self="loginReg = false"
+    >
+      <div class="absolute inset-0 bg-gray-900/50 dark:bg-gray-950/70 backdrop-blur-sm" />
+      <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-xs max-h-[85dvh] sm:max-h-[80vh] flex flex-col mb-5 sm:mb-0">
+        <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+              {{ isLogin ? "欢迎回来" : "创建账户" }}
+            </h3>
+            <UIcon @click="loginReg = false" name="i-heroicons-x-mark" class="text-gray-400 hover:text-gray-500 p-2 cursor-pointer" />
+          </div>
+          <p class="mt-0.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            {{ isLogin ? "登录账户，继续记录美好时光" : "加入我们，开始记录美好时光" }}
+          </p>
         </div>
-        <p class="mt-0.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          {{ isLogin ? "登录账户，继续记录美好时光" : "加入我们，开始记录美好时光" }}
-        </p>
-      </div>
-      <div class="flex-1 overflow-y-auto">
-        <div class="p-4 sm:p-5">
-          <UForm
-            class="space-y-4"
-            size="sm"
-            :state="state"
-            @keyup.enter="doLoginReg"
-          >
-            <UFormGroup 
-              name="username"
-              :ui="{ 
-                container: 'space-y-1'
-              }"
+        <div class="flex-1 overflow-y-auto">
+          <div class="p-4 sm:p-5">
+            <UForm
+              class="space-y-4"
+              size="sm"
+              :state="state"
+              @keyup.enter="doLoginReg"
             >
-              <UInput 
-                v-model="state.username" 
-                placeholder="请输入账号"
-                size="md"
+              <UFormGroup 
+                name="username"
                 :ui="{ 
-                  base: 'w-full text-sm',
-                  rounded: 'rounded-md',
-                  placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
-                }"
-                class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <template #leading>
-                  <UIcon name="i-heroicons-user" class="w-4 h-4 text-gray-400" />
-                </template>
-              </UInput>
-            </UFormGroup>
-            <UFormGroup 
-              name="password"
-              :ui="{ 
-                container: 'space-y-1'
-              }"
-            >
-              <UInput 
-                type="password" 
-                v-model="state.password" 
-                placeholder="请输入密码"
-                size="md"
-                :ui="{ 
-                  base: 'w-full text-sm',
-                  rounded: 'rounded-md',
-                  placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
-                }"
-                class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <template #leading>
-                  <UIcon name="i-heroicons-lock-closed" class="w-4 h-4 text-gray-400" />
-                </template>
-              </UInput>
-            </UFormGroup>
-            <UFormGroup 
-              v-if="!isLogin" 
-              name="repeatPassword"
-              :ui="{ 
-                container: 'space-y-1'
-              }"
-            >
-              <UInput 
-                type="password" 
-                v-model="state.repeatPassword" 
-                placeholder="请确认密码"
-                size="md"
-                :ui="{ 
-                  base: 'w-full text-sm',
-                  rounded: 'rounded-md',
-                  placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
-                }"
-                class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
-                <template #leading>
-                  <UIcon name="i-heroicons-lock-closed" class="w-4 h-4 text-gray-400" />
-                </template>
-              </UInput>
-            </UFormGroup>
-            <div class="space-y-4">
-              <UButton
-                @click="doLoginReg"
-                :disabled="pending"
-                :loading="pending"
-                size="md"
-                block
-                class="rounded-md font-medium"
-                :ui="{ 
-                  base: 'w-full py-2.5 text-sm',
-                  rounded: 'rounded-md'
+                  container: 'space-y-1'
                 }"
               >
-                {{ isLogin ? "登录" : "注册" }}
-              </UButton>
-
-              <div class="text-center">
-                <UButton
-                  color="gray"
-                  variant="link"
-                  @click="isLogin = !isLogin"
-                  v-if="isLogin ? sysConfig.enableRegister : true"
-                  class="text-xs sm:text-sm font-medium"
-                  size="sm"
+                <UInput 
+                  v-model="state.username" 
+                  placeholder="请输入账号"
+                  size="md"
+                  :ui="{ 
+                    base: 'w-full text-sm',
+                    rounded: 'rounded-md',
+                    placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
+                  }"
+                  class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
-                  {{ isLogin ? "还没有账户？立即注册" : "已有账户？立即登录" }}
+                  <template #leading>
+                    <UIcon name="i-heroicons-user" class="w-4 h-4 text-gray-400" />
+                  </template>
+                </UInput>
+              </UFormGroup>
+              <UFormGroup 
+                name="password"
+                :ui="{ 
+                  container: 'space-y-1'
+                }"
+              >
+                <UInput 
+                  type="password" 
+                  v-model="state.password" 
+                  placeholder="请输入密码"
+                  size="md"
+                  :ui="{ 
+                    base: 'w-full text-sm',
+                    rounded: 'rounded-md',
+                    placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
+                  }"
+                  class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <template #leading>
+                    <UIcon name="i-heroicons-lock-closed" class="w-4 h-4 text-gray-400" />
+                  </template>
+                </UInput>
+              </UFormGroup>
+              <UFormGroup 
+                v-if="!isLogin" 
+                name="repeatPassword"
+                :ui="{ 
+                  container: 'space-y-1'
+                }"
+              >
+                <UInput 
+                  type="password" 
+                  v-model="state.repeatPassword" 
+                  placeholder="请确认密码"
+                  size="md"
+                  :ui="{ 
+                    base: 'w-full text-sm',
+                    rounded: 'rounded-md',
+                    placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
+                  }"
+                  class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <template #leading>
+                    <UIcon name="i-heroicons-lock-closed" class="w-4 h-4 text-gray-400" />
+                  </template>
+                </UInput>
+              </UFormGroup>
+              <div class="space-y-4">
+                <UButton
+                  @click="doLoginReg"
+                  :disabled="pending"
+                  :loading="pending"
+                  size="md"
+                  block
+                  class="rounded-md font-medium"
+                  :ui="{ 
+                    base: 'w-full py-2.5 text-sm',
+                    rounded: 'rounded-md'
+                  }"
+                >
+                  {{ isLogin ? "登录" : "注册" }}
                 </UButton>
+
+                <div class="text-center">
+                  <UButton
+                    color="gray"
+                    variant="link"
+                    @click="isLogin = !isLogin"
+                    v-if="isLogin ? sysConfig.enableRegister : true"
+                    class="text-xs sm:text-sm font-medium"
+                    size="sm"
+                  >
+                    {{ isLogin ? "还没有账户？立即注册" : "已有账户？立即登录" }}
+                  </UButton>
+                </div>
               </div>
-            </div>
-          </UForm>
+            </UForm>
+          </div>
         </div>
       </div>
     </div>
@@ -150,6 +157,8 @@ const state = reactive({
   password: "",
   ...(!isLogin.value && { repeatPassword: "" }),
 });
+
+
 
 const pending = ref(false);
 
@@ -194,6 +203,6 @@ watch(isLogin, (newVal) => {
     state.repeatPassword = "";
   }
 });
-</script>
 
-<style scoped></style>
+
+</script>
