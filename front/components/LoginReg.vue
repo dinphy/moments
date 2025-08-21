@@ -13,7 +13,7 @@
       @click.self="loginReg = false"
     >
       <div class="absolute inset-0 bg-gray-900/50 dark:bg-gray-950/70 backdrop-blur-sm" />
-      <div class="relative bg-white dark:bg-gray-900 rounded-t-xl sm:rounded-xl shadow-xl w-full max-w-xs max-h-[85dvh] sm:max-h-[80vh] flex flex-col">
+      <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-xs max-h-[85dvh] sm:max-h-[80vh] flex flex-col mb-5 sm:mb-0">
         <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
           <div class="flex items-center justify-between">
             <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
