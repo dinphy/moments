@@ -29,12 +29,12 @@
       <UPopover
         v-if="$route.path.indexOf('/memo/') >= 0 && memoItem"
         v-model:open="moreToolbar"
-        :popper="{ placement: 'bottom-end', strategy: 'fixed' }"
+        :popper="{ placement: 'bottom-end', strategy: 'fixed', arrow: true }"
       >
         <UIcon
           v-if="global.userinfo.id === 1 || (memoItem && global.userinfo.id === memoItem.userId)"
           name="i-solar-menu-dots-bold"
-          class="w-5 h-5 cursor-pointer"
+          class="mt-1 w-5 h-5 cursor-pointer"
         />
         <template #panel>
           <div class="w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
