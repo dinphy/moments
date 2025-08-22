@@ -317,22 +317,16 @@
 
       }"
     >
-      <UCard
-        :ui="{ body: { base: 'max-h-[64vh] sm:max-h-[96vh] overflow-y-auto !p-2' } }"
-      >
-        <template #header>
-          <h3 class="text-lg font-semibold">
-            编辑用户 - {{ settingsTargetUser?.username }}
-          </h3>
-        </template>
+      <div class="p-4 border-b border-gray-200 dark:border-gray-700 text-md font-semibold">
+        编辑用户 - {{ settingsTargetUser?.username }}
+      </div>
 
-        <UserSettings
-          v-if="settingsTargetUser"
-          :target-user="settingsTargetUser"
-          :is-admin-mode="true"
-          :on-save="handleUserSettingsSave"
-        />
-      </UCard>
+      <UserSettings
+        v-if="settingsTargetUser"
+        :target-user="settingsTargetUser"
+        :is-admin-mode="true"
+        :on-save="handleUserSettingsSave"
+      />
     </UModal>
 
     <!-- 删除确认对话框 -->

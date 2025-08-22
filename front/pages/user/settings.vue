@@ -1,7 +1,7 @@
 <template>
   <Header :user="currentUser" v-if="!isAdminMode"/>
 
-  <div class="space-y-4 flex flex-col p-4 my-4" :class="{ 'pt-0': isAdminMode }">
+  <div class="space-y-4 flex flex-col p-4 my-4" :class="{ 'px-6 pt-0': isAdminMode }">
     <UFormGroup label="登录名" name="username" :ui="{label:{base:'font-bold'}}">
       <UInput v-model="state.username" disabled />
     </UFormGroup>
@@ -224,7 +224,6 @@ onMounted(async () => {
 })
 
 </script>
-
 <style scoped>
 
 </style>
