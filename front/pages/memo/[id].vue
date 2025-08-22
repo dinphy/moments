@@ -1,5 +1,5 @@
 <template>
-  <Header v-if="memo && memo.user" v-bind:user="memo.user"/>
+  <Header v-if="memo && memo.user" v-bind:user="memo.user" v-bind:memo-item="memo"/>
 
   <Memo v-if="memo" v-bind:memo="memo"/>
 

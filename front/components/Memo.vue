@@ -1,310 +1,218 @@
 <template>
-  <div v-if="isDetailPage" class="header relative mb-14">
-    <div
-      :class="{ 'bg-[#4c4c4c]/80 z-10': y > 100 }"
-      class="flex fixed justify-between items-center p-4 w-full md:w-[567px] text-white top-0"
-    >
-      <NuxtLink class="flex items-center" title="返回">
-        <UIcon
-          @click="goBack"
-          name="i-carbon-chevron-left"
-          class="w-5 h-5 cursor-pointer mr-4"
-        />
-        <span>详情</span>
+  <div
+    class="relative flex gap-4 text-sm dark:bg-neutral-800 p-4"
+    :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
+  >
+    <div class="avatar">
+      <NuxtLink
+        :to="isDetailPage ? '' : `/memo/${item.id}`"
+      >
+        <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
       </NuxtLink>
-      <UIcon
-        v-if="global.userinfo.id === 1 || global.userinfo.id === item.userId"
-        name="i-solar-menu-dots-bold"
-        class="w-5 h-5 cursor-pointer"
-        @click="moreToolbar = true"
-      />
     </div>
-  </div>
-  <div>
-    <div
-      class="relative flex gap-4 text-sm dark:bg-neutral-800 p-4"
-      :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
-    >
-      <div class="avatar">
-        <NuxtLink
-          :to="isDetailPage ? '' : `/memo/${item.id}`"
-        >
-          <UAvatar :src="item.user.avatarUrl" alt="Avatar" />
+    <div class="flex flex-col gap-1 flex-1">
+      <div
+        class="username text-[#576b95] mb-1 dark:text-white flex justify-between"
+      >
+        <NuxtLink class="cursor-pointer" :to="`/user/${item.user.id}`">
+          {{ item.user.nickname }}
         </NuxtLink>
+        <div>
+          <UIcon v-if="item.pinned" name="i-carbon-pin" />
+          <UIcon
+            v-if="item.showType === 0"
+            name="i-carbon-locked"
+            class="text-red-500 ml-2 dark:text-white"
+          />
+        </div>
       </div>
-      <div class="flex flex-col gap-1 flex-1">
+      <div class="mb-2">
+        <div :style="getMemoMaxHeightStyle()" class="overflow-hidden">
+          <div
+            class="markdown-content"
+            ref="contentRef"
+            v-html="content"
+          ></div>
+        </div>
         <div
-          class="username text-[#576b95] mb-1 dark:text-white flex justify-between"
+          v-if="showMore"
+          class="text-[#576b95] text-sm my-1 cursor-pointer"
+          @click="doShowMore"
         >
-          <NuxtLink class="cursor-pointer" :to="`/user/${item.user.id}`">
-            {{ item.user.nickname }}
-          </NuxtLink>
-          <div>
-            <UIcon v-if="item.pinned" name="i-carbon-pin" />
-            <UIcon
-              v-if="item.showType === 0"
-              name="i-carbon-locked"
-              class="text-red-500 ml-2 dark:text-white"
-            />
+          {{ getMemoMaxHeightStyle() === "" ? "收起" : "全文" }}
+        </div>
+        <div v-if="tags.length > 0" class="flex flex-wrap gap-2 mt-3">
+          <span v-for="(tag, index) in tags" :key="`tag-${index}`">
+            <NuxtLink :to="`/tags/${item.user.username}/${tag}`">
+              <UBadge 
+                size="sm" 
+                color="gray" 
+                variant="soft"
+                class="px-3 py-1.5 text-xs transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700/70 dark:hover:to-gray-600/70 border border-gray-200/50 dark:border-gray-600/30"
+              >
+                <UIcon name="i-carbon-hashtag" />
+                <span class="text-gray-700 dark:text-gray-200">{{ tag }}</span>
+              </UBadge>
+            </NuxtLink>
+          </span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <external-url-preview
+          v-if="
+            item.externalFavicon && item.externalTitle && item.externalUrl
+          "
+          :favicon="item.externalFavicon"
+          :title="item.externalTitle"
+          :url="item.externalUrl"
+        />
+        <upload-image-preview
+          :imgs="item.imgs"
+          :imgConfigs="item.imgConfigs"
+          :memo-id="item.id"
+        />
+
+        <music-preview
+          v-if="extJSON.music && extJSON.music.id"
+          v-bind="extJSON.music"
+        />
+        <douban-book-preview
+          v-if="extJSON.doubanBook && extJSON.doubanBook.title"
+          :book="extJSON.doubanBook"
+        />
+        <douban-movie-preview
+          v-if="extJSON.doubanMovie && extJSON.doubanMovie.title"
+          :movie="extJSON.doubanMovie"
+        />
+        <video-preview-iframe
+          v-if="
+            extJSON.video &&
+            ['bilibili', 'youtube'].includes(extJSON.video.type) &&
+            extJSON.video.value
+          "
+          :url="extJSON.video.value"
+        />
+        <video-preview
+          v-if="
+            extJSON.video &&
+            extJSON.video.type === 'online' &&
+            extJSON.video.value
+          "
+          :url="extJSON.video.value"
+        />
+      </div>
+
+      <div
+        v-if="location"
+        class="text-[#576b95] font-medium dark:text-white text-xs mt-2 mb-1 select-none flex items-center gap-0.5"
+      >
+        <UIcon name="i-carbon-location" />
+        <span>{{ location }}</span>
+      </div>
+
+      <div class="flex justify-between items-center relative">
+        <div class="flex text-xs text-[#9DA4B0]">
+          {{
+            sysConfig.timeFormat === "timeAgo"
+              ? $dayjs(item.createdAt).fromNow()
+              : $dayjs(item.createdAt).format("YYYY-MM-DD HH:mm")
+          }}
+          {{
+            $dayjs(item.createdAt).isAfter($dayjs()) ? '，未到发布时间，仅自己可见' : ''
+          }}
+        </div>
+        <div
+          @click="showToolbar = !showToolbar"
+          class="toolbar-icon px-2 py-1 bg-[#f7f7f7] dark:bg-slate-700 hover:bg-[#dedede] cursor-pointer rounded flex items-center justify-center"
+        >
+          <img
+            class="w-3 h-3"
+            src="data:image/svg+xml,%3csvg%20t='1709204592505'%20class='icon'%20viewBox='0%200%201024%201024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20p-id='16237'%20width='16'%20height='16'%3e%3cpath%20d='M229.2%20512m-140%200a140%20140%200%201%200%20280%200%20140%20140%200%201%200-280%200Z'%20p-id='16238'%20fill='%238a8a8a'%3e%3c/path%3e%3cpath%20d='M794.8%20512m-140%200a140%20140%200%201%200%20280%200%20140%20140%200%201%200-280%200Z'%20p-id='16239'%20fill='%238a8a8a'%3e%3c/path%3e%3c/svg%3e"
+          />
+        </div>
+
+        <div
+          v-if="showToolbar"
+          ref="toolbarRef"
+          class="absolute top-[-8px] right-[32px] bg-[#4c4c4c] rounded text-white p-2"
+        >
+          <div class="flex flex-row gap-2">
+            <div
+              class="flex flex-row gap-1 cursor-pointer items-center px-4"
+              @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
+            >
+              <UIcon
+                v-if="liked"
+                name="i-carbon-favorite-filled"
+                class="w-4 h-4 text-red-400"
+              />
+              <UIcon v-else name="i-carbon-favorite" class="w-4 h-4" />
+              <div>{{ liked ? "取消" : "赞" }}</div>
+            </div>
+            <template v-if="sysConfig.enableComment">
+              <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
+              <div
+                class="flex flex-row gap-1 cursor-pointer items-center px-4"
+                @click="doComment"
+              >
+                <UIcon
+                  name="i-octicon-comment"
+                  class="w-4 h-4 relative top-[2px]"
+                />
+                <div>评论</div>
+              </div>
+            </template>
           </div>
         </div>
-        <div class="mb-2">
-          <div :style="getMemoMaxHeightStyle()" class="overflow-hidden">
-            <div
-              class="markdown-content"
-              ref="contentRef"
-              v-html="content"
-            ></div>
-          </div>
-          <div
-            v-if="showMore"
-            class="text-[#576b95] text-sm my-1 cursor-pointer"
-            @click="doShowMore"
-          >
-            {{ getMemoMaxHeightStyle() === "" ? "收起" : "全文" }}
-          </div>
-          <div v-if="tags.length > 0" class="flex flex-wrap gap-2 mt-3">
-            <span v-for="(tag, index) in tags" :key="`tag-${index}`">
-              <NuxtLink :to="`/tags/${item.user.username}/${tag}`">
-                <UBadge 
-                  size="sm" 
-                  color="gray" 
-                  variant="soft"
-                  class="px-3 py-1.5 text-xs transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-pointer bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50 hover:from-gray-100 hover:to-gray-200 dark:hover:from-gray-700/70 dark:hover:to-gray-600/70 border border-gray-200/50 dark:border-gray-600/30"
-                >
-                  <UIcon name="i-carbon-hashtag" />
-                  <span class="text-gray-700 dark:text-gray-200">{{ tag }}</span>
-                </UBadge>
-              </NuxtLink>
+      </div>
+
+      <div
+        class="rounded bottom-shadow bg-[#f7f7f7] dark:bg-[#202020] flex flex-col gap-1"
+      >
+        <div
+          v-if="likeInfo && likeInfo.length > 0"
+          class="flex flex-row py-2 px-3 gap-2 items-center text-sm"
+          :class="[
+            item.comments && item.comments.length > 0
+              ? 'border-b-[1px] border-neutral-[100] dark:border-neutral-800'
+              : '',
+          ]"
+        >
+          <div class="text-[#576b95] gap-1">
+            <UIcon name="i-carbon-favorite" class="mr-1 relative top-[1px]" />
+            <!-- 显示点赞用户列表区域 -->
+            {{ (likeShowAll || isDetailPage ? likeInfo : likeInfo.slice(0, 3)).map(info => info.name || info.id).join(', ') }}
+            <span 
+              v-if="!isDetailPage"
+              @click="likeShowAll = !likeShowAll" 
+              class="cursor-pointer"
+            >
+              <span v-if="likeNum > 3">
+                <span v-if="likeShowAll" class="text-gray-400">[收起]</span>
+                <span v-else>等{{ likeNum }}位称赞</span>
+              </span>
             </span>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2">
-          <external-url-preview
-            v-if="
-              item.externalFavicon && item.externalTitle && item.externalUrl
-            "
-            :favicon="item.externalFavicon"
-            :title="item.externalTitle"
-            :url="item.externalUrl"
-          />
-          <upload-image-preview
-            :imgs="item.imgs"
-            :imgConfigs="item.imgConfigs"
-            :memo-id="item.id"
-          />
-
-          <music-preview
-            v-if="extJSON.music && extJSON.music.id"
-            v-bind="extJSON.music"
-          />
-          <douban-book-preview
-            v-if="extJSON.doubanBook && extJSON.doubanBook.title"
-            :book="extJSON.doubanBook"
-          />
-          <douban-movie-preview
-            v-if="extJSON.doubanMovie && extJSON.doubanMovie.title"
-            :movie="extJSON.doubanMovie"
-          />
-          <video-preview-iframe
-            v-if="
-              extJSON.video &&
-              ['bilibili', 'youtube'].includes(extJSON.video.type) &&
-              extJSON.video.value
-            "
-            :url="extJSON.video.value"
-          />
-          <video-preview
-            v-if="
-              extJSON.video &&
-              extJSON.video.type === 'online' &&
-              extJSON.video.value
-            "
-            :url="extJSON.video.value"
-          />
-        </div>
-
-        <div
-          v-if="location"
-          class="text-[#576b95] font-medium dark:text-white text-xs mt-2 mb-1 select-none flex items-center gap-0.5"
-        >
-          <UIcon name="i-carbon-location" />
-          <span>{{ location }}</span>
-        </div>
-
-        <div class="flex justify-between items-center relative">
-          <div class="flex text-xs text-[#9DA4B0]">
-            {{
-              sysConfig.timeFormat === "timeAgo"
-                ? $dayjs(item.createdAt).fromNow()
-                : $dayjs(item.createdAt).format("YYYY-MM-DD HH:mm")
-            }}
-            {{
-              $dayjs(item.createdAt).isAfter($dayjs()) ? '，未到发布时间，仅自己可见' : ''
-            }}
-          </div>
+        <div class="flex flex-col gap-1" v-if="sysConfig.enableComment">
+          <CommentBox :comment-id="0" :memo-id="item.id" :memo-user-id="item.user.id" />
           <div
-            @click="showToolbar = !showToolbar"
-            class="toolbar-icon px-2 py-1 bg-[#f7f7f7] dark:bg-slate-700 hover:bg-[#dedede] cursor-pointer rounded flex items-center justify-center"
+            class="space-y-1"
+            :class="[item.comments && item.comments.length > 0 ? 'py-2' : '']"
           >
-            <img
-              class="w-3 h-3"
-              src="data:image/svg+xml,%3csvg%20t='1709204592505'%20class='icon'%20viewBox='0%200%201024%201024'%20version='1.1'%20xmlns='http://www.w3.org/2000/svg'%20p-id='16237'%20width='16'%20height='16'%3e%3cpath%20d='M229.2%20512m-140%200a140%20140%200%201%200%20280%200%20140%20140%200%201%200-280%200Z'%20p-id='16238'%20fill='%238a8a8a'%3e%3c/path%3e%3cpath%20d='M794.8%20512m-140%200a140%20140%200%201%200%20280%200%20140%20140%200%201%200-280%200Z'%20p-id='16239'%20fill='%238a8a8a'%3e%3c/path%3e%3c/svg%3e"
-            />
-          </div>
-
-          <div
-            v-if="showToolbar"
-            ref="toolbarRef"
-            class="absolute top-[-8px] right-[32px] bg-[#4c4c4c] rounded text-white p-2"
-          >
-            <div class="flex flex-row gap-2">
-              <div
-                class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                @click="liked ? unlikeMemo(item.id) : likeMemo(item.id)"
-              >
-                <UIcon
-                  v-if="liked"
-                  name="i-carbon-favorite-filled"
-                  class="w-4 h-4 text-red-400"
-                />
-                <UIcon v-else name="i-carbon-favorite" class="w-4 h-4" />
-                <div>{{ liked ? "取消" : "赞" }}</div>
-              </div>
-              <template v-if="sysConfig.enableComment">
-                <span class="bg-[#6b7280] h-[20px] w-[1px]"></span>
-                <div
-                  class="flex flex-row gap-1 cursor-pointer items-center px-4"
-                  @click="doComment"
-                >
-                  <UIcon
-                    name="i-octicon-comment"
-                    class="w-4 h-4 relative top-[2px]"
-                  />
-                  <div>评论</div>
-                </div>
-              </template>
-            </div>
-          </div>
-          <template>
-            <UModal
-              v-model="moreToolbar"
-              :ui="{
-                container:
-                  'fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center backdrop-blur-sm',
-              }"
-            >
-              <div
-                class="flex items-center justify-center pt-4 text-gray-500 dark:text-white"
-              >
-                基本操作
-              </div>
-              <div
-                class="flex items-center justify-center gap-8 p-4 text-gray-500 dark:text-white h-[200px]"
-              >
-                <template v-if="global.userinfo.id === 1">
-                  <div
-                    class="flex flex-col gap-1 cursor-pointer items-center"
-                    @click="setPinned(item.id)"
-                  >
-                    <span
-                      class="flex items-center bg-gray-200/75 dark:bg-gray-800/75 p-3 rounded-full"
-                    >
-                      <UIcon class="w-5 h-5" name="i-carbon-pin" />
-                    </span>
-                    <div class="text-sm mt-1">
-                      {{ item.pinned ? "取消" : "" }}置顶
-                    </div>
-                  </div>
-                </template>
-                <template v-if="global && global.userinfo.id === item.userId">
-                  <div
-                    class="flex flex-col gap-1 cursor-pointer items-center"
-                    @click="go2Edit(item.id)"
-                  >
-                    <span
-                      class="flex items-center bg-gray-200/75 dark:bg-gray-800/75 p-3 rounded-full"
-                    >
-                      <UIcon class="w-5 h-5" name="i-carbon-edit" />
-                    </span>
-                    <div class="text-sm mt-1">编辑</div>
-                  </div>
-                </template>
-                <template
-                  v-if="
-                    global.userinfo.id === 1 ||
-                    global.userinfo.id === item.userId
-                  "
-                >
-                  <Confirm
-                    @ok="removeMemo(item.id)"
-                    @cancel="moreToolbar = false"
-                  >
-                    <div
-                      class="flex flex-col gap-1 cursor-pointer items-center"
-                    >
-                      <span
-                        class="flex items-center bg-gray-200/75 dark:bg-gray-800/75 p-3 rounded-full"
-                      >
-                        <UIcon class="w-5 h-5" name="i-carbon-trash-can" />
-                      </span>
-                      <div class="text-sm mt-1">删除</div>
-                    </div>
-                  </Confirm>
-                </template>
-              </div>
-            </UModal>
-          </template>
-        </div>
-
-        <div
-          class="rounded bottom-shadow bg-[#f7f7f7] dark:bg-[#202020] flex flex-col gap-1"
-        >
-          <div
-            v-if="likeInfo && likeInfo.length > 0"
-            class="flex flex-row py-2 px-3 gap-2 items-center text-sm"
-            :class="[
-              item.comments && item.comments.length > 0
-                ? 'border-b-[1px] border-neutral-[100] dark:border-neutral-800'
-                : '',
-            ]"
-          >
-            <div class="text-[#576b95] gap-1">
-              <UIcon name="i-carbon-favorite" class="mr-1 relative top-[1px]" />
-              <!-- 显示点赞用户列表区域 -->
-              {{ (likeShowAll || isDetailPage ? likeInfo : likeInfo.slice(0, 3)).map(info => info.name || info.id).join(', ') }}
-              <span 
-                v-if="!isDetailPage"
-                @click="likeShowAll = !likeShowAll" 
-                class="cursor-pointer"
-              >
-                <span v-if="likeNum > 3">
-                  <span v-if="likeShowAll" class="text-gray-400">[收起]</span>
-                  <span v-else>等{{ likeNum }}位称赞</span>
-                </span>
-              </span>
-            </div>
-          </div>
-          <div class="flex flex-col gap-1" v-if="sysConfig.enableComment">
-            <CommentBox :comment-id="0" :memo-id="item.id" :memo-user-id="item.user.id" />
             <div
-              class="space-y-1"
-              :class="[item.comments && item.comments.length > 0 ? 'py-2' : '']"
+              v-if="item.comments && item.comments.length > 0"
+              v-for="c in item.comments"
+              :key="c.id"
+              class="px-3 relative flex-col text-sm"
             >
-              <div
-                v-if="item.comments && item.comments.length > 0"
-                v-for="c in item.comments"
-                :key="c.id"
-                class="px-3 relative flex-col text-sm"
-              >
-                <Comment
-                  :comment="c"
-                  :memo-id="item.id"
-                  :memo-user-id="item.user.id"
-                  :is-detail-page="isDetailPage"
-                />
-              </div>
+              <Comment
+                :comment="c"
+                :memo-id="item.id"
+                :memo-user-id="item.user.id"
+                :is-detail-page="isDetailPage"
+              />
             </div>
           </div>
         </div>
@@ -354,7 +262,6 @@ const item = computed(() => {
 });
 
 const global = useGlobalState();
-const moreToolbar = ref(false);
 const showToolbar = ref(false);
 const toolbarRef = ref(null);
 
@@ -394,30 +301,7 @@ const doShowMore = () => {
   showMoreClicked.value = !showMoreClicked.value;
 };
 
-const go2Edit = async (id: number) => {
-  await navigateTo("/edit/" + id);
-};
 
-const removeMemo = async (id: number) => {
-  await useMyFetch("/memo/remove?id=" + id);
-  toast.success("删除成功!");
-  if (isDetailPage.value) {
-    await navigateTo("/");
-  } else {
-    memoReloadEvent.emit();
-  }
-  moreToolbar.value = false;
-};
-const setPinned = async (id: number) => {
-  await useMyFetch("/memo/setPinned?id=" + id);
-  toast.success("操作成功!");
-  if (isDetailPage.value) {
-    await navigateTo("/");
-  } else {
-    memoReloadEvent.emit();
-  }
-  moreToolbar.value = false;
-};
 
 const liked = ref(false);
 const likeInfo = ref<{ id: number | string; name: string }[] | null>(null);
