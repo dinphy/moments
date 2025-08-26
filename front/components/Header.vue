@@ -27,12 +27,11 @@
       </NuxtLink>
 
       <UPopover
-        v-if="$route.path.indexOf('/memo/') >= 0 && memoItem"
+        v-if="$route.path.indexOf('/memo/') >= 0 && memoItem && (global.userinfo.id === 1 || (memoItem && global.userinfo.id === memoItem.userId))"
         v-model:open="moreToolbar"
         :popper="{ placement: 'bottom-end', strategy: 'fixed', arrow: true }"
       >
         <UIcon
-          v-if="global.userinfo.id === 1 || (memoItem && global.userinfo.id === memoItem.userId)"
           name="i-solar-menu-dots-bold"
           class="mt-1 w-5 h-5 cursor-pointer"
         />
