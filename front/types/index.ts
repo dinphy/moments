@@ -95,7 +95,7 @@ export type MetingJSDTO = {
     type: "song" | "playlist" | "album" | "search" | "artist" | undefined
 }
 
-export type MetingMusicServer = Exclude<MetingJSDTO['server'], undefined>
+export type MetingMusicServer = Exclude<MetingJSDTO['server'], undefined> | 'local'
 export type MetingMusicType = Exclude<MetingJSDTO['type'], undefined>
 
 
