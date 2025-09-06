@@ -47,6 +47,25 @@
                 </div>
               </div>
             </UFormGroup>
+            <div v-if="isLocalMusicMode" class="space-y-3 mt-4">
+              <UFormGroup label="歌曲名称" :ui="{label:{base:'font-bold'}}">
+                <template #hint>
+                  <div class="text-xs text-gray-400">
+                    不填写将显示为"未知名歌曲"
+                  </div>
+                </template>
+                <UInput v-model="musicTitle" placeholder="输入歌曲名称" />
+              </UFormGroup>
+              
+              <UFormGroup label="歌手名称" :ui="{label:{base:'font-bold'}}">
+                <template #hint>
+                  <div class="text-xs text-gray-400">
+                    不填写将显示为"未知名歌手"
+                  </div>
+                </template>
+                <UInput v-model="musicArtist" placeholder="输入歌手名称" />
+              </UFormGroup>
+            </div>
             
             <div v-if="uploadingAudio" class="space-y-2 mt-4">
               <div class="flex justify-between text-sm">
@@ -89,13 +108,17 @@ const props = withDefaults(defineProps<MusicDTO>(), {
   id: "",
   server: "netease" as MetingMusicServer,
   type: "song" as MetingMusicType,
-  api: "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"
+  api: "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r",
+  title: "",
+  artist: ""
 })
 
 const id = ref<string>(props.id)
 const server = ref<MetingMusicServer>(props.server)
 const type = ref<MetingMusicType>(props.type)
 const api = ref<string>(props.api)
+const musicTitle = ref<string>('')
+const musicArtist = ref<string>('')
 const emit = defineEmits(['confirm'])
 const items = [{
   slot: 'localMusic',
@@ -113,7 +136,10 @@ watch(props, () => {
   server.value = props.server
   type.value = props.type
   api.value = props.api
-})
+  musicTitle.value = props.title || ''
+  musicArtist.value = props.artist || ''
+  if (props.server === 'local' && props.id && !uploadedAudioUrl.value) {}
+}, { immediate: true })
 
 const previewing = ref(false)
 const previewLoading = ref(false)
@@ -121,6 +147,10 @@ const uploadingAudio = ref(false)
 const audioProgress = ref(0)
 const audioFilename = ref('')
 const uploadedAudioUrl = ref('')
+
+const isLocalMusicMode = computed(() => {
+  return !!uploadedAudioUrl.value || (server.value === 'local' && !!id.value)
+})
 const isLocalAudio = computed(() => !!uploadedAudioUrl.value)
 
 const preview = (close: Function) => {
@@ -146,7 +176,18 @@ const confirm = (close: Function) => {
       id: uploadedAudioUrl.value,
       server: 'local' as MetingMusicServer,
       type: 'song' as MetingMusicType,
-      api: ''
+      api: '',
+      title: musicTitle.value,
+      artist: musicArtist.value
+    })
+  } else if (server.value === 'local' && id.value) {
+    emit('confirm', {
+      id: id.value,
+      server: 'local' as MetingMusicServer,
+      type: 'song' as MetingMusicType,
+      api: '',
+      title: musicTitle.value,
+      artist: musicArtist.value
     })
   } else {
     emit('confirm', {
@@ -165,6 +206,8 @@ const reset = (close: Function) => {
   type.value = "song" as MetingMusicType
   api.value = "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"
   uploadedAudioUrl.value = ""
+  musicTitle.value = ""
+  musicArtist.value = ""
   emit('confirm', {
     id: id.value,
     server: server.value,

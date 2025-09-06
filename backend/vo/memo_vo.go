@@ -22,6 +22,8 @@ type Music struct {
 	Server string `json:"server,omitempty"` //音乐的平台
 	Type   string `json:"type,omitempty"`   //音乐的类型
 	Api    string `json:"api,omitempty"`    //MetingJS的服务端API地址
+	Title  string `json:"title,omitempty"`  //音乐标题
+	Artist string `json:"artist,omitempty"` //艺术家/歌手
 }
 
 type MemoExt struct {

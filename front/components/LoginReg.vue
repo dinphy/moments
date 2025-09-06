@@ -124,7 +124,7 @@
                 </UInput>
                 <div 
                   @click="generateCaptcha(); state.captcha = ''"
-                  class="flex items-center justify-center w-16 h-10 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  class="flex items-center justify-center w-16 h-9 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   :title="'点击刷新验证码'"
                 >
                   <span class="text-sm font-mono font-semibold text-gray-700 dark:text-gray-300 select-none">

@@ -110,7 +110,9 @@ export type MusicDTO = {
     id?: string,
     server?: MetingMusicServer,
     type?: MetingMusicType,
-    api?: string
+    api?: string,
+    title?: string,
+    artist?: string
 }
 
 export type DoubanBook = {

@@ -133,7 +133,9 @@ const defaultState = {
     id: '',
     api: 'https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r',
     server: 'netease' as MetingMusicServer,
-    type: 'song' as MetingMusicType
+    type: 'song' as MetingMusicType,
+    title: '',
+    artist: ''
   },
   video: {
     type: 'youtube' as VideoType,
