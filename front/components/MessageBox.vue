@@ -21,22 +21,19 @@
     <div class="flex justify-between items-center p-5">
       <h3 class="font-medium">消息盒子</h3>
       <div class="flex space-x-4">
-        <div
-          @click="unreadCount > 0 ? markAllAsRead() : null"
+        <div 
+          v-if="unreadCount > 0"
+          @click="toggleUnreadFilter"
           :class="{
-            'text-blue-500 cursor-pointer': unreadCount > 0,
-            'text-gray-400 cursor-not-allowed': unreadCount === 0,
+            'text-blue-500 cursor-pointer': true,
+            'bg-blue-50 dark:bg-blue-900/20': showUnreadOnly,
+            'hover:bg-blue-50 dark:hover:bg-blue-900/20': true
           }"
-          class="flex items-center text-sm"
+          class="flex items-center text-sm transition-colors px-2 py-1 rounded"
+          :title="showUnreadOnly ? '显示全部消息' : '仅看未读消息'"
         >
-          <span v-if="unreadCount > 0" class="flex items-center">
-            <UIcon name="i-carbon-notification-new" class="w-4 h-4 mr-1" />
-            未读({{ unreadCount }})
-          </span>
-          <span v-else class="flex items-center">
-            <UIcon name="i-carbon-list-checked" class="w-4 h-4 mr-1" />
-            全部已读
-          </span>
+          <UIcon :name="showUnreadOnly ? 'i-carbon-filter-remove' : 'i-carbon-notification-new'" class="w-4 h-4 mr-1" />
+          {{ showUnreadOnly ? '已筛选未读' : `未读(${unreadCount})` }}
         </div>
         <div
           @click="messages.length > 0 ? handleDeleteAllMessages() : null"
@@ -61,7 +58,7 @@
 
     <div v-else class="max-h-96 overflow-y-auto mb-5">
       <div
-        v-for="message in messages"
+        v-for="message in filteredMessages"
         :key="message.id"
         :class="{ 'bg-gray-50 dark:bg-neutral-700/50': !message.isRead }"
         class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
@@ -177,6 +174,26 @@ const memoImages = ref<Record<number, string[]>>({});
 const memoContents = ref<Record<number, string>>({});
 const fetchingMemoImages = ref<Record<number, boolean>>({});
 const showMoreClicked = ref(false);
+const showUnreadOnly = ref(false);
+
+// 计算过滤后的消息列表
+const filteredMessages = computed(() => {
+  if (!showUnreadOnly.value) {
+    return messages.value;
+  }
+  return messages.value.filter(message => !message.isRead);
+});
+
+// 切换未读消息筛选
+const toggleUnreadFilter = () => {
+  showUnreadOnly.value = !showUnreadOnly.value;
+};
+
+watch(unreadCount, (newCount) => {
+  if (newCount === 0 && showUnreadOnly.value) {
+    showUnreadOnly.value = false;
+  }
+});
 
 const toggleMessageBox = () => {
   showMessageBox.value = !showMessageBox.value;
@@ -287,39 +304,6 @@ const markAsRead = async (messageId: number) => {
     }
   } catch (error) {
     console.error("标记消息为已读失败:", error);
-  }
-};
-
-// 标记所有消息为已读
-const markAllAsRead = async () => {
-  if (!global.value.userinfo.token || unreadCount.value === 0) return;
-
-  try {
-    const response = await fetch("/api/message/read-all", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-token": global.value.userinfo.token,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.code === 0) {
-        // 更新本地消息状态
-        if (messages.value) {
-          messages.value.forEach((msg) => {
-            msg.isRead = true;
-          });
-          const change = -unreadCount.value;
-          unreadCount.value = 0;
-          // 触发消息数量变化事件
-          messageChangedEvent.emit(change);
-        }
-      }
-    }
-  } catch (error) {
-    console.error("标记所有消息为已读失败:", error);
   }
 };
 
