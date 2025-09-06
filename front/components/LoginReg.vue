@@ -38,7 +38,7 @@
             >
               <UInput 
                 v-model="state.username" 
-                placeholder="请输入账号"
+                placeholder="请输入用户名"
                 size="md"
                 :ui="{ 
                   base: 'w-full text-sm',
@@ -99,6 +99,40 @@
                 </template>
               </UInput>
             </UFormGroup>
+            <UFormGroup 
+              v-if="isLogin"
+              name="captcha"
+              :ui="{ 
+                container: 'space-y-1'
+              }"
+            >
+              <div class="flex gap-2">
+                <UInput 
+                  v-model="state.captcha" 
+                  placeholder="请输入验证码"
+                  size="md"
+                  :ui="{ 
+                    base: 'flex-1 text-sm',
+                    rounded: 'rounded-md',
+                    placeholder: 'placeholder-gray-400 dark:placeholder-gray-500'
+                  }"
+                  class="focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <template #leading>
+                    <UIcon name="i-heroicons-shield-check" class="w-4 h-4 text-gray-400" />
+                  </template>
+                </UInput>
+                <div 
+                  @click="generateCaptcha(); state.captcha = ''"
+                  class="flex items-center justify-center w-16 h-10 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  :title="'点击刷新验证码'"
+                >
+                  <span class="text-sm font-mono font-semibold text-gray-700 dark:text-gray-300 select-none">
+                    {{ captchaCode }}
+                  </span>
+                </div>
+              </div>
+            </UFormGroup>
             <div class="space-y-4">
               <UButton
                 @click="doLoginReg"
@@ -148,17 +182,51 @@ const loginReg = useState<boolean>("loginReg", () => false);
 const state = reactive({
   username: "",
   password: "",
+  captcha: "",
   ...(!isLogin.value && { repeatPassword: "" }),
 });
 
 const pending = ref(false);
+const captchaCode = ref("");
+
+const generateCaptcha = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  captchaCode.value = result;
+};
+
+const validateCaptcha = () => {
+  return state.captcha.toLowerCase() === captchaCode.value.toLowerCase();
+};
+
+onMounted(() => {
+  generateCaptcha()
+});
 
 const doLoginReg = async () => {
-  pending.value = true;
+  pending.value = true
   try {
     if (isLogin.value) {
+      if (!state.username) {
+        toast.warning("用户名为空或不正确")
+        return
+      }
+      if (!state.password) {
+        toast.warning("密码为空或不正确")
+        return
+      }
+      if (!validateCaptcha()) {
+        toast.warning("验证码为空或不正确")
+        generateCaptcha()
+        state.captcha = ""
+        return
+      }
+      
       global.value.userinfo = await useMyFetch<LoginResp>("/user/login", state);
-      toast.success("登录成功，跳转到首页...");
+      toast.success("登录成功，正在跳转...");
       loginReg.value = false;
       location.reload();
     } else {
@@ -176,6 +244,8 @@ const doLoginReg = async () => {
     }
   } catch (warning: any) {
     if (isLogin.value) {
+      generateCaptcha();
+      state.captcha = "";
       toast.warning("用户不存在或密码不正确");
       return;
     } else {
@@ -193,6 +263,8 @@ watch(isLogin, (newVal) => {
   } else {
     state.repeatPassword = "";
   }
+  generateCaptcha();
+  state.captcha = "";
 });
 </script>
 
