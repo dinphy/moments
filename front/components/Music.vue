@@ -75,16 +75,20 @@
               <UProgress :value="audioProgress" size="sm" />
             </div>
             
-            <div v-if="uploadedAudioUrl" class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <div class="text-sm text-green-700 dark:text-green-300 font-medium">上传成功!</div>
-              <div class="text-xs text-green-600 dark:text-green-400 truncate mt-1">{{ uploadedAudioUrl }}</div>
+            <div v-if="uploadedAudioUrl || localMusicPath" class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div class="text-sm text-green-700 dark:text-green-300 font-medium">
+                {{ uploadedAudioUrl ? '上传成功!' : '音频路径' }}
+              </div>
+              <div class="text-xs text-green-600 dark:text-green-400 truncate mt-1">
+                {{ uploadedAudioUrl || localMusicPath }}
+              </div>
             </div>
           </template>
         </UTabs>
         <MusicPreview v-if="previewing && !isLocalAudio" :id="id" :server="server" :type="type" :api="api"/>
         <div v-if="previewing && isLocalAudio" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div class="text-sm text-blue-700 dark:text-blue-300 font-medium">本地预览</div>
-          <audio :src="uploadedAudioUrl" controls class="w-full mt-2"></audio>
+          <audio :src="uploadedAudioUrl || localMusicPath" controls class="w-full mt-2"></audio>
         </div>
 
         <UButtonGroup class="shadow-none mt-1 gap-1">
@@ -119,6 +123,8 @@ const type = ref<MetingMusicType>(props.type)
 const api = ref<string>(props.api)
 const musicTitle = ref<string>('')
 const musicArtist = ref<string>('')
+const localMusicPath = ref<string>('')
+const uploadedAudioUrl = ref('')
 const emit = defineEmits(['confirm'])
 const items = [{
   slot: 'localMusic',
@@ -132,13 +138,22 @@ const items = [{
 }]
 
 watch(props, () => {
-  id.value = props.id
-  server.value = props.server
-  type.value = props.type
-  api.value = props.api
+  if (props.server === 'local' && props.id) {
+    localMusicPath.value = props.id
+    server.value = 'local'
+    type.value = 'song'
+    api.value = ''
+    id.value = ''
+  } else {
+    id.value = props.id
+    server.value = props.server
+    type.value = props.type
+    api.value = props.api
+    localMusicPath.value = ''
+    uploadedAudioUrl.value = ''
+  }
   musicTitle.value = props.title || ''
   musicArtist.value = props.artist || ''
-  if (props.server === 'local' && props.id && !uploadedAudioUrl.value) {}
 }, { immediate: true })
 
 const previewing = ref(false)
@@ -146,12 +161,11 @@ const previewLoading = ref(false)
 const uploadingAudio = ref(false)
 const audioProgress = ref(0)
 const audioFilename = ref('')
-const uploadedAudioUrl = ref('')
 
 const isLocalMusicMode = computed(() => {
-  return !!uploadedAudioUrl.value || (server.value === 'local' && !!id.value)
+  return !!uploadedAudioUrl.value || !!localMusicPath.value
 })
-const isLocalAudio = computed(() => !!uploadedAudioUrl.value)
+const isLocalAudio = computed(() => !!uploadedAudioUrl.value || !!localMusicPath.value)
 
 const preview = (close: Function) => {
   if (isLocalAudio.value) {
@@ -171,18 +185,9 @@ const preview = (close: Function) => {
   }, 500)
 }
 const confirm = (close: Function) => {
-  if (isLocalAudio.value) {
+  if (isLocalAudio.value || localMusicPath.value) {
     emit('confirm', {
-      id: uploadedAudioUrl.value,
-      server: 'local' as MetingMusicServer,
-      type: 'song' as MetingMusicType,
-      api: '',
-      title: musicTitle.value,
-      artist: musicArtist.value
-    })
-  } else if (server.value === 'local' && id.value) {
-    emit('confirm', {
-      id: id.value,
+      id: uploadedAudioUrl.value || localMusicPath.value,
       server: 'local' as MetingMusicServer,
       type: 'song' as MetingMusicType,
       api: '',
@@ -206,6 +211,7 @@ const reset = (close: Function) => {
   type.value = "song" as MetingMusicType
   api.value = "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"
   uploadedAudioUrl.value = ""
+  localMusicPath.value = ""
   musicTitle.value = ""
   musicArtist.value = ""
   emit('confirm', {
