@@ -47,7 +47,7 @@
                 </div>
               </div>
             </UFormGroup>
-            <div v-if="isLocalMusicMode" class="space-y-3 mt-4">
+            <div v-if="isLocalAudio" class="space-y-3 mt-4">
               <UFormGroup label="歌曲名称" :ui="{label:{base:'font-bold'}}">
                 <template #hint>
                   <div class="text-xs text-gray-400">
@@ -85,11 +85,13 @@
             </div>
           </template>
         </UTabs>
-        <MusicPreview v-if="previewing && !isLocalAudio" :id="id" :server="server" :type="type" :api="api"/>
-        <div v-if="previewing && isLocalAudio" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <div class="text-sm text-blue-700 dark:text-blue-300 font-medium">本地预览</div>
-          <audio :src="uploadedAudioUrl || localMusicPath" controls class="w-full mt-2"></audio>
-        </div>
+        <MusicPreview v-if="previewing" 
+                      :id="isLocalAudio ? (uploadedAudioUrl || localMusicPath) : id"
+                      :server="isLocalAudio ? 'local' : server"
+                      :type="isLocalAudio ? 'song' : type"
+                      :api="isLocalAudio ? '' : api"
+                      :title="musicTitle"
+                      :artist="musicArtist" />
 
         <UButtonGroup class="shadow-none mt-1 gap-1">
           <UButton color="indigo" variant="solid" @click="preview(close)" :disabled="previewLoading || uploadingAudio"
@@ -145,13 +147,13 @@ watch(props, () => {
     api.value = ''
     id.value = ''
   } else {
-    id.value = props.id
-    server.value = props.server
-    type.value = props.type
-    api.value = props.api
+    id.value = props.id || ''
+    server.value = props.server || 'netease'
+    type.value = props.type || 'song'
     localMusicPath.value = ''
     uploadedAudioUrl.value = ''
   }
+  api.value = props.api || "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"
   musicTitle.value = props.title || ''
   musicArtist.value = props.artist || ''
 }, { immediate: true })
@@ -162,9 +164,6 @@ const uploadingAudio = ref(false)
 const audioProgress = ref(0)
 const audioFilename = ref('')
 
-const isLocalMusicMode = computed(() => {
-  return !!uploadedAudioUrl.value || !!localMusicPath.value
-})
 const isLocalAudio = computed(() => !!uploadedAudioUrl.value || !!localMusicPath.value)
 
 const preview = (close: Function) => {
@@ -185,41 +184,28 @@ const preview = (close: Function) => {
   }, 500)
 }
 const confirm = (close: Function) => {
-  if (isLocalAudio.value || localMusicPath.value) {
-    emit('confirm', {
-      id: uploadedAudioUrl.value || localMusicPath.value,
-      server: 'local' as MetingMusicServer,
-      type: 'song' as MetingMusicType,
-      api: '',
-      title: musicTitle.value,
-      artist: musicArtist.value
-    })
-  } else {
-    emit('confirm', {
-      id: id.value,
-      server: server.value,
-      type: type.value,
-      api: api.value
-    })
-  }
+  const isLocal = isLocalAudio.value || localMusicPath.value
+  emit('confirm', {
+    id: isLocal ? (uploadedAudioUrl.value || localMusicPath.value) : id.value,
+    server: isLocal ? 'local' : server.value,
+    type: isLocal ? 'song' : type.value,
+    api: isLocal ? '' : api.value,
+    title: musicTitle.value,
+    artist: musicArtist.value
+  })
   close()
 }
 const reset = (close: Function) => {
   previewing.value = false
   id.value = ""
-  server.value = "netease" as MetingMusicServer
-  type.value = "song" as MetingMusicType
+  server.value = "netease"
+  type.value = "song"
   api.value = "https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r"
   uploadedAudioUrl.value = ""
   localMusicPath.value = ""
   musicTitle.value = ""
   musicArtist.value = ""
-  emit('confirm', {
-    id: id.value,
-    server: server.value,
-    type: type.value,
-    api: api.value
-  })
+  emit('confirm', { id: "", server: "netease", type: "song", api: api.value, title: "", artist: "" })
   close()
 }
 const servers = ref([{
@@ -256,10 +242,11 @@ const types = ref([{
   label: "艺术家",
 },])
 
+const audioInput = ref<HTMLInputElement>()
+
 const openAudioFileDialog = () => {
-  const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement
-  if (fileInput) {
-    fileInput.click()
+  if (audioInput.value) {
+    audioInput.value.click()
   }
 }
 
