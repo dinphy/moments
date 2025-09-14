@@ -55,21 +55,12 @@ const getFavicon = async () => {
   }
   pending.value = true
   try {
-    const params = new URLSearchParams()
-    params.append('url', url.value)
-    
     const res = await useMyFetch<{
       favicon: string,
       title: string
-    }>('/memo/getFaviconAndTitle?' + params.toString(), {})
-    
-    if (res) {
-      title.value = res.title || ''
-      favicon.value = res.favicon || ''
-      if (!title.value || !favicon.value) {
-        toast.info("获取信息不完整，建议手动填写")
-      }
-    }
+    }>('/memo/getFaviconAndTitle?url=' + encodeURIComponent(url.value))
+    title.value = res.title
+    favicon.value = res.favicon
   } finally {
     pending.value = false
   }
