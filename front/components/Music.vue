@@ -75,13 +75,27 @@
               <UProgress :value="audioProgress" size="sm" />
             </div>
             
-            <div v-if="uploadedAudioUrl || localMusicPath" class="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-              <div class="text-sm text-green-700 dark:text-green-300 font-medium">
-                {{ uploadedAudioUrl ? '上传成功!' : '音频路径' }}
-              </div>
-              <div class="text-xs text-green-600 dark:text-green-400 truncate mt-1">
-                {{ uploadedAudioUrl || localMusicPath }}
-              </div>
+            <div v-if="uploadedAudioUrl || localMusicPath" class="mt-4 space-y-2">
+              <UFormGroup :label="uploadedAudioUrl ? '上传成功' : '音频路径'" :ui="{label:{base:'font-bold text-green-700 dark:text-green-300'}}">
+                <div class="flex items-center gap-2">
+                  <UInput 
+                    v-model="currentAudioPath" 
+                    readonly 
+                    class="relative flex-1 cursor-text"
+                    placeholder="音频路径"
+                  />
+                  <UButton 
+                    size="sm" 
+                    color="gray" 
+                    variant="ghost" 
+                    @click="copyAudioPath"
+                    :disabled="!currentAudioPath"
+                    icon="i-carbon-copy"
+                    :ui="{icon: {base: 'w-4 h-4'}}"
+                    class="absolute top-1/2 right-0 -translate-y-1/2"
+                  />
+                </div>
+              </UFormGroup>
             </div>
           </template>
         </UTabs>
@@ -165,6 +179,17 @@ const audioProgress = ref(0)
 const audioFilename = ref('')
 
 const isLocalAudio = computed(() => !!uploadedAudioUrl.value || !!localMusicPath.value)
+const currentAudioPath = computed(() => uploadedAudioUrl.value || localMusicPath.value)
+const copyAudioPath = () => {
+  if (!currentAudioPath.value) return
+  const textarea = document.createElement('textarea')
+  textarea.value = currentAudioPath.value
+  document.body.appendChild(textarea)
+  textarea.select()
+  document.execCommand('copy')
+  document.body.removeChild(textarea)
+  toast.success("路径已复制")
+}
 
 const preview = (close: Function) => {
   if (isLocalAudio.value) {
