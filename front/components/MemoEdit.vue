@@ -59,18 +59,45 @@
     </div>
 
     <div class="flex justify-between items-center">
-      <div class="flex flex-row gap-1 items-center text-[#576b95] text-sm cursor-pointer">
-        <UPopover :popper="{ arrow: true }" mode="click">
-          <div class="flex items-center gap-1">
-            <UIcon name="i-carbon-location"/>
+      <div class="flex flex-row gap-1 items-center text-[#576b95] text-sm cursor-pointer group">
+        <UPopover :popper="{ arrow: true, placement: 'bottom-start' }" mode="click">
+          <div class="flex items-center gap-1 px-2 py-1 rounded-md transition-colors group-hover:bg-gray-100">
+            <UIcon name="i-carbon-location" class="w-4 h-4"/>
             <span>{{ state.location ? locationLabel : '自定义位置' }}</span>
           </div>
           <template #panel="{close}">
-            <div class="p-4">
-              <UButtonGroup>
-                <UInput v-model="state.location" placeholder="自定义位置,空格分隔"/>
-                <UButton @click="close" color="white" variant="solid">关闭</UButton>
-              </UButtonGroup>
+            <div class="p-4 bg-white rounded-lg shadow-lg min-w-64">
+              <div class="space-y-3">
+                <h3 class="text-sm font-semibold text-gray-800">所在位置</h3>
+                <UInput 
+                  v-model="state.location" 
+                  placeholder="例如：北京 朝阳区 三里屯"
+                  class="w-full"
+                  size="sm"
+                  autofocus
+                />
+                <p class="text-xs text-gray-500">多个位置用空格分隔，显示时会用"·"连接</p>
+                <div class="flex justify-end gap-2 pt-2">
+                  <UButton 
+                    @click="close" 
+                    color="gray" 
+                    variant="ghost" 
+                    size="sm"
+                    class="px-3"
+                  >
+                    取消
+                  </UButton>
+                  <UButton 
+                    @click="close" 
+                    color="primary" 
+                    variant="solid" 
+                    size="sm"
+                    class="px-3"
+                  >
+                    确定
+                  </UButton>
+                </div>
+              </div>
             </div>
           </template>
         </UPopover>
