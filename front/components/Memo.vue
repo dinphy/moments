@@ -181,17 +181,9 @@
         >
           <div class="text-[#576b95] gap-1">
             <UIcon name="i-carbon-favorite" class="mr-1 relative top-[1px]" />
-            <!-- 显示点赞用户列表区域 -->
-            {{ (likeShowAll || isDetailPage ? likeInfo : likeInfo.slice(0, 3)).map(info => info.name || info.id).join(', ') }}
-            <span 
-              v-if="!isDetailPage"
-              @click="likeShowAll = !likeShowAll" 
-              class="cursor-pointer"
-            >
-              <span v-if="likeNum > 3">
-                <span v-if="likeShowAll" class="text-gray-400">[收起]</span>
-                <span v-else>等{{ likeNum }}位称赞</span>
-              </span>
+            {{ visibleLikeInfo.map(info => info.name).join(', ') }}
+            <span v-if="likeNum > visibleLikeInfo.length">
+              {{ visibleLikeInfo.length > 0 ? ', ' : '' }}{{ guestLikeNum }}位访客
             </span>
           </div>
         </div>
@@ -250,6 +242,7 @@ const getMemoMaxHeightStyle = () => {
   }
   return "";
 };
+
 const currentCommentBox = useState("currentCommentBox");
 const props = defineProps<{
   memo: MemoVO;
@@ -301,8 +294,6 @@ const doShowMore = () => {
   showMoreClicked.value = !showMoreClicked.value;
 };
 
-
-
 const liked = ref(false);
 const likeInfo = ref<{ id: number | string; name: string }[] | null>(null);
 const likeNum = ref(0);
@@ -313,6 +304,17 @@ const localCommentUserinfo = useStorage('localCommentUserinfo', {
   website: "",
   email: "",
 })
+
+const visibleLikeInfo = computed(() => {
+  if (!likeInfo.value) return [];
+  return likeInfo.value.filter(info => info.name && info.name !== info.id);
+});
+
+const guestLikeNum = computed(() => {
+  if (!likeInfo.value) return 0;
+  return likeInfo.value.filter(info => typeof info.id === 'string').length;
+});
+
 const doLike = async (params: string) => {
   showToolbar.value = false;
   try {
