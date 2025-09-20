@@ -291,7 +291,7 @@ const markAsRead = async (messageId: number) => {
     if (response.ok) {
       const data = await response.json();
       if (data.code === 0) {
-        if (messages.value) {
+        if (messages.value && messages.value.length > 0) {
           const index = messages.value.findIndex((msg) => msg.id === messageId);
           if (index !== -1) {
             messages.value[index].isRead = true;

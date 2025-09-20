@@ -239,9 +239,11 @@ memoReloadEvent.on(async () => {
 
 memoChangedEvent.on(async (id: number) => {
   const res = await useMyFetch<MemoVO>('/memo/get?latest=1&id=' + id)
-  const index = memos.value.findIndex(r => r.id === id)
-  if (index >= 0) {
-    memos.value[index] = res
+  if (memos.value && memos.value.length > 0) {
+    const index = memos.value.findIndex(r => r.id === id)
+    if (index >= 0) {
+      memos.value[index] = res
+    }
   }
 })
 
