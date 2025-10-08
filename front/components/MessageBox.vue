@@ -12,24 +12,10 @@
       </div>
 
       <template #panel>
-        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg border border-gray-100 dark:border-neutral-700">
+        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg">
           <div class="flex justify-between items-center p-5">
             <h3 class="font-medium">消息</h3>
             <div class="flex space-x-4">
-              <div 
-                v-if="unreadCount > 0"
-                @click="toggleUnreadFilter"
-                :class="{
-                  'text-blue-500 cursor-pointer': true,
-                  'bg-blue-50 dark:bg-blue-900/20': showUnreadOnly,
-                  'hover:bg-blue-50 dark:hover:bg-blue-900/20': true
-                }"
-                class="flex items-center text-sm transition-colors px-2 py-1 rounded"
-                :title="showUnreadOnly ? '显示全部消息' : '仅看未读消息'"
-              >
-                <UIcon :name="showUnreadOnly ? 'i-carbon-filter-remove' : 'i-carbon-notification-new'" class="w-4 h-4 mr-1" />
-                {{ showUnreadOnly ? '已筛选未读' : `未读(${unreadCount})` }}
-              </div>
               <div
                 @click="messages.length > 0 ? handleDeleteAllMessages() : null"
                 :class="{
@@ -38,7 +24,7 @@
                 }"
                 class="flex items-center text-sm"
               >
-                <UIcon name="i-carbon-trash-can" class="w-4 h-4 mr-1" />
+
                 <span>清空</span>
               </div>
             </div>
@@ -51,77 +37,140 @@
             暂无消息
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto mb-5">
-            <div
-              v-for="message in filteredMessages"
-              :key="message.id"
-              :class="{ 'bg-gray-50 dark:bg-neutral-700/50': !message.isRead }"
-              class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
-              @click="handleMessageClick(message)"
-            >
-              <div class="flex items-start">
+          <div v-else class="max-h-96 overflow-y-auto">
+            <!-- 未读消息 -->
+            <div v-for="message in messages" :key="message.id">
+              <div v-if="!message.isRead">
                 <div
-                  class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative"
+                  class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
+                  @click="handleMessageClick(message)"
                 >
-                  <img
-                    v-if="message.fromUserAvatar"
-                    :src="message.fromUserAvatar"
-                    alt="User avatar"
-                    class="w-full h-full rounded-full object-cover"
-                  />
-                  <span
-                    v-else
-                    class="text-lg font-medium text-gray-600 dark:text-gray-300"
-                  >
-                    {{ message.fromName.charAt(0) }}
-                  </span>
-                  <div
-                    v-if="!message.isRead"
-                    class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500"
-                  ></div>
-                </div>
-                <div class="flex-grow mr-3">
-                  <div class="flex flex-wrap items-center justify-between">
-                    <span
-                      class="text-sm font-medium text-gray-800 dark:text-gray-200"
-                    >
-                      {{ message.fromName }}
-                    </span>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                      {{ sysConfig.timeFormat === "timeAgo" ? $dayjs(message.createdAt).fromNow() : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm") }}
-                    </span>
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
+                      <img
+                        v-if="message.fromUserAvatar"
+                        :src="message.fromUserAvatar"
+                        alt="User avatar"
+                        class="w-full h-full rounded-full object-cover"
+                      />
+                      <span v-else class="text-lg font-medium text-gray-600 dark:text-gray-300">
+                        {{ message.fromName.charAt(0) }}
+                      </span>
+                      <div v-if="!message.isRead" class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-blue-500"></div>
+                    </div>
+                    
+                    <div class="flex-grow mr-3">
+                      <div class="flex flex-wrap items-center justify-between">
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          {{ message.fromName }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ sysConfig.timeFormat === "timeAgo" ? $dayjs(message.createdAt).fromNow() : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm") }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
+                        <template v-if="message.replyTo">
+                          <span class="mr-1">回复</span>
+                          <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
+                          <span class="mr-1">:</span>
+                        </template>
+                        {{ message.content }}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
+                      <img
+                        v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
+                        :src="memoImages[message.memoId][0]"
+                        alt="Message image"
+                        class="w-full h-full object-cover"
+                      />
+                      <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
+                      </span>
+                      <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
+                        无内容
+                      </span>
+                      <button
+                        @click.stop="deleteMessage(message.id)"
+                        class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200"
+                      >
+                        <UIcon name="i-carbon-trash-can" class="w-5 h-5 text-white" />
+                      </button>
+                    </div>
                   </div>
-                  <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
-                    <template v-if="message.replyTo">
-                      <span class="mr-1">回复</span>
-                      <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
-                      <span class="mr-1">:</span>
-                    </template>
-                    {{ message.content }}
-                  </p>
                 </div>
-                <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
-                  <img
-                    v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
-                    :src="memoImages[message.memoId][0]"
-                    alt="Message image"
-                    class="w-full h-full object-cover"
-                  />
-                  <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
-                  </span>
-                  <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
-                    无内容
-                  </span>
-                  <button
-                    @click.stop="deleteMessage(message.id)"
-                    class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200"
-                  >
-                    <UIcon name="i-carbon-trash-can" class="w-5 h-5 text-white" />
-                  </button>
+              </div>
+            </div>
+
+            <!-- 已读消息分割线 -->
+            <div v-if="messages.some(msg => msg.isRead) && unreadCount > 0" class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500">
+              <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
+              以下为已读消息
+              <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
+            </div>
+
+            <!-- 已读消息 -->
+            <div v-for="message in messages" :key="message.id">
+              <div v-if="message.isRead">
+                <div
+                  class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
+                  @click="handleMessageClick(message)"
+                >
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
+                      <img
+                        v-if="message.fromUserAvatar"
+                        :src="message.fromUserAvatar"
+                        alt="User avatar"
+                        class="w-full h-full rounded-full object-cover"
+                      />
+                      <span v-else class="text-lg font-medium text-gray-600 dark:text-gray-300">
+                        {{ message.fromName.charAt(0) }}
+                      </span>
+                    </div>
+                    <div class="flex-grow mr-3">
+                      <div class="flex flex-wrap items-center justify-between">
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                          {{ message.fromName }}
+                        </span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ sysConfig.timeFormat === "timeAgo" ? $dayjs(message.createdAt).fromNow() : $dayjs(message.createdAt).format("YYYY-MM-DD HH:mm") }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
+                        <template v-if="message.replyTo">
+                          <span class="mr-1">回复</span>
+                          <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
+                          <span class="mr-1">:</span>
+                        </template>
+                        {{ message.content }}
+                      </p>
+                    </div>
+                    <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
+                      <img
+                        v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
+                        :src="memoImages[message.memoId][0]"
+                        alt="Message image"
+                        class="w-full h-full object-cover"
+                      />
+                      <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
+                      </span>
+                      <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
+                        无内容
+                      </span>
+                      <button
+                        @click.stop="deleteMessage(message.id)"
+                        class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/preview:opacity-100 transition-opacity duration-200"
+                      >
+                        <UIcon name="i-carbon-trash-can" class="w-5 h-5 text-white" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="py-2"></div>
         </div>
       </template>
     </UPopover>
@@ -173,31 +222,7 @@ const fetchingMemoImages = ref<Record<number, boolean>>({});
 const showMoreClicked = ref(false);
 const showUnreadOnly = ref(false);
 
-// 计算过滤后的消息列表
-const filteredMessages = computed(() => {
-  if (!showUnreadOnly.value) {
-    return messages.value;
-  }
-  return messages.value.filter(message => !message.isRead);
-});
 
-// 切换未读消息筛选
-const toggleUnreadFilter = () => {
-  showUnreadOnly.value = !showUnreadOnly.value;
-};
-
-watch(unreadCount, (newCount) => {
-  if (newCount === 0 && showUnreadOnly.value) {
-    showUnreadOnly.value = false;
-  }
-});
-
-// 关闭浮层时，取消“仅看未读”筛选
-watch(showMessageBox, (open) => {
-  if (!open && showUnreadOnly.value) {
-    showUnreadOnly.value = false;
-  }
-});
 
 const toggleMessageBox = () => {
   showMessageBox.value = !showMessageBox.value;
