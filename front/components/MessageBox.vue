@@ -68,7 +68,15 @@
                           <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
                           <span class="mr-1">:</span>
                         </template>
-                        {{ message.content }}
+                        <template v-else-if="message.type === 'like'">
+                          <div class="flex items-center">
+                            <UIcon name="i-carbon-favorite" class="text-red-500 w-4 h-4 inline-block mr-1" />
+                            <span>#{{ message.memoId }}</span>
+                          </div>
+                        </template>
+                        <template v-else>
+                          {{ message.content }}
+                        </template>
                       </p>
                     </div>
                     <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
@@ -136,7 +144,15 @@
                           <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
                           <span class="mr-1">:</span>
                         </template>
-                        {{ message.content }}
+                        <template v-else-if="message.type === 'like'">
+                          <div class="flex items-center">
+                            <UIcon name="i-carbon-favorite" class="text-red-500 w-4 h-4 inline-block mr-1" />
+                            <span>了动态 #{{ message.memoId }}</span>
+                          </div>
+                        </template>
+                        <template v-else>
+                          {{ message.content }}
+                        </template>
                       </p>
                     </div>
                     <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">

@@ -152,7 +152,7 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 	// 只有当点赞者不是动态发布者时才创建消息
 	if (currentUser != nil && currentUser.Id != memo.UserId) || (currentUser == nil && guestID != "") {
 		// 创建消息
-		content := fmt.Sprintf("点赞了动态 #%d", like.MemoID)
+		content := fmt.Sprintf("#%d", like.MemoID)
 		now := time.Now()
 		message := db.Message{
 			UserId:      memo.UserId,
@@ -167,9 +167,9 @@ func (l LikeHandler) AddLike(c echo.Context) error {
 			FromName:    fromName,
 		}
 
-	// 保存消息
-	if err := l.base.db.Save(&message).Error; err != nil {
-		l.base.log.Error().Err(err).Msg("保存消息失败")
+		// 保存消息
+		if err := l.base.db.Save(&message).Error; err != nil {
+			l.base.log.Error().Err(err).Msg("保存消息失败")
 		}
 	}
 
