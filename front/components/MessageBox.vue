@@ -86,6 +86,16 @@
                         alt="Message image"
                         class="w-full h-full object-cover"
                       />
+                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        <div class="relative z-1">
+                          <div class="w-6 h-6 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+                            <UIcon :name="getMediaIcon(message.memoId)" class="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                          </div>
+                        </div>
+                        <div class="absolute top-1 right-1 w-1 h-1 bg-blue-400/60 rounded-full"></div>
+                        <div class="absolute bottom-1 left-1 w-1 h-1 bg-purple-400/60 rounded-full"></div>
+                      </div>
                       <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
                       </span>
                       <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
@@ -147,7 +157,7 @@
                         <template v-else-if="message.type === 'like'">
                           <div class="flex items-center">
                             <UIcon name="i-carbon-favorite" class="text-red-500 w-4 h-4 inline-block mr-1" />
-                            <span>了动态 #{{ message.memoId }}</span>
+                            <span>#{{ message.memoId }}</span>
                           </div>
                         </template>
                         <template v-else>
@@ -162,6 +172,16 @@
                         alt="Message image"
                         class="w-full h-full object-cover"
                       />
+                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
+                        <div class="relative z-1">
+                          <div class="w-6 h-6 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
+                            <UIcon :name="getMediaIcon(message.memoId)" class="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                          </div>
+                        </div>
+                        <div class="absolute top-1 right-1 w-1 h-1 bg-blue-400/60 rounded-full"></div>
+                        <div class="absolute bottom-1 left-1 w-1 h-1 bg-purple-400/60 rounded-full"></div>
+                      </div>
                       <span v-else-if="memoContents[message.memoId]" class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-3 px-1" v-html="renderMarkdown(memoContents[message.memoId])">
                       </span>
                       <span v-else class="text-xs text-gray-500 dark:text-gray-400 p-1 text-center">
@@ -214,7 +234,7 @@
 
 <script setup lang="ts">
 import { useGlobalState } from "~/store";
-import type { SysConfigVO } from "~/types";
+import type { SysConfigVO, ExtDTO } from "~/types";
 import { md } from "~/utils";
 import { messageChangedEvent } from "~/event";
 
@@ -226,6 +246,7 @@ const unreadCount = ref(0);
 const fetching = ref(false);
 const memoImages = ref<Record<number, string[]>>({});
 const memoContents = ref<Record<number, string>>({});
+const memoExts = ref<Record<number, string>>({});
 const fetchingMemoImages = ref<Record<number, boolean>>({});
 const showMoreClicked = ref(false);
 
@@ -245,7 +266,7 @@ const renderMarkdown = (content: string) => {
   return md.render(content);
 }
 
-// 获取动态图片
+// 获取动态图片和扩展信息
 const fetchMemoImages = () => {
   if (!messages.value || messages.value.length === 0) return;
 
@@ -260,6 +281,9 @@ const fetchMemoImages = () => {
           // 存储memo内容
           memoContents.value[message.memoId] = memo.content || '';
           
+          // 存储memo扩展信息
+          memoExts.value[message.memoId] = memo.ext || '{}';
+          
           // 解析图片字符串为数组
           if (memo.imgs) {
             const imgs = memo.imgs.split(',').filter((img: string) => img.trim() !== '');
@@ -273,6 +297,55 @@ const fetchMemoImages = () => {
       }
     }
   });
+};
+
+// 获取memo的扩展JSON对象
+const getMemoExtJSON = (memoId: number): ExtDTO => {
+  try {
+    return JSON.parse(memoExts.value[memoId] || "{}") as ExtDTO;
+  } catch (error) {
+    console.error("解析 ext 字段时出错:", error);
+    return {} as ExtDTO;
+  }
+};
+
+// 检查是否有媒体内容
+const hasMediaContent = (memoId: number): boolean => {
+  const extJSON = getMemoExtJSON(memoId);
+  const memo = messages.value.find(m => m.memoId === memoId);
+  
+  return (
+    (memo && memo.externalFavicon && memo.externalTitle && memo.externalUrl) ||
+    (extJSON.music && extJSON.music.id) ||
+    (extJSON.doubanBook && extJSON.doubanBook.title) ||
+    (extJSON.doubanMovie && extJSON.doubanMovie.title) ||
+    (extJSON.video && 
+      (['bilibili', 'youtube'].includes(extJSON.video.type) || extJSON.video.type === 'online') &&
+      extJSON.video.value)
+  );
+};
+
+// 获取媒体类型图标
+const getMediaIcon = (memoId: number): string => {
+  const extJSON = getMemoExtJSON(memoId);
+  const memo = messages.value.find(m => m.memoId === memoId);
+  
+  if (memo && memo.externalFavicon && memo.externalTitle && memo.externalUrl) {
+    return 'i-carbon-link';
+  }
+  if (extJSON.music && extJSON.music.id) {
+    return 'i-carbon-play-filled';
+  }
+  if (extJSON.doubanBook && extJSON.doubanBook.title) {
+    return 'i-carbon-book';
+  }
+  if (extJSON.doubanMovie && extJSON.doubanMovie.title) {
+    return 'i-carbon-video';
+  }
+  if (extJSON.video && extJSON.video.value) {
+    return 'i-carbon-play';
+  }
+  return 'i-carbon-media';
 };
 
 // 标记消息为已读
