@@ -12,21 +12,15 @@
       </div>
 
       <template #panel>
-        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg">
-          <div class="flex justify-between items-center p-5">
-            <h3 class="font-medium">消息</h3>
-            <div class="flex space-x-4">
-              <div
-                @click="messages.length > 0 ? handleDeleteAllMessages() : null"
-                :class="{
-                  'text-red-500 cursor-pointer': messages.length > 0,
-                  'text-gray-400 cursor-not-allowed': messages.length === 0,
-                }"
-                class="flex items-center text-sm"
-              >
-
-                <span>清空</span>
-              </div>
+        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg pb-2">
+          <div class="flex justify-between items-center p-3 relative">
+            <h3 class="flex flex-1 justify-center font-medium pb-2 border-b border-gray-200 dark:border-gray-700">消息</h3>
+            <div
+              v-if="messages.length > 0"
+              @click="handleDeleteAllMessages()"
+              class="absolute top-3 right-3 text-sm text-red-500 cursor-pointer"
+            >
+              <span>清空</span>
             </div>
           </div>
 
@@ -37,7 +31,7 @@
             暂无消息
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto">
+          <div v-else class="max-h-96 overflow-y-auto scrollbar">
             <!-- 未读消息 -->
             <div v-for="message in messages" :key="message.id">
               <div v-if="!message.isRead">
@@ -169,8 +163,6 @@
               </div>
             </div>
           </div>
-
-          <div class="py-2"></div>
         </div>
       </template>
     </UPopover>
@@ -207,8 +199,8 @@
 <script setup lang="ts">
 import { useGlobalState } from "~/store";
 import type { SysConfigVO } from "~/types";
-import { messageChangedEvent } from "~/event";
 import { md } from "~/utils";
+import { messageChangedEvent } from "~/event";
 
 const global = useGlobalState();
 const sysConfig = useState<SysConfigVO>("sysConfig");
@@ -220,50 +212,13 @@ const memoImages = ref<Record<number, string[]>>({});
 const memoContents = ref<Record<number, string>>({});
 const fetchingMemoImages = ref<Record<number, boolean>>({});
 const showMoreClicked = ref(false);
-const showUnreadOnly = ref(false);
 
-
-
-const toggleMessageBox = () => {
-  showMessageBox.value = !showMessageBox.value;
-  if (showMessageBox.value) {
+// 监听showMessageBox的变化，当打开时刷新消息
+watch(showMessageBox, (newValue) => {
+  if (newValue) {
     fetchAllMessages();
   }
-};
-
-// 获取未读消息
-const fetchUnreadMessages = async () => {
-  if (fetching.value || !global.value.userinfo.token) return;
-
-  fetching.value = true;
-  try {
-    const response = await fetch("/api/message/unread", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-token": global.value.userinfo.token,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data.code === 0) {
-        messages.value = data.data.list || [];
-        unreadCount.value = data.data.total;
-        fetchMemoImages();
-      } else {
-        messages.value = [];
-      }
-    } else {
-      messages.value = [];
-    }
-  } catch (error) {
-    console.error("获取未读消息失败:", error);
-    messages.value = [];
-  } finally {
-    fetching.value = false;
-  }
-};
+});
 
 // 渲染markdown内容
 const renderMarkdown = (content: string) => {
@@ -325,7 +280,6 @@ const markAsRead = async (messageId: number) => {
           if (index !== -1) {
             messages.value[index].isRead = true;
             unreadCount.value--;
-            // 触发消息数量变化事件
             messageChangedEvent.emit(-1);
           }
         }
@@ -398,6 +352,7 @@ const deleteMessage = async (messageId: number) => {
       if (data.code === 0) {
         messages.value = messages.value.filter(msg => msg.id !== messageId);
         unreadCount.value = messages.value.filter(msg => !msg.isRead).length;
+        messageChangedEvent.emit(-1);
       }
     }
   } catch (error) {
@@ -431,6 +386,7 @@ const confirmDeleteAllMessages = async () => {
       if (data.code === 0) {
         messages.value = [];
         unreadCount.value = 0;
+        messageChangedEvent.emit(-1);
       }
     }
   } catch (error) {
@@ -444,8 +400,14 @@ onMounted(() => {
   }
 
   // 监听消息数量变化事件
-  const unsubscribe = messageChangedEvent.on(() => {
-    fetchAllMessages();
+  const unsubscribe = messageChangedEvent.on((change) => {
+    // 如果是增加消息，直接增加未读计数
+    if (change > 0) {
+      unreadCount.value += change;
+    } else {
+      // 如果是减少消息或刷新，重新获取所有消息
+      fetchAllMessages();
+    }
   });
 
   // 存储取消订阅函数，以便在组件卸载时调用
@@ -455,4 +417,31 @@ onMounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 自定义滚动条样式 */
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+
+/* 暗色模式下的滚动条样式 */
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.8);
+}
+</style>
