@@ -61,7 +61,7 @@ func (r RssHandler) generateRss(host string) (string, error) {
 	// 查询动态
 	limit := sysConfigVO.RssMaxItems
 	if limit <= 0 {
-		limit = 15 // 默认值
+		limit = 15
 	}
 	tx := r.base.db.Preload("User", func(x *gorm.DB) *gorm.DB {
 		return x.Select("username", "nickname", "id", "email")

@@ -80,7 +80,7 @@ useHead({
       rel: "alternate",
       type: "application/rss+xml",
       title: "我的 RSS 订阅",
-      href: sysConfigVO.rss || `/rss`,
+      href: `/rss`,
     },
   ],
   style: [
