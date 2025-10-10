@@ -76,8 +76,8 @@
     <UFormGroup label="自定义JS" name="js" :ui="{label:{base:'font-bold'}}">
       <UTextarea v-model="state.js" :rows="5"/>
     </UFormGroup>
-    <UFormGroup label="自定义RSS" name="rss" :ui="{label:{base:'font-bold'}}">
-      <UTextarea v-model="state.rss" :rows="1"  placeholder="留空使用默认配置"/>
+    <UFormGroup label="RSS最大条数" name="rssMaxItems" :ui="{label:{base:'font-bold'}}">
+      <UInput v-model="rssMaxItemsComputed" placeholder="留空则默认(15条)"/>
     </UFormGroup>
     <UFormGroup label="评论最大字数" name="maxCommentLength" :ui="{label:{base:'font-bold'}}">
       <UInput v-model.number="state.maxCommentLength"/>
@@ -181,7 +181,7 @@ const state = reactive({
   beiAnNo: "",
   css: "",
   js: "",
-  rss: "",
+  rssMaxItems: 15,
   enableS3: false,
   s3: {
     domain: "",
@@ -198,6 +198,18 @@ const state = reactive({
   smtpUsername: "",
   smtpPassword: "",
 })
+
+// 处理 rssMaxItems，确保其始终为数字
+const rssMaxItemsComputed = computed({
+  get: () => state.rssMaxItems,
+  set: (val: number | string | null | undefined) => {
+    if (val === null || val === undefined || val === '') {
+      state.rssMaxItems = 0;
+    } else {
+      state.rssMaxItems = Number(val);
+    }
+  }
+});
 
 const reload = async () => {
   const res = await useMyFetch<SysConfigVO>('/sysConfig/getFull')

@@ -58,16 +58,15 @@ func (r RssHandler) generateRss(host string) (string, error) {
 	// 获取管理员信息
 	r.base.db.First(&user, "Username = ?", "admin")
 
-	// 使用自定义RSS
-	if sysConfigVO.Rss != "" {
-		return "", nil
-	}
-
 	// 查询动态
+	limit := sysConfigVO.RssMaxItems
+	if limit <= 0 {
+		limit = 15 // 默认值
+	}
 	tx := r.base.db.Preload("User", func(x *gorm.DB) *gorm.DB {
 		return x.Select("username", "nickname", "id", "email")
 	}).Where("showType = 1")
-	tx.Order("createdAt desc").Limit(15).Find(&memos)
+	tx.Order("createdAt desc").Limit(limit).Find(&memos)
 
 	for i := range memos {
 		if *memos[i].Pinned {

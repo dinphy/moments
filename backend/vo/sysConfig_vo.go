@@ -19,7 +19,7 @@ type SysConfigVO struct {
 	BeiAnNo                string `json:"beiAnNo,omitempty"`          //备案号码
 	Css                    string `json:"css,omitempty"`              //自定义css
 	Js                     string `json:"js,omitempty"`               //自定义js
-	Rss                    string `json:"rss,omitempty"`              //自定义rss
+	RssMaxItems            int    `json:"rssMaxItems,omitempty"`      //自定义RSS最大动态条数
 	EnableGoogleRecaptcha  bool   `json:"enableGoogleRecaptcha"`      //是否启用google recaptcha
 	GoogleSiteKey          string `json:"googleSiteKey,omitempty"`    //google recaptcha siteKey
 	EnableComment          bool   `json:"enableComment"`              //是否启用评论
@@ -43,7 +43,7 @@ type FullSysConfigVO struct {
 	BeiAnNo                string `json:"beiAnNo,omitempty"`          //备案号码
 	Css                    string `json:"css,omitempty"`              //自定义css
 	Js                     string `json:"js,omitempty"`               //自定义js
-	Rss                    string `json:"rss,omitempty"`              //自定义rss
+	RssMaxItems            int    `json:"rssMaxItems,omitempty"`      //自定义RSS最大动态条数
 	S3                     S3VO   `json:"s3"`                         //S3相关信息
 	EnableGoogleRecaptcha  bool   `json:"enableGoogleRecaptcha"`      //是否启用google recaptcha
 	GoogleSiteKey          string `json:"googleSiteKey,omitempty"`    //google recaptcha siteKey
