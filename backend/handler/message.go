@@ -44,7 +44,21 @@ func (m MessageHandler) GetUnreadMessages(ctx echo.Context) error {
 	}
 
 	var messageVOs []vo.MessageVO
+	// 过滤掉关联的 memo 已被删除的消息，并顺带清理历史脏数据
+	filteredMessages := make([]db.Message, 0, len(messages))
 	for _, msg := range messages {
+		if msg.MemoId > 0 {
+			var cnt int64
+			m.base.db.Model(&db.Memo{}).Where("id = ?", msg.MemoId).Count(&cnt)
+			if cnt == 0 {
+				// 清理历史脏数据：删除指向不存在 memo 的消息
+				_ = m.base.db.Where("id = ?", msg.Id).Delete(&db.Message{}).Error
+				continue
+			}
+		}
+		filteredMessages = append(filteredMessages, msg)
+	}
+	for _, msg := range filteredMessages {
 		if msg.FromUserId > 0 {
 			var fromUser db.User
 			m.base.db.Where("id = ?", msg.FromUserId).First(&fromUser)
@@ -166,7 +180,21 @@ func (m MessageHandler) GetAllMessages(ctx echo.Context) error {
 	}
 
 	var messageVOs []vo.MessageVO
+	// 过滤掉关联的 memo 已被删除的消息，并顺带清理历史脏数据
+	filteredMessages := make([]db.Message, 0, len(messages))
 	for _, msg := range messages {
+		if msg.MemoId > 0 {
+			var cnt int64
+			m.base.db.Model(&db.Memo{}).Where("id = ?", msg.MemoId).Count(&cnt)
+			if cnt == 0 {
+				// 清理历史脏数据：删除指向不存在 memo 的消息
+				_ = m.base.db.Where("id = ?", msg.Id).Delete(&db.Message{}).Error
+				continue
+			}
+		}
+		filteredMessages = append(filteredMessages, msg)
+	}
+	for _, msg := range filteredMessages {
 		if msg.FromUserId > 0 {
 			var fromUser db.User
 			m.base.db.Where("id = ?", msg.FromUserId).First(&fromUser)

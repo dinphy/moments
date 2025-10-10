@@ -294,6 +294,12 @@ const fetchMemoImages = () => {
         }
       } catch (error) {
         console.error(`获取动态 ${message.memoId} 图片失败:`, error);
+        // 该 memo 可能已被删除，移除对应消息避免残留
+        messages.value = messages.value.filter((m: any) => m.id !== message.id);
+        if (!message.isRead) {
+          unreadCount.value = Math.max(0, unreadCount.value - 1);
+        }
+        messageChangedEvent.emit(-1);
       } finally {
         fetchingMemoImages.value[message.memoId] = false;
       }
@@ -410,6 +416,10 @@ const fetchAllMessages = async () => {
       const data = await response.json();
       if (data.code === 0) {
         messages.value = data.data.list || [];
+        // 过滤掉无效的 memo 关联消息（comment/like 但没有有效 memoId）
+        messages.value = (messages.value || []).filter((m: any) => {
+          return !(['comment', 'like'].includes(m.type)) || (m.memoId && Number(m.memoId) > 0);
+        });
         unreadCount.value = messages.value.filter((msg: any) => !msg.isRead).length;
         fetchMemoImages();
       } else {
