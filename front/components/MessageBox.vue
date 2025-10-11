@@ -13,8 +13,8 @@
 
       <template #panel>
         <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg pb-2">
-          <div class="flex justify-between items-center p-3 relative">
-            <h3 class="flex flex-1 justify-center font-medium pb-2 border-b border-gray-200 dark:border-gray-700">消息</h3>
+          <div class="flex justify-between items-center p-3 pb-0 relative border-b border-gray-200 dark:border-gray-700">
+            <h3 class="flex flex-1 justify-center font-medium pb-2">消息</h3>
             <div
               v-if="messages.length > 0"
               @click="handleDeleteAllMessages()"
@@ -36,11 +36,11 @@
             <div v-for="message in messages" :key="message.id">
               <div v-if="!message.isRead">
                 <div
-                  class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
+                  class="p-3 pb-0 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
                   @click="handleMessageClick(message)"
                 >
                   <div class="flex items-start">
-                    <div class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
+                    <div class="flex-shrink-0 w-10 h-10 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
                       <img
                         v-if="message.fromUserAvatar"
                         :src="message.fromUserAvatar"
@@ -80,7 +80,7 @@
                         </template>
                       </p>
                     </div>
-                    <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
+                    <div class="flex-shrink-0 w-10 h-10 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
                       <img
                         v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
                         :src="memoImages[message.memoId][0]"
@@ -110,12 +110,13 @@
                       </button>
                     </div>
                   </div>
+                  <div class="ml-[60px] border-b border-gray-200 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
 
             <!-- 已读消息分割线 -->
-            <div v-if="messages.some(msg => msg.isRead) && unreadCount > 0" class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500">
+            <div  class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-gray-700/50">
               <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
               以下为已读消息
               <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
@@ -125,11 +126,11 @@
             <div v-for="message in messages" :key="message.id">
               <div v-if="message.isRead">
                 <div
-                  class="p-3 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
+                  class="p-3 pb-0 hover:bg-gray-100 dark:hover:bg-neutral-700/80 cursor-pointer transition-colors duration-200"
                   @click="handleMessageClick(message)"
                 >
                   <div class="flex items-start">
-                    <div class="flex-shrink-0 w-12 h-12 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
+                    <div class="flex-shrink-0 w-10 h-10 rounded bg-gray-200 dark:bg-neutral-600 flex items-center justify-center mr-3 relative">
                       <img
                         v-if="message.fromUserAvatar"
                         :src="message.fromUserAvatar"
@@ -167,7 +168,7 @@
                         </template>
                       </p>
                     </div>
-                    <div class="flex-shrink-0 w-12 h-12 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
+                    <div class="flex-shrink-0 w-10 h-10 overflow-hidden bg-gray-100 dark:bg-neutral-700 flex items-center justify-center relative group/preview">
                       <img
                         v-if="memoImages[message.memoId] && memoImages[message.memoId].length > 0"
                         :src="memoImages[message.memoId][0]"
@@ -197,6 +198,7 @@
                       </button>
                     </div>
                   </div>
+                  <div class="ml-[60px] border-b border-gray-200 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
