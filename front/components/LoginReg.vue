@@ -13,14 +13,11 @@
     <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-h-[85dvh] sm:max-h-[80vh] flex flex-col">
       <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-            {{ isLogin ? "欢迎回来" : "创建账户" }}
+          <h3 class="text-lg  text-gray-900 dark:text-white">
+            {{ isLogin ? "用户登录" : "注册账户" }}
           </h3>
           <UIcon @click="loginReg = false" name="i-heroicons-x-mark" class="text-gray-400 hover:text-gray-500 p-2 cursor-pointer" />
         </div>
-        <p class="mt-0.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-          {{ isLogin ? "登录账户，继续记录美好时光" : "加入我们，开始记录美好时光" }}
-        </p>
       </div>
       <div class="flex-1 overflow-y-auto">
         <div class="p-4 sm:p-5">
@@ -158,7 +155,7 @@
                   class="text-xs sm:text-sm font-medium"
                   size="sm"
                 >
-                  {{ isLogin ? "还没有账户？立即注册" : "已有账户？立即登录" }}
+                  {{ isLogin ? "没有账户？请注册" : "已有账户？请登录" }}
                 </UButton>
               </div>
             </div>
