@@ -1,6 +1,13 @@
 <template>
   <div class="absolute top-4 left-4 z-10">
-    <UPopover v-model:open="showMessageBox" :popper="{ placement: 'bottom', offset: 8, strategy: 'fixed', arrow: true }">
+    <!-- 自定义遮罩层 -->
+    <div 
+      v-if="showMessageBox" 
+      class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
+      @click="showMessageBox = false"
+    ></div>
+    
+    <UPopover v-model:open="showMessageBox" :popper="{ placement: 'bottom-start', strategy: 'fixed' }">
       <div class="cursor-pointer relative">
         <UIcon name="i-carbon-notification" class="text-[#9fc84a] w-5 h-5" />
         <span

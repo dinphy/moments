@@ -26,10 +26,17 @@
         <span v-else>{{ props.user.nickname }} 的空间</span>
       </NuxtLink>
 
+      <!-- 自定义遮罩层 -->
+      <div 
+        v-if="moreToolbar" 
+        class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
+        @click="moreToolbar = false"
+      ></div>
+      
       <UPopover
         v-if="$route.path.indexOf('/memo/') >= 0 && memoItem && (global.userinfo.id === 1 || (memoItem && global.userinfo.id === memoItem.userId))"
         v-model:open="moreToolbar"
-        :popper="{ placement: 'bottom-end', strategy: 'fixed', arrow: true }"
+        :popper="{ placement: 'bottom-end', strategy: 'fixed' }"
       >
         <UIcon
           name="i-solar-menu-dots-bold"
