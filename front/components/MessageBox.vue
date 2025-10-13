@@ -19,8 +19,8 @@
       </div>
 
       <template #panel>
-        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-neutral-800 shadow-lg pb-2">
-          <div class="flex justify-between items-center p-3 pb-0 relative border-b border-gray-200 dark:border-gray-700">
+        <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-gray-800 shadow-lg pb-2">
+          <div class="flex justify-between items-center p-3 pb-0 relative border-b border-gray-100 dark:border-gray-700">
             <h3 class="flex flex-1 justify-center font-medium pb-2">消息</h3>
             <div
               v-if="messages.length > 0"
@@ -94,7 +94,7 @@
                         alt="Message image"
                         class="w-full h-full object-cover"
                       />
-                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-100 dark:border-gray-700 relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                         <div class="relative z-1">
                           <div class="w-6 h-6 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
@@ -117,16 +117,16 @@
                       </button>
                     </div>
                   </div>
-                  <div class="ml-[60px] border-b border-gray-200 dark:border-gray-700 mt-3"></div>
+                  <div class="ml-[60px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
 
             <!-- 已读消息分割线 -->
-            <div  class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500 border-b border-gray-200 dark:border-gray-700/50">
-              <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
+            <div  class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700/50">
+              <span class="inline-block w-16 border-t border-gray-100 dark:border-gray-700 align-middle mx-2"></span>
               以下为已读消息
-              <span class="inline-block w-16 border-t border-gray-300 dark:border-gray-600 align-middle mx-2"></span>
+              <span class="inline-block w-16 border-t border-gray-100 dark:border-gray-700 align-middle mx-2"></span>
             </div>
 
             <!-- 已读消息 -->
@@ -182,7 +182,7 @@
                         alt="Message image"
                         class="w-full h-full object-cover"
                       />
-                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+                      <div v-else-if="hasMediaContent(message.memoId)" class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded flex items-center justify-center border border-gray-100 dark:border-gray-700 relative overflow-hidden">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"></div>
                         <div class="relative z-1">
                           <div class="w-6 h-6 bg-white/90 dark:bg-gray-800/90 rounded-full flex items-center justify-center shadow-lg backdrop-blur-sm">
@@ -205,7 +205,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="ml-[60px] border-b border-gray-200 dark:border-gray-700 mt-3"></div>
+                  <div class="ml-[60px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
