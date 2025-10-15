@@ -123,7 +123,10 @@
             </div>
 
             <!-- 已读消息分割线 -->
-            <div  class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700/50">
+            <div 
+              v-if="messages.some(msg => msg.isRead)"
+              class="px-4 py-6 text-center text-xs text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700/50"
+            >
               <span class="inline-block w-16 border-t border-gray-100 dark:border-gray-700 align-middle mx-2"></span>
               以下为已读消息
               <span class="inline-block w-16 border-t border-gray-100 dark:border-gray-700 align-middle mx-2"></span>
