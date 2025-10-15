@@ -117,7 +117,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="ml-[60px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
+                  <div class="ml-[50px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
@@ -208,7 +208,7 @@
                       </button>
                     </div>
                   </div>
-                  <div class="ml-[60px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
+                  <div class="ml-[50px] border-b border-gray-100 dark:border-gray-700 mt-3"></div>
                 </div>
               </div>
             </div>
