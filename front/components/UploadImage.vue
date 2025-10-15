@@ -6,7 +6,7 @@
     </div>
 
     <template #panel="{ close }">
-      <div class="w-72 max-w-72 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700">       
+      <div class="w-72 max-w-72 bg-white dark:bg-gray-900 rounded-lg shadow-xl border border-gray-100 dark:border-gray-700">       
         <div class="p-4 space-y-4">
           <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-blue-400 dark:hover:border-blue-500 transition-colors duration-200">
             <UIcon name="i-carbon-cloud-upload" class="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-2 cursor-pointer hover:text-blue-500 transition-colors duration-200" @click="openFileDialog" />

@@ -61,14 +61,14 @@
     <div class="flex justify-between items-center">
       <div class="flex flex-row gap-1 items-center text-[#576b95] text-sm cursor-pointer group">
         <UPopover :popper="{ arrow: true, placement: 'bottom-start' }" mode="click">
-          <div class="flex items-center gap-1 px-2 py-1 rounded-md transition-colors group-hover:bg-gray-100">
+          <div class="flex items-center gap-1 px-2 py-1 rounded-md transition-colors group-hover:bg-gray-100 dark:group-hover:bg-gray-900">
             <UIcon name="i-carbon-location" class="w-4 h-4"/>
             <span>{{ state.location ? locationLabel : '自定义位置' }}</span>
           </div>
           <template #panel="{close}">
-            <div class="p-4 bg-white rounded-lg shadow-lg min-w-64">
+            <div class="p-4 bg-white rounded-lg shadow-lg min-w-64 dark:bg-gray-900">
               <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-gray-800">所在位置</h3>
+                <h3 class="text-sm font-semibold text-gray-500">所在位置</h3>
                 <UInput 
                   v-model="state.location" 
                   placeholder="例如：北京 朝阳区 三里屯"
