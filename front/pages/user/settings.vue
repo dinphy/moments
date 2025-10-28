@@ -1,114 +1,117 @@
 <template>
   <Header :user="currentUser" v-if="!isAdminMode"/>
 
-  <div class="space-y-4 flex flex-col p-4 my-4" :class="{ 'px-6 pt-0': isAdminMode }">
-    <UFormGroup label="登录名" name="username" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.username" disabled />
-    </UFormGroup>
-    <UFormGroup label="昵称" name="nickname" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.nickname"/>
-    </UFormGroup>
-    <UFormGroup label="心情状态" name="slogan" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.slogan"/>
-    </UFormGroup>
-    <UFormGroup class="dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
-      <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 transition-colors cursor-pointer" @click="showAvatar = !showAvatar">
-        <span class="text-sm font-medium text-gray-900 dark:text-white">头像</span>
-        <div class="flex items-center space-x-2">
-          <UAvatar :src="state.avatarUrl" size="sm"/>
-          <UIcon 
-            :name="showAvatar ? 'i-carbon-chevron-down' : 'i-carbon-chevron-right'"
-            class="w-5 h-5 text-gray-400 transition-transform duration-200"
-            :class="{'rotate-180': showAvatar}"
-          />
+  <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-2 rounded-b-lg">
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showAvatar = !showAvatar">
+          <span class="text-gray-700 dark:text-gray-300">头像</span>
+          <div class="flex items-center space-x-2">
+            <UAvatar :src="state.avatarUrl" size="sm"/>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
         </div>
-      </div>
-      <div v-show="showAvatar" class="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-neutral-700">
-        <div class="space-y-3 pt-3">
-          <UInput v-model="state.avatarUrl" placeholder="输入地址或上传" size="sm"/>
-          <label class="cursor-pointer group space-y-3">
+        <div v-show="showAvatar" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600 space-y-3">
+          <UInput v-model="state.avatarUrl" placeholder="输入头像地址或上传" size="md"/>
+          <label class="cursor-pointer inline-block">
             <UInput
               type="file"
               @change="uploadAvatarUrl"
               accept="image/*"
               class="hidden"
             />
-            <div
-              class="flex-col w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
-            >
-              <svg
-                class="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                ></path>
-              </svg>
-              <span class="text-xs">上传头像</span>
+            <div class="flex items-center justify-center p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm">
+              <UIcon name="i-heroicons-arrow-up-tray" class="w-4 h-4 mr-1"/>
+              上传头像
             </div>
           </label>
         </div>
-      </div>
-    </UFormGroup>
-    <UFormGroup class="dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
-      <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 transition-colors cursor-pointer" @click="showCover = !showCover">
-        <span class="text-sm font-medium text-gray-900 dark:text-white">顶部图片</span>
-        <div class="flex items-center space-x-2">
-          <img v-if="state.coverUrl" :src="state.coverUrl" class="w-8 h-6 rounded object-cover" alt=""/>
-          <UIcon 
-            :name="showCover ? 'i-carbon-chevron-down' : 'i-carbon-chevron-right'"
-            class="w-5 h-5 text-gray-400 transition-transform duration-200"
-            :class="{'rotate-180': showCover}"
-          />
+        
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showNickname = !showNickname">
+          <span class="text-gray-700 dark:text-gray-300">昵称</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.nickname || "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
         </div>
-      </div>
-      <div v-show="showCover" class="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-neutral-700">
-        <div class="space-y-3 pt-3">
-          <UInput v-model="state.coverUrl" placeholder="输入地址或上传" size="sm"/>
-          <label class="cursor-pointer group space-y-3">
+        <div v-show="showNickname" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="state.nickname" placeholder="请输入昵称" size="md"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showSlogan = !showSlogan">
+          <span class="text-gray-700 dark:text-gray-300">个性签名</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.slogan || "这个人很懒，什么都没留下" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showSlogan" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="state.slogan" placeholder="请输入个性签名" size="md"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showCover = !showCover">
+          <span class="text-gray-700 dark:text-gray-300">朋友圈封面</span>
+          <div class="flex items-center space-x-2">
+            <span v-if="state.coverUrl" class="text-gray-500 dark:text-gray-400 text-sm">已设置</span>
+            <span v-else class="text-gray-500 dark:text-gray-400 text-sm">未设置</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showCover" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600 space-y-3">
+          <UInput v-model="state.coverUrl" placeholder="输入封面地址或上传" size="md"/>
+          <label class="cursor-pointer inline-block">
             <UInput
               type="file"
               @change="uploadCoverUrl"
               accept="image/*"
               class="hidden"
             />
-            <div
-              class="flex-col w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
-            >
-              <svg
-                class="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                ></path>
-              </svg>
-              <span class="text-xs">上传图片</span>
+            <div class="flex items-center justify-center p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm">
+              <UIcon name="i-heroicons-arrow-up-tray" class="w-4 h-4 mr-1"/>
+              上传封面
             </div>
           </label>
-        </div>
-        <div v-if="state.coverUrl" class="rounded overflow-hidden">
-          <img :src="state.coverUrl" class="w-full h-full object-cover" alt=""/>
+          <div v-if="state.coverUrl" class="rounded overflow-hidden mt-3">
+            <img :src="state.coverUrl" class="w-full h-32 object-cover" alt="封面预览"/>
+          </div>
         </div>
       </div>
-    </UFormGroup>
-    <UFormGroup label="密码" name="password" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.password" type="password" placeholder="留空则不修改密码"/>
-    </UFormGroup>
-    <UFormGroup label="邮箱" name="email" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.email" type="email" placeholder="若管理员启用了邮件通知，将在收到评论时发送邮件通知"/>
-    </UFormGroup>
-    <UButton class="justify-center" @click="save">保存</UButton>
+    </div>
+
+    <!-- 账号设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">登录名</span>
+          <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.username }}</span>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showPassword = !showPassword">
+          <span class="text-gray-700 dark:text-gray-300">修改密码</span>
+          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+        </div>
+        <div v-show="showPassword" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600 space-y-3">
+          <UInput v-model="state.password" type="password" placeholder="请输入新密码（留空则不修改）" size="md"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showEmail = !showEmail">
+          <span class="text-gray-700 dark:text-gray-300">邮箱</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.email || "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showEmail" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600 space-y-3">
+          <UInput v-model="state.email" type="email" placeholder="请输入邮箱地址" size="md"/>
+          <p class="text-xs text-gray-500 dark:text-gray-400">若管理员启用了邮件通知，将在收到评论时发送邮件通知</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 保存按钮 -->
+    <div class="py-3">
+      <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="save" size="md">保存设置</UButton>
+    </div>
   </div>
 </template>
 
@@ -140,6 +143,11 @@ const state = reactive({
 
 const showAvatar = ref(false)
 const showCover = ref(false)
+const showNickname = ref(false)
+const showSlogan = ref(false)
+const showPassword = ref(false)
+const showEmail = ref(false)
+
 const logout = async () => {
   global.value.userinfo = {}
   await navigateTo('/')
