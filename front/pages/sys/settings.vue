@@ -1,156 +1,379 @@
 <template>
   <Header :user="currentUser"/>
-  <div class="space-y-4  flex flex-col p-4 my-4 dark:bg-neutral-800">
-    <div class="flex flex-col items-end text-xs text-gray-400">
-      <div v-if="version" class="w-32">版本号: {{ version }}</div>
-      <div v-if="commitId" class="w-32">commitId: {{ commitId }}</div>
-    </div>
-    <UFormGroup label="管理员账号" name="adminUserName" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.adminUserName"/>
-    </UFormGroup>
-    <UFormGroup label="网站标题" name="title" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.title"/>
-    </UFormGroup>
-    <UFormGroup class="dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-neutral-700 overflow-hidden">
-      <div class="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-neutral-700/50 transition-colors cursor-pointer" @click="showFavicon = !showFavicon">
-        <span class="text-sm font-medium text-gray-900 dark:text-white">Favicon</span>
+
+  <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-2 rounded-b-lg">
+
+
+    <!-- 基本设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
         <div class="flex items-center space-x-2">
-          <UAvatar :src="state.favicon" size="sm"/>
-          <UIcon 
-            :name="showFavicon ? 'i-carbon-chevron-down' : 'i-carbon-chevron-right'"
-            class="w-5 h-5 text-gray-400 transition-transform duration-200"
-            :class="{'rotate-180': showFavicon}"
-          />
+          <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">基本</h3>
         </div>
       </div>
-      <div v-show="showFavicon" class="px-4 pb-4 space-y-3 border-t border-gray-100 dark:border-neutral-700">
-        <div class="space-y-3 pt-3">
-          <UInput v-model="state.favicon" placeholder="输入地址或上传" size="sm"/>
-          <label class="cursor-pointer group space-y-3">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showAdminUserName = !showAdminUserName">
+          <span class="text-gray-700 dark:text-gray-300">管理账号</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.adminUserName }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showAdminUserName" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="state.adminUserName" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showTitle = !showTitle">
+          <span class="text-gray-700 dark:text-gray-300">网站标题</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.title }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showTitle" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="state.title" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showFavicon = !showFavicon">
+          <span class="text-gray-700 dark:text-gray-300">网站图标</span>
+          <div class="flex items-center space-x-2">
+            <UAvatar :src="state.favicon" size="sm"/>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showFavicon" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600 space-y-3">
+          <UInput v-model="state.favicon" placeholder="输入地址或上传" size="md" class="h-10"/>
+          <label class="cursor-pointer inline-block">
             <UInput
               type="file"
               @change="uploadFavicon"
               accept="image/*"
               class="hidden"
             />
-            <div
-              class="flex-col w-24 h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 group-hover:border-gray-400 dark:group-hover:border-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-400 transition-colors"
-            >
-              <svg
-                class="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                ></path>
-              </svg>
-              <span class="text-xs">上传图标</span>
+            <div class="flex items-center justify-center p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm">
+              <UIcon name="i-heroicons-arrow-up-tray" class="w-4 h-4 mr-1"/>
+              上传图标
             </div>
           </label>
         </div>
       </div>
-    </UFormGroup>
-    <UFormGroup label="首页是否自动加载下一页" name="enableAutoLoadNextPage" :ui="{label:{base:'font-bold'}}">
-      <UToggle v-model="state.enableAutoLoadNextPage"/>
-    </UFormGroup>
-    <UFormGroup label="用户主页是否切换列表布局" name="enableNewMemo" :ui="{label:{base:'font-bold'}}">
-      <UToggle v-model="state.enableNewMemo"/>
-    </UFormGroup>
-    <UFormGroup label="是否启用评论" name="enableComment" :ui="{label:{base:'font-bold'}}">
-      <UToggle v-model="state.enableComment"/>
-    </UFormGroup>
-    <UFormGroup label="是否开启注册用户" name="enableRegister" :ui="{label:{base:'font-bold'}}">
-      <UToggle v-model="state.enableRegister"/>
-    </UFormGroup>
-    <UFormGroup label="备案号" name="beiAnNo" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="state.beiAnNo" placeholder="没有可以不填写"/>
-    </UFormGroup>
-    <UFormGroup label="自定义CSS" name="css" :ui="{label:{base:'font-bold'}}">
-      <UTextarea v-model="state.css" :rows="5"/>
-    </UFormGroup>
-    <UFormGroup label="自定义JS" name="js" :ui="{label:{base:'font-bold'}}">
-      <UTextarea v-model="state.js" :rows="5"/>
-    </UFormGroup>
-    <UFormGroup label="RSS最大条数" name="rssMaxItems" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model="rssMaxItemsComputed" placeholder="留空则默认(15条)"/>
-    </UFormGroup>
-    <UFormGroup label="评论最大字数" name="maxCommentLength" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model.number="state.maxCommentLength"/>
-    </UFormGroup>
-    <UFormGroup label="发言最大高度(单位px,填0时则不限制高度)" name="memoMaxHeight" :ui="{label:{base:'font-bold'}}">
-      <UInput v-model.number="state.memoMaxHeight"/>
-    </UFormGroup>
-    <UFormGroup label="评论排序方式(按日期)" name="commentOrder" :ui="{label:{base:'font-bold'}}">
-      <USelectMenu v-model="state.commentOrder"
-                   :options="[{label:'倒序,越晚发布越靠前',value:'desc'},{label:'正序,越早发布越靠前',value:'asc'}]"
-                   value-attribute="value" option-attribute="label"></USelectMenu>
-    </UFormGroup>
-    <UFormGroup label="日期格式" name="timeFormat" :ui="{label:{base:'font-bold'}}">
-      <USelectMenu v-model="state.timeFormat"
-                   :options="[{label:'几分钟前',value:'timeAgo'},{label:$dayjs().format('YYYY-MM-DD HH:mm'),value:'time'}]"
-                   value-attribute="value" option-attribute="label"></USelectMenu>
-    </UFormGroup>
-      <UFormGroup label="是否启用Google Recaptcha" name="enableGoogleRecaptcha" :ui="{label:{base:'font-bold'}}">
-        <UToggle v-model="state.enableGoogleRecaptcha"/>
-      </UFormGroup>
-      <template v-if="state.enableGoogleRecaptcha">
-        <UFormGroup label="SiteKey" name="googleSiteKey" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.googleSiteKey"/>
-        </UFormGroup>
-        <UFormGroup label="SecretKey" name="googleSecretKey" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.googleSecretKey"/>
-        </UFormGroup>
-      </template>
-      <UFormGroup label="是否启用S3存储" name="s3" :ui="{label:{base:'font-bold'}}">
-        <UToggle v-model="state.enableS3"/>
-      </UFormGroup>
-      <template v-if="state.enableS3">
-        <UFormGroup label="Bucket 域名（资源访问地址）" name="domain" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.domain" placeholder="https://moments-test-bucket.oss-cn-hangzhou.aliyuncs.com" />
-        </UFormGroup>
-        <UFormGroup label="Endpoint 地址" name="endpoint" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.endpoint" placeholder="https://oss-cn-hangzhou.aliyuncs.com" />
-        </UFormGroup>
-        <UFormGroup label="Bucket 名称" name="bucket" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.bucket" placeholder="moments-test-bucket" />
-        </UFormGroup>
-        <UFormGroup label="Bucket 地区" name="region" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.region" placeholder="oss-cn-hangzhou" />
-        </UFormGroup>
-        <UFormGroup label="AccessKey" name="accessKey" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.accessKey"/>
-        </UFormGroup>
-        <UFormGroup label="SecretKey" name="secretKey" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.secretKey"/>
-        </UFormGroup>
-        <UFormGroup label="图片后缀（在访问缩略图时会追加在图片地址后）" name="thumbnailSuffix" :ui="{label:{base:'font-bold'}}">
-          <UInput v-model="state.s3.thumbnailSuffix"/>
-        </UFormGroup>
-      </template>
-      <UFormGroup label="是否启用邮件通知" name="enableEmail" :ui="{label:{base:'font-bold'}}">
-      <UToggle v-model="state.enableEmail"/>
-      </UFormGroup>
-      <template v-if="state.enableEmail">
-      <UFormGroup label="smtp服务器" name="smtpHost" :ui="{label:{base:'font-bold'}}">
-        <UInput v-model="state.smtpHost" placeholder="smtp.qq.com"/>
-      </UFormGroup>
-      <UFormGroup label="smtp端口" name="smtpPort" :ui="{label:{base:'font-bold'}}">
-        <UInput v-model="state.smtpPort" placeholder="465"/>
-      </UFormGroup>
-      <UFormGroup label="smtp用户名" name="smtpUsername" :ui="{label:{base:'font-bold'}}">
-        <UInput v-model="state.smtpUsername" placeholder="******@qq.com"/>
-      </UFormGroup>
-      <UFormGroup label="smtp密码/授权码" name="smtpPassword" :ui="{label:{base:'font-bold'}}">
-        <UInput v-model="state.smtpPassword" type="password"/>
-      </UFormGroup>
-      </template>
+    </div>
 
-    <UButton class="justify-center" @click="save">保存</UButton>
+    <!-- 功能设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-puzzle-piece" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">扩展</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">自动加载内容</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">滚动时自动加载更多内容</span>
+          </div>
+          <UToggle v-model="state.enableAutoLoadNextPage"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">用户主页布局</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">以列表形式展示用户动态</span>
+          </div>
+          <UToggle v-model="state.enableNewMemo"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">评论功能</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">允许用户对动态进行评论</span>
+          </div>
+          <UToggle v-model="state.enableComment"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">开放注册</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">允许新用户注册账号</span>
+          </div>
+          <UToggle v-model="state.enableRegister"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 显示设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-eye" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">显示</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showBeiAnNo = !showBeiAnNo">
+          <span class="text-gray-700 dark:text-gray-300">备案号</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.beiAnNo || "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showBeiAnNo" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="state.beiAnNo" placeholder="没有可以不填写" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showRssMaxItems = !showRssMaxItems">
+          <span class="text-gray-700 dark:text-gray-300">RSS最大条数</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.rssMaxItems || "15(默认)" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showRssMaxItems" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model="rssMaxItemsComputed" placeholder="留空则默认(15条)" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showMaxCommentLength = !showMaxCommentLength">
+          <span class="text-gray-700 dark:text-gray-300">评论最大字数</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.maxCommentLength }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showMaxCommentLength" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model.number="state.maxCommentLength" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showMemoMaxHeight = !showMemoMaxHeight">
+          <span class="text-gray-700 dark:text-gray-300">发言最大高度</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.memoMaxHeight ? state.memoMaxHeight + 'px' : '不限制' }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showMemoMaxHeight" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UInput v-model.number="state.memoMaxHeight" placeholder="单位px,填0时则不限制高度" size="md" class="h-10"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showCommentOrder = !showCommentOrder">
+          <span class="text-gray-700 dark:text-gray-300">评论排序方式</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.commentOrder === 'desc' ? '倒序' : '正序' }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showCommentOrder" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <USelectMenu v-model="state.commentOrder"
+                       :options="[{label:'倒序,越晚发布越靠前',value:'desc'},{label:'正序,越早发布越靠前',value:'asc'}]"
+                       value-attribute="value" option-attribute="label" size="md" class="w-full"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showTimeFormat = !showTimeFormat">
+          <span class="text-gray-700 dark:text-gray-300">日期格式</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.timeFormat === 'timeAgo' ? '几分钟前' : $dayjs().format('YYYY-MM-DD HH:mm') }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showTimeFormat" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <USelectMenu v-model="state.timeFormat"
+                       :options="[{label:'几分钟前',value:'timeAgo'},{label:$dayjs().format('YYYY-MM-DD HH:mm'),value:'time'}]"
+                       value-attribute="value" option-attribute="label" size="md" class="w-full"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 安全设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-shield-check" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">安全</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">启用Google Recaptcha</span>
+          <UToggle v-model="state.enableGoogleRecaptcha"/>
+        </div>
+
+        <template v-if="state.enableGoogleRecaptcha">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="SiteKey" name="googleSiteKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.googleSiteKey" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="SecretKey" name="googleSecretKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.googleSecretKey" type="password" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- 存储设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-server" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">存储</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">启用S3存储</span>
+          <UToggle v-model="state.enableS3"/>
+        </div>
+
+        <template v-if="state.enableS3">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Bucket 域名（资源访问地址）" name="domain" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.domain" placeholder="https://moments-test-bucket.oss-cn-hangzhou.aliyuncs.com" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Endpoint 地址" name="endpoint" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.endpoint" placeholder="https://oss-cn-hangzhou.aliyuncs.com" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Bucket 名称" name="bucket" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.bucket" placeholder="moments-test-bucket" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Bucket 地区" name="region" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.region" placeholder="oss-cn-hangzhou" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="AccessKey" name="accessKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.accessKey" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="SecretKey" name="secretKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.secretKey" type="password" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="图片后缀（在访问缩略图时会追加在图片地址后）" name="thumbnailSuffix" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.s3.thumbnailSuffix" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- 邮件设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">邮件</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">启用邮件通知</span>
+          <UToggle v-model="state.enableEmail"/>
+        </div>
+
+        <template v-if="state.enableEmail">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="smtp服务器" name="smtpHost" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.smtpHost" placeholder="smtp.qq.com" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="smtp端口" name="smtpPort" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.smtpPort" placeholder="465" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="smtp用户名" name="smtpUsername" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.smtpUsername" placeholder="******@qq.com" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="smtp密码/授权码" name="smtpPassword" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.smtpPassword" type="password" size="md" class="h-10"/>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- 高级设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-wrench-screwdriver" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">高级</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showCss = !showCss">
+          <span class="text-gray-700 dark:text-gray-300">自定义CSS</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.css ? "已设置" : "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showCss" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UTextarea v-model="state.css" :rows="5" placeholder="输入自定义CSS代码"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showJs = !showJs">
+          <span class="text-gray-700 dark:text-gray-300">自定义JS</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.js ? "已设置" : "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showJs" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UTextarea v-model="state.js" :rows="5" placeholder="输入自定义JS代码"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 版本信息 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">关于</h3>
+        </div>
+      </div>
+      <div class="px-4 py-3 space-y-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-lg">M</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300 font-medium">极简朋友圈</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">一个极简、开源的朋友圈应用</span>
+          </div>
+        </div>
+        <div class="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div v-if="version" class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-300">版本号:</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400">{{ version }}</span>
+          </div>
+          <div v-if="commitId" class="flex items-center justify-between">
+            <span class="text-sm text-gray-600 dark:text-gray-300">提交ID:</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400 font-mono">{{ commitId }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 保存按钮 -->
+    <div class="py-3">
+      <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="save" size="md">保存设置</UButton>
+    </div>
   </div>
 </template>
 
@@ -162,7 +385,20 @@ import {useUpload} from "~/utils";
 const currentUser = useState<UserVO>('userinfo')
 const version = ref('')
 const commitId = ref('')
+
+// 控制各个设置项的显示/隐藏
+const showAdminUserName = ref(false)
+const showTitle = ref(false)
 const showFavicon = ref(false)
+const showBeiAnNo = ref(false)
+const showRssMaxItems = ref(false)
+const showMaxCommentLength = ref(false)
+const showMemoMaxHeight = ref(false)
+const showCommentOrder = ref(false)
+const showTimeFormat = ref(false)
+const showCss = ref(false)
+const showJs = ref(false)
+
 const state = reactive({
   enableGoogleRecaptcha: false,
   googleSiteKey:"",
@@ -245,7 +481,3 @@ onMounted(async () => {
 })
 
 </script>
-
-<style scoped>
-
-</style>
