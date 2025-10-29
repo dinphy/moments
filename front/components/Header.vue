@@ -196,26 +196,7 @@
           class="text-[#9fc84a] w-5 h-5 cursor-pointer"
         />
       </NuxtLink>
-      <NuxtLink
-        v-if="$route.path === '/user/settings' && global.userinfo.id === 1"
-        to="/user/manage"
-        title="用户管理"
-      >
-        <UIcon
-          name="i-carbon-user-multiple"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
-      <NuxtLink
-        v-if="$route.path !== '/sys/settings' && global.userinfo.id === 1"
-        to="/sys/settings"
-        title="系统设置"
-      >
-        <UIcon
-          name="i-carbon-settings"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
+
       <NuxtLink
         v-if="$route.path !== '/user/settings' && global.userinfo.token"
         to="/user/settings"
