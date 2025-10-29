@@ -50,7 +50,7 @@
         </div>
 
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showCover = !showCover">
-          <span class="text-gray-700 dark:text-gray-300">朋友圈封面</span>
+          <span class="text-gray-700 dark:text-gray-300">封面</span>
           <div class="flex items-center space-x-2">
             <span v-if="state.coverUrl" class="text-gray-500 dark:text-gray-400 text-sm">已设置</span>
             <span v-else class="text-gray-500 dark:text-gray-400 text-sm">未设置</span>

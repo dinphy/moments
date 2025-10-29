@@ -167,7 +167,7 @@
             class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
           />
         </span>
-        <span class="text-xs mt-1">管理</span>
+        <span class="text-xs mt-1">用户</span>
       </div>
       <div
         v-if="$route.path !== '/sys/settings' && global.userinfo.id === 1"
@@ -181,13 +181,13 @@
             class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
           />
         </span>
-        <span class="text-xs mt-1">系统</span>
+        <span class="text-xs mt-1">设置</span>
       </div>
       <div
         v-if="$route.path !== '/user/settings' && global.userinfo.token"
         class="flex flex-col items-center"
         @click="navigate('/user/settings')"
-        title="用户中心"
+        title="个人资料"
       >
         <span class="flex items-center">
           <UIcon
@@ -195,7 +195,7 @@
             class="w-6 h-6 sm:w-7 sm:h-7 cursor-pointer"
           />
         </span>
-        <span class="text-xs mt-1">用户</span>
+        <span class="text-xs mt-1">我的</span>
       </div>
     </div>
   </USlideover>

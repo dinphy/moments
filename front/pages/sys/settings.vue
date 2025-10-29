@@ -36,7 +36,7 @@
         </div>
 
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showFavicon = !showFavicon">
-          <span class="text-gray-700 dark:text-gray-300">网站图标</span>
+          <span class="text-gray-700 dark:text-gray-300">Favicon</span>
           <div class="flex items-center space-x-2">
             <UAvatar :src="state.favicon" size="sm"/>
             <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
@@ -359,11 +359,11 @@
         </div>
         <div class="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-700">
           <div v-if="version" class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-300">版本号:</span>
+            <span class="text-sm text-gray-600 dark:text-gray-300">版本号</span>
             <span class="text-sm text-gray-500 dark:text-gray-400">{{ version }}</span>
           </div>
           <div v-if="commitId" class="flex items-center justify-between">
-            <span class="text-sm text-gray-600 dark:text-gray-300">提交ID:</span>
+            <span class="text-sm text-gray-600 dark:text-gray-300">CommitID</span>
             <span class="text-sm text-gray-500 dark:text-gray-400 font-mono">{{ commitId }}</span>
           </div>
         </div>
