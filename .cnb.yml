@@ -16,7 +16,7 @@ develop*:
         - name: 获取dev版本号
           script: echo -n $(date +%s)
           exports:
-            code: DEV_VERSION
+            info: DEV_VERSION
         - name: 编译Docker dev镜像
           script: docker build -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
         - name: 推送Docker镜像到CNB
