@@ -1,11 +1,11 @@
 # .cnb/web_trigger.yml
 branch:
   # 如下按钮在分支名以 dev 开头的分支详情页面显示
-  - reg: "^develop"
+  - reg: "^main"
     buttons:
-      - name: 构建测试
-        description: 打包测试环境包
-        event: web_trigger_develop
+      - name: 构建正式环境
+        description: 构建正式环境
+        event: web_trigger_main
         permissions:
           # roles 和 users 配置其中之一或都配置均可，二者满足其一即可
           roles:
