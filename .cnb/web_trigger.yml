@@ -12,4 +12,4 @@ branch:
             - owner
             - master
         env:
-          devVersion: date +%s
+          devVersion: $(date +%s)
