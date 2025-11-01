@@ -11,3 +11,5 @@ branch:
           roles:
             - owner
             - master
+        env:
+          devVersion: date +%s
