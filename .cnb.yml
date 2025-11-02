@@ -3,7 +3,7 @@
 # 匹配以 develop 开头的分支名
 develop*:
   ## 标签触发
-  tag:
+  tag: v*
     - services:
         - docker
       runner:
