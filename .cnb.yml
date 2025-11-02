@@ -19,7 +19,7 @@ develop*:
           exports:
             info: DEV_VERSION
         - name: 编译Docker dev镜像
-          script: docker build --build-arg VERSION=develop-${GIT_COMMIT_SHA:0:7} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
+          script: docker build --build-arg VERSION=develop-${GIT_COMMIT:0:7} --build-arg COMMIT_ID=${GIT_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
         - name: 推送Docker镜像到CNB
           script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION  
 # 构建以 main 开头的分支
@@ -36,6 +36,6 @@ main*:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
         - name: 编译Docker latest镜像
-          script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+          script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${GIT_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
           script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
