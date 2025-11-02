@@ -18,13 +18,8 @@ develop*:
           script: echo -n $(date +%s)
           exports:
             info: DEV_VERSION
-        - name: 获取Git提交ID
-          script: |
-            COMMIT_ID=$(git rev-parse HEAD | cut -c1-7)
-            echo "COMMIT_ID=${COMMIT_ID}"
-            export COMMIT_ID
         - name: 编译Docker dev镜像
-          script: docker build --build-arg VERSION=develop-${COMMIT_ID} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
+          script: docker build --build-arg VERSION=develop-${CNB_COMMIT:0:7} --build-arg COMMIT_ID=${CNB_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
         - name: 推送Docker镜像到CNB
           script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION  
 # 构建以 main 开头的分支
@@ -40,12 +35,7 @@ main*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 获取Git提交ID
-          script: |
-            COMMIT_ID=$(git rev-parse HEAD | cut -c1-7)
-            echo "COMMIT_ID=${COMMIT_ID}"
-            export COMMIT_ID
         - name: 编译Docker latest镜像
-          script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+          script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${CNB_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
           script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
