@@ -2,8 +2,8 @@
 
 # 匹配以 develop 开头的分支名
 develop*:
-  ## 推送触发
-  push:
+  ## 标签触发
+  tag:
     - services:
         - docker
       runner:
@@ -14,14 +14,14 @@ develop*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 获取dev版本号
-          script: echo -n $(date +%s)
+        - name: 获取标签版本号
+          script: echo -n ${CNB_TAG} | sed 's/^v//'
           exports:
-            info: DEV_VERSION
+            info: TAG_VERSION
         - name: 编译Docker dev镜像
-          script: docker build --build-arg VERSION=develop-${CNB_COMMIT:0:7} --build-arg COMMIT_ID=${CNB_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
+          script: docker build --build-arg VERSION=$TAG_VERSION --build-arg COMMIT_ID=${CNB_COMMIT:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:$TAG_VERSION .
         - name: 推送Docker镜像到CNB
-          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION  
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:$TAG_VERSION  
 # 构建以 main 开头的分支
 main*:
   web_trigger_main:
