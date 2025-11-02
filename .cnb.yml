@@ -1,7 +1,7 @@
 # .cnb.yml
 
-# 匹配以 v 开头的标签，当推送标签时触发构建
-v*:
+# 匹配以 develop 开头的分支名
+develop*:
   ## 推送触发
   push:
     - services:
@@ -14,21 +14,14 @@ v*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 获取dev版本号和提交ID
-          script: |
-            # 获取当前提交ID
-            COMMIT_ID=$(git rev-parse --short HEAD)
-            # 获取时间戳作为dev版本号
-            DEV_VERSION=$(date +%s)
-            echo "DEV_VERSION=${DEV_VERSION}"
-            echo "COMMIT_ID=${COMMIT_ID}"
+        - name: 获取dev版本号
+          script: echo -n $(date +%s)
           exports:
-            - DEV_VERSION
-            - COMMIT_ID
+            info: DEV_VERSION
         - name: 编译Docker dev镜像
-          script: docker build --build-arg VERSION=dev-${DEV_VERSION} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-${DEV_VERSION} .
+          script: docker build --build-arg VERSION=develop-${GIT_COMMIT_SHA:0:7} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
         - name: 推送Docker镜像到CNB
-          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-${DEV_VERSION}  
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION  
 # 构建以 main 开头的分支
 main*:
   web_trigger_main:
@@ -42,18 +35,7 @@ main*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 获取版本号和提交ID
-          script: |
-            # 获取当前提交ID
-            COMMIT_ID=$(git rev-parse --short HEAD)
-            # 获取最新的标签作为版本号，如果没有标签则使用提交ID
-            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${COMMIT_ID}")
-            echo "VERSION=${VERSION}"
-            echo "COMMIT_ID=${COMMIT_ID}"
-          exports:
-            - VERSION
-            - COMMIT_ID
         - name: 编译Docker latest镜像
-          script: docker build --build-arg VERSION=${VERSION} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+          script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
-          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
