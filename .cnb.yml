@@ -14,25 +14,22 @@ v*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 提取版本号
+        - name: 获取dev版本号和提交ID
           script: |
-            # 从标签名中提取版本号，去掉v前缀
-            VERSION=${GIT_TAG_NAME#v}
-            echo "提取的版本号: $VERSION"
-            echo -n $VERSION
+            # 获取当前提交ID
+            COMMIT_ID=$(git rev-parse --short HEAD)
+            # 获取时间戳作为dev版本号
+            DEV_VERSION=$(date +%s)
+            echo "DEV_VERSION=${DEV_VERSION}"
+            echo "COMMIT_ID=${COMMIT_ID}"
           exports:
-            info: VERSION
-        - name: 编译Docker镜像
-          script: |
-            # 使用提取的版本号和提交ID构建镜像
-            docker build --build-arg VERSION=${VERSION} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:${VERSION} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+            - DEV_VERSION
+            - COMMIT_ID
+        - name: 编译Docker dev镜像
+          script: docker build --build-arg VERSION=dev-${DEV_VERSION} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-${DEV_VERSION} .
         - name: 推送Docker镜像到CNB
-          script: |
-            # 推送带版本号和latest标签的镜像
-            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:${VERSION}
-            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
-
-# 构建以 main 开头的分支，用于手动触发构建
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-${DEV_VERSION}  
+# 构建以 main 开头的分支
 main*:
   web_trigger_main:
     - services:
@@ -45,7 +42,18 @@ main*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 编译Docker开发镜像
-          script: docker build --build-arg VERSION=dev-${GIT_COMMIT_SHA:0:7} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev .
+        - name: 获取版本号和提交ID
+          script: |
+            # 获取当前提交ID
+            COMMIT_ID=$(git rev-parse --short HEAD)
+            # 获取最新的标签作为版本号，如果没有标签则使用提交ID
+            VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "dev-${COMMIT_ID}")
+            echo "VERSION=${VERSION}"
+            echo "COMMIT_ID=${COMMIT_ID}"
+          exports:
+            - VERSION
+            - COMMIT_ID
+        - name: 编译Docker latest镜像
+          script: docker build --build-arg VERSION=${VERSION} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
           script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev
