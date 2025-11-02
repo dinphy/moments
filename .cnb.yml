@@ -1,7 +1,7 @@
 # .cnb.yml
 
-# 匹配以 develop 开头的分支名
-develop*:
+# 匹配以 v 开头的标签，当推送标签时触发构建
+v*:
   ## 推送触发
   push:
     - services:
@@ -14,15 +14,25 @@ develop*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 获取dev版本号
-          script: echo -n $(date +%s)
+        - name: 提取版本号
+          script: |
+            # 从标签名中提取版本号，去掉v前缀
+            VERSION=${GIT_TAG_NAME#v}
+            echo "提取的版本号: $VERSION"
+            echo -n $VERSION
           exports:
-            info: DEV_VERSION
-        - name: 编译Docker dev镜像
-          script: docker build -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
+            info: VERSION
+        - name: 编译Docker镜像
+          script: |
+            # 使用提取的版本号和提交ID构建镜像
+            docker build --build-arg VERSION=${VERSION} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:${VERSION} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
-          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION  
-# 构建以 main 开头的分支
+          script: |
+            # 推送带版本号和latest标签的镜像
+            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:${VERSION}
+            docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
+
+# 构建以 main 开头的分支，用于手动触发构建
 main*:
   web_trigger_main:
     - services:
@@ -35,7 +45,7 @@ main*:
       stages:
         - name: 登录Docker仓库
           script: docker login -u ${CNB_TOKEN_USER_NAME} -p "${CNB_TOKEN}" ${CNB_DOCKER_REGISTRY}
-        - name: 编译Docker latest镜像
-          script: docker build -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
+        - name: 编译Docker开发镜像
+          script: docker build --build-arg VERSION=dev-${GIT_COMMIT_SHA:0:7} --build-arg COMMIT_ID=${GIT_COMMIT_SHA:0:7} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev .
         - name: 推送Docker镜像到CNB
-          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest
+          script: docker push ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev
