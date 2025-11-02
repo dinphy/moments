@@ -22,7 +22,7 @@ develop*:
           script: |
             COMMIT_ID=$(git rev-parse HEAD | cut -c1-7)
             echo "COMMIT_ID=${COMMIT_ID}"
-            echo "COMMIT_ID=${COMMIT_ID}" >> $CNB_ENV
+            export COMMIT_ID
         - name: 编译Docker dev镜像
           script: docker build --build-arg VERSION=develop-${COMMIT_ID} --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:dev-$DEV_VERSION .
         - name: 推送Docker镜像到CNB
@@ -44,7 +44,7 @@ main*:
           script: |
             COMMIT_ID=$(git rev-parse HEAD | cut -c1-7)
             echo "COMMIT_ID=${COMMIT_ID}"
-            echo "COMMIT_ID=${COMMIT_ID}" >> $CNB_ENV
+            export COMMIT_ID
         - name: 编译Docker latest镜像
           script: docker build --build-arg VERSION=latest --build-arg COMMIT_ID=${COMMIT_ID} -t ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}:latest .
         - name: 推送Docker镜像到CNB
