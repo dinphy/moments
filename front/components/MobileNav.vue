@@ -1,34 +1,34 @@
 <template>
-  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50">
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-10">
     <div class="flex justify-around items-center">
       <!-- 动态 -->
       <div
-        class="flex flex-col items-center p-2"
+        class="flex flex-col items-center py-1.5"
         :class="{ 'text-green-500': $route.path === '/' }"
         @click="handleHomeClick"
       >
         <UIcon name="i-carbon-activity" class="w-6 h-6" />
-        <span class="text-xs mt-1">动态</span>
+        <span class="text-xs mt-0.5">动态</span>
       </div>
 
       <!-- 发现 -->
       <div
-        class="flex flex-col items-center p-2"
+        class="flex flex-col items-center py-1.5"
         :class="{ 'text-green-500': $route.path === '/discover' }"
         @click="navigate('/discover')"
       >
         <UIcon name="i-system-uicons-compass" class="w-6 h-6" />
-        <span class="text-xs mt-1">发现</span>
+        <span class="text-xs mt-0.5">发现</span>
       </div>
 
       <!-- 我 -->
       <div
-        class="flex flex-col items-center p-2"
+        class="flex flex-col items-center py-1.5"
         :class="{ 'text-green-500': $route.path === '/user/settings' }"
         @click="handleUserClick"
       >
         <UIcon name="i-system-uicons-user-male" class="w-6 h-6" />
-        <span class="text-xs mt-1">我</span>
+        <span class="text-xs mt-0.5">我</span>
       </div>
     </div>
   </div>
