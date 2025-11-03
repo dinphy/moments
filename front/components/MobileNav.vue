@@ -17,7 +17,7 @@
         :class="{ 'text-green-500': $route.path === '/discover' }"
         @click="navigate('/discover')"
       >
-        <UIcon name="i-carbon-compass" class="w-6 h-6" />
+        <UIcon name="i-system-uicons-compass" class="w-6 h-6" />
         <span class="text-xs mt-1">发现</span>
       </div>
 
@@ -27,7 +27,7 @@
         :class="{ 'text-green-500': $route.path === '/user/settings' }"
         @click="handleUserClick"
       >
-        <UIcon name="i-carbon-user-avatar" class="w-6 h-6" />
+        <UIcon name="i-system-uicons-user-male" class="w-6 h-6" />
         <span class="text-xs mt-1">我</span>
       </div>
     </div>

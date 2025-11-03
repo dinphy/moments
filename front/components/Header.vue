@@ -137,10 +137,11 @@
         <!-- Logo区域 -->
         <div class="flex items-center space-x-4">
           <NuxtLink to="/" class="flex items-center space-x-2 group">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-200">
-              <UIcon name="i-carbon-activity" class="w-6 h-6 text-white" />
-            </div>
-            <span class="text-xl font-bold text-gray-800 dark:text-white">Moments</span>
+            <img
+              :src="props.user.avatarUrl"
+              class="avatar w-10 h-10 rounded-lg"
+            />
+            <span class="text-xl font-bold text-gray-800 dark:text-white">{{ props.user.nickname }}</span>
           </NuxtLink>
         </div>
 
@@ -165,7 +166,7 @@
             :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/discover' }"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-carbon-compass" class="w-5 h-5" />
+              <UIcon name="i-system-uicons-compass" class="w-5 h-5" />
               <span class="font-medium">发现</span>
             </div>
           </NuxtLink>
@@ -178,7 +179,7 @@
             :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/user/settings' }"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-carbon-user-avatar" class="w-5 h-5" />
+              <UIcon name="i-system-uicons-user-male" class="w-5 h-5" />
               <span class="font-medium">我</span>
             </div>
           </NuxtLink>
@@ -188,7 +189,7 @@
             class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-carbon-user-avatar" class="w-5 h-5" />
+              <UIcon name="i-heroicons-user" class="w-5 h-5" />
               <span class="font-medium">我</span>
             </div>
           </div>
@@ -202,72 +203,36 @@
               @click="toggleMode"
               class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              <svg
+              <UIcon
                 v-if="mode.preference === 'light'"
-                class="w-5 h-5 text-yellow-500"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
+                name="i-carbon-sun"
+                class="w-5 h-5"
+              />
 
-              <svg
+              <UIcon
                 v-else-if="mode.preference === 'dark'"
-                class="w-5 h-5 text-gray-700 dark:text-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
+                name="i-carbon-moon"
+                class="w-5 h-5"
+              />
 
-              <svg
+              <UIcon
                 v-else
-                class="w-5 h-5 text-gray-700 dark:text-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="9" y1="9" x2="15" y2="9"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
+                name="i-carbon-laptop"
+                class="w-5 h-5"
+              />
             </button>
           </div>
 
-          <!-- 发表动态按钮 -->
-          <NuxtLink
+          <!-- 发表动态 -->
+          <UButton
             v-if="global.userinfo.token"
             to="/new"
             class="relative group"
             title="发表动态"
+            tag="NuxtLink"
           >
-            <button class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center space-x-2 shadow-sm transition-all duration-200 hover:shadow-md">
-              <UIcon name="i-carbon-add" class="w-5 h-5" />
-              <span class="font-medium">发表动态</span>
-            </button>
-          </NuxtLink>
+            发表动态
+          </UButton>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
   <Header :user="currentUser" />
   <div class="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-b-lg p-2">
     <div class="grid grid-cols-2 gap-2 mb-2">
-      <!-- 发表动态卡片 -->
+      <!-- 发动态卡片 -->
       <div 
         v-if="global.userinfo.token"
         class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center justify-center hover:shadow-lg transition-all duration-200 cursor-pointer group"
@@ -40,42 +40,23 @@
         @click="toggleMode"
       >
         <div class="relative mb-2">
-          <svg
-            v-if="mode.value === 'light'"
-            class="w-10 h-10 text-yellow-500 transition-transform duration-200 group-hover:scale-110"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"></path>
-            <path d="M20 3v4"></path>
-            <path d="M22 5h-4"></path>
-          </svg>
-          <svg
-            v-else
-            class="w-10 h-10 text-yellow-500 transition-transform duration-200 group-hover:scale-110"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2"></path>
-            <path d="M12 20v2"></path>
-            <path d="m4.93 4.93 1.41 1.41"></path>
-            <path d="m17.66 17.66 1.41 1.41"></path>
-            <path d="M2 12h2"></path>
-            <path d="M20 12h2"></path>
-            <path d="m6.34 17.66-1.41 1.41"></path>
-            <path d="m19.07 4.93-1.41 1.41"></path>
-          </svg>
+          <UIcon
+                v-if="mode.preference === 'light'"
+                name="i-carbon-sun"
+                class="w-10 h-10"
+              />
+
+              <UIcon
+                v-else-if="mode.preference === 'dark'"
+                name="i-carbon-moon"
+                class="w-10 h-10"
+              />
+
+              <UIcon
+                v-else
+                name="i-carbon-laptop"
+                class="w-10 h-10"
+              />
         </div>
         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ modeText }}</span>
       </div>
