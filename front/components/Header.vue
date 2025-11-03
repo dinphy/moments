@@ -22,6 +22,7 @@
           {{ route.params.tag || "话题专栏" }}
         </span>
         <span v-else-if="$route.path === '/friend'">友情链接</span>
+        <span v-else-if="$route.path === '/discover'">发现</span>
         <span v-else-if="$route.path.indexOf('/memo/') >= 0">详情</span>
         <span v-else>{{ props.user.nickname }} 的空间</span>
       </NuxtLink>
@@ -109,7 +110,7 @@
 
       <NuxtLink
         v-else-if="$route.path === '/user/settings' && global.userinfo.token"
-        class="hidden sm:flex"
+        class="flex"
         title="登出"
         @click="logout"
       >
@@ -127,91 +128,147 @@
       </span>
     </div>
 
-    <div
-      class="dark:bg-neutral-800 hidden sm:flex sm:absolute sm:-right-10 sm:rounded sm:p-2 sm:flex-col sm:w-fit justify-end shadow w-full flex-row top-0 p-1 gap-2 bg-white"
+    <!-- PC端顶部导航 -->
+    <div 
+      class="hidden sm:flex fixed top-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm z-30 transition-all duration-300"
+      :class="{ 'translate-y-0': y > 100, '-translate-y-full': y <= 100 }"
     >
-      <svg
-        v-if="mode.value === 'light'"
-        class="lucide lucide-moon-star-icon cursor-pointer"
-        @click="toggleMode"
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#FDE047"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9"></path>
-        <path d="M20 3v4"></path>
-        <path d="M22 5h-4"></path>
-      </svg>
+      <div class="max-w-6xl mx-auto w-full flex items-center justify-between px-6 py-3">
+        <!-- Logo区域 -->
+        <div class="flex items-center space-x-4">
+          <NuxtLink to="/" class="flex items-center space-x-2 group">
+            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-200">
+              <UIcon name="i-carbon-activity" class="w-6 h-6 text-white" />
+            </div>
+            <span class="text-xl font-bold text-gray-800 dark:text-white">Moments</span>
+          </NuxtLink>
+        </div>
 
-      <svg
-        v-else
-        class="lucide lucide-sun-icon cursor-pointer"
-        @click="toggleMode"
-        xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#FDE047"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="12" cy="12" r="4"></circle>
-        <path d="M12 2v2"></path>
-        <path d="M12 20v2"></path>
-        <path d="m4.93 4.93 1.41 1.41"></path>
-        <path d="m17.66 17.66 1.41 1.41"></path>
-        <path d="M2 12h2"></path>
-        <path d="M20 12h2"></path>
-        <path d="m6.34 17.66-1.41 1.41"></path>
-        <path d="m19.07 4.93-1.41 1.41"></path>
-      </svg>
+        <!-- 导航链接区域 -->
+        <div class="hidden md:flex items-center space-x-1">
+          <!-- 动态 -->
+          <div
+            class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
+            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/' }"
+            @click="handleHomeClick"
+          >
+            <div class="flex items-center space-x-2">
+              <UIcon name="i-carbon-activity" class="w-5 h-5" />
+              <span class="font-medium">动态</span>
+            </div>
+          </div>
 
-      <NuxtLink v-if="global.userinfo.token" to="/new" title="发表">
-        <UIcon
-          name="i-carbon-camera"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
-      <NuxtLink
-        v-if="$route.path !== '/user/calendar' && global.userinfo.token"
-        to="/user/calendar"
-        title="日历检索"
-      >
-        <UIcon
-          name="i-jam-search-folder"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
-      <NuxtLink v-if="$route.path === '/'" to="/friend" title="友情链接">
-        <UIcon
-          name="i-carbon-friendship"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
+          <!-- 发现 -->
+          <NuxtLink
+            to="/discover"
+            class="relative px-4 py-2 rounded-lg transition-all duration-200"
+            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/discover' }"
+          >
+            <div class="flex items-center space-x-2">
+              <UIcon name="i-carbon-compass" class="w-5 h-5" />
+              <span class="font-medium">发现</span>
+            </div>
+          </NuxtLink>
 
-      <NuxtLink
-        v-if="$route.path !== '/user/settings' && global.userinfo.token"
-        to="/user/settings"
-        title="个人资料"
-      >
-        <UIcon
-          name="i-carbon-user-avatar"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
-      </NuxtLink>
-      <div v-if="!global.userinfo.token" title="登录" @click="loginReg = true">
-        <UIcon
-          name="i-carbon-login"
-          class="text-[#9fc84a] w-5 h-5 cursor-pointer"
-        />
+          <!-- 我 -->
+          <NuxtLink
+            v-if="global.userinfo.token"
+            to="/user/settings"
+            class="relative px-4 py-2 rounded-lg transition-all duration-200"
+            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/user/settings' }"
+          >
+            <div class="flex items-center space-x-2">
+              <UIcon name="i-carbon-user-avatar" class="w-5 h-5" />
+              <span class="font-medium">我</span>
+            </div>
+          </NuxtLink>
+          <div
+            v-else
+            @click="handleUserClick"
+            class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
+          >
+            <div class="flex items-center space-x-2">
+              <UIcon name="i-carbon-user-avatar" class="w-5 h-5" />
+              <span class="font-medium">我</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作区域 -->
+        <div class="flex items-center space-x-3">
+          <!-- 主题切换 -->
+          <div class="relative group" :title="modeText">
+            <button
+              @click="toggleMode"
+              class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <svg
+                v-if="mode.preference === 'light'"
+                class="w-5 h-5 text-yellow-500"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+
+              <svg
+                v-else-if="mode.preference === 'dark'"
+                class="w-5 h-5 text-gray-700 dark:text-gray-300"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+
+              <svg
+                v-else
+                class="w-5 h-5 text-gray-700 dark:text-gray-300"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="9"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 发表动态按钮 -->
+          <NuxtLink
+            v-if="global.userinfo.token"
+            to="/new"
+            class="relative group"
+            title="发表动态"
+          >
+            <button class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center space-x-2 shadow-sm transition-all duration-200 hover:shadow-md">
+              <UIcon name="i-carbon-add" class="w-5 h-5" />
+              <span class="font-medium">发表动态</span>
+            </button>
+          </NuxtLink>
+        </div>
       </div>
     </div>
     <img class="header-img w-full" :src="props.user.coverUrl" alt="" />
@@ -273,6 +330,36 @@ const mode = useColorMode();
 const { y } = useWindowScroll();
 const loginReg = useState<boolean>("loginReg", () => false);
 const moreToolbar = ref(false);
+
+// 根据当前主题模式返回对应的文案
+const modeText = computed(() => {
+  if (mode.preference === 'light') {
+    return '切换到暗色模式';
+  } else if (mode.preference === 'dark') {
+    return '切换到亮色模式';
+  } else {
+    return '跟随系统主题';
+  }
+});
+
+const handleUserClick = async () => {
+  if (global.value.userinfo.token) {
+    await navigateTo("/user/settings");
+  } else {
+    loginReg.value = true;
+  }
+};
+
+const handleHomeClick = async () => {
+  if (route.path === '/') {
+    // 如果当前在主页，触发内容刷新事件
+    const { memoReloadEvent } = await import('~/event');
+    memoReloadEvent.emit('refresh');
+  } else {
+    // 否则导航到主页
+    await navigateTo('/');
+  }
+};
 
 // 删除相关
 const showDeleteModal = ref(false);

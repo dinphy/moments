@@ -19,31 +19,24 @@
   </div>
 
   <div class="md:hidden relative">
-    <div class="right-0 bottom-[10%] fixed flex items-center justify-end">
-      <div class="flex flex-col items-center gap-2">
-        <div
-          v-if="y > 300"
-          @click="y = 0"
-          class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
-        >
-          <UIcon
-            name="i-lets-icons-expand-top-stop"
-            class="w-6 h-6 text-[#9fc84a] cursor-pointer"
-          ></UIcon>
-        </div>
-        <div
-          class="dark:bg-gray-900/85 mr-4 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
-          @click="open = true"
-        >
-          <UIcon
-            name="i-icon-park-solid-more-four"
-            class="w-6 h-6 text-[#9fc84a] cursor-pointer"
-          ></UIcon>
-        </div>
+    <!-- 返回顶部按钮 -->
+    <div
+      v-if="y > 300"
+      @click="y = 0"
+      class="right-4 bottom-20 fixed flex items-center justify-center"
+    >
+      <div
+        class="dark:bg-gray-900/85 rounded-full bg-slate-50 w-10 h-10 flex items-center justify-center shadow-xl"
+      >
+        <UIcon
+          name="i-lets-icons-expand-top-stop"
+          class="w-6 h-6 text-[#9fc84a] cursor-pointer"
+        ></UIcon>
       </div>
     </div>
 
-    <MobileNav :open="open" />
+    <!-- 底部导航栏 -->
+    <MobileNav />
     <LoginReg v-model="mobileloginReg" />
   </div>
 </template>
@@ -53,7 +46,6 @@ import type { SysConfigVO, UserVO } from "~/types";
 import { useGlobalState } from "~/store";
 
 const global = useGlobalState();
-const open = useState<boolean>("sidebarOpen", () => false);
 const mobileloginReg = useState<boolean>("mobileloginReg", () => false);
 const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
