@@ -1,75 +1,141 @@
 <template>
   <Header :user="currentUser" />
-  <div class="bg-gray-100 dark:bg-gray-900 min-h-screen rounded-b-lg p-2">
-    <div class="grid grid-cols-2 gap-2 mb-2">
+  <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen rounded-b-lg p-4 overflow-hidden relative">
+    
+    <!-- 功能卡片区域 -->
+    <div class="relative grid grid-cols-2 gap-4 mb-6">
       <!-- 发动态卡片 -->
       <div 
         v-if="global.userinfo.token"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center justify-center hover:shadow-lg transition-all duration-200 cursor-pointer group"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="navigateTo('/new')"
       >
-        <div class="mb-2">
-          <UIcon name="i-carbon-camera" class="w-10 h-10 text-blue-500 transition-transform duration-200 group-hover:scale-110"/>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
+          <div class="w-14 h-14 bg-blue-500 bg-opacity-10 dark:bg-blue-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
+            <UIcon name="i-carbon-camera" class="w-8 h-8 text-blue-600 dark:text-blue-400"/>
+          </div>
+          <div class="text-center sm:text-left">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">发表动态</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">分享你的精彩瞬间</p>
+          </div>
         </div>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">发表动态</span>
       </div>
+      
       <!-- 日历检索卡片 -->
       <div 
         v-if="global.userinfo.token"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center justify-center hover:shadow-lg transition-all duration-200 cursor-pointer group"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="navigateTo('/user/calendar')"
       >
-        <div class="mb-2">
-          <UIcon name="i-jam-search-folder" class="w-10 h-10 text-purple-500 transition-transform duration-200 group-hover:scale-110"/>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
+          <div class="w-14 h-14 bg-purple-500 bg-opacity-10 dark:bg-purple-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
+            <UIcon name="i-jam-search-folder" class="w-8 h-8 text-purple-600 dark:text-purple-400"/>
+          </div>
+          <div class="text-center sm:text-left">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">日历检索</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">那往昔的美好时光</p>
+          </div>
         </div>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">日历检索</span>
       </div>
+      
       <!-- 友情链接卡片 -->
       <div 
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center justify-center hover:shadow-lg transition-all duration-200 cursor-pointer group"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="navigateTo('/friend')"
       >
-        <div class="mb-2">
-          <UIcon name="i-carbon-friendship" class="w-10 h-10 text-green-500 transition-transform duration-200 group-hover:scale-110"/>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
+          <div class="w-14 h-14 bg-green-500 bg-opacity-10 dark:bg-green-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
+            <UIcon name="i-carbon-friendship" class="w-8 h-8 text-green-600 dark:text-green-400"/>
+          </div>
+          <div class="text-center sm:text-left">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">友情链接</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">发现更多精彩博客</p>
+          </div>
         </div>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">友情链接</span>
       </div>
+      
       <!-- 主题切换卡片 -->
       <div 
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex flex-col items-center justify-center hover:shadow-lg transition-all duration-200 cursor-pointer group"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="toggleMode"
       >
-        <div class="relative mb-2">
-          <UIcon
-                v-if="mode.preference === 'light'"
-                name="i-carbon-sun"
-                class="w-10 h-10"
-              />
-
-              <UIcon
-                v-else-if="mode.preference === 'dark'"
-                name="i-carbon-moon"
-                class="w-10 h-10"
-              />
-
-              <UIcon
-                v-else
-                name="i-carbon-laptop"
-                class="w-10 h-10"
-              />
+        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
+        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
+          <div class="w-14 h-14 bg-indigo-500 bg-opacity-10 dark:bg-indigo-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
+            <UIcon
+              v-if="mode.preference === 'light'"
+              name="i-carbon-sun"
+              class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+            />
+            <UIcon
+              v-else-if="mode.preference === 'dark'"
+              name="i-carbon-moon"
+              class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+            />
+            <UIcon
+              v-else
+              name="i-carbon-laptop"
+              class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
+            />
+          </div>
+          <div class="text-center sm:text-left">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">{{ modeText }}</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">主题切换</p>
+          </div>
         </div>
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ modeText }}</span>
       </div>
     </div>
-    <!-- 探索更多 -->
-    <div v-if="!global.userinfo.token" class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-6 text-center">
-        <UIcon name="i-carbon-locked" class="w-12 h-12 text-gray-400 mx-auto mb-3" />
-        <p class="text-gray-600 dark:text-gray-400 text-sm">登录后，发现更多精彩内容</p>
+
+    <!-- 管理员功能区域 -->
+    <div v-if="global.userinfo.token && global.userinfo.id === 1" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl px-4 py-8 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
+      <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
+      <div class="relative">
+        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center">
+          <UIcon name="i-heroicons-shield-check" class="w-5 h-5 mr-2 text-amber-500" />
+          系统与安全
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <NuxtLink to="/user/manage" class="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-amber-200 dark:border-amber-800/30">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-amber-100 dark:bg-amber-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+                <UIcon name="i-heroicons-users" class="w-5 h-5 text-amber-600 dark:text-amber-400"/>
+              </div>
+              <span class="font-medium text-gray-700 dark:text-gray-300">用户管理</span>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+          </NuxtLink>
+          <NuxtLink to="/sys/settings" class="group bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-blue-200 dark:border-blue-800/30">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
+                <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
+              </div>
+              <span class="font-medium text-gray-700 dark:text-gray-300">系统设置</span>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 未登录提示区域 -->
+    <div v-if="!global.userinfo.token" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-8 overflow-hidden border border-slate-200 dark:border-slate-700">
+      <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
+      <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
+      <div class="relative text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full mb-4 border border-slate-200 dark:border-slate-600">
+          <UIcon name="i-carbon-locked" class="w-8 h-8 text-slate-600 dark:text-slate-400" />
+        </div>
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">解锁更多功能</h3>
+        <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">登录后，发现更多精彩内容，记录你的生活点滴</p>
         <button 
           @click="loginReg = true" 
-          class="mt-3 px-4 py-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 transition-colors"
+          class="inline-flex items-center justify-center px-6 py-3 bg-slate-600 dark:bg-slate-500 text-white rounded-xl font-medium hover:bg-slate-700 dark:hover:bg-slate-400 transition-all duration-300 transform hover:scale-105 shadow-md"
         >
+          <UIcon name="i-carbon-login" class="w-5 h-5 mr-2" />
           立即登录
         </button>
       </div>

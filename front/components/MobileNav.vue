@@ -1,5 +1,5 @@
 <template>
-  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-700 z-10">
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-[#202020]/95 backdrop-blur-md z-10 border-t border-gray-100 dark:border-gray-700">
     <div class="flex justify-around items-center">
       <!-- 动态 -->
       <div
