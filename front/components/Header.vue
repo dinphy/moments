@@ -40,7 +40,7 @@
         :popper="{ placement: 'bottom-end', strategy: 'fixed' }"
       >
         <UIcon
-          name="i-solar-menu-dots-bold"
+          name="i-weui-more-filled"
           class="mt-1 w-5 h-5 cursor-pointer"
         />
         <template #panel>
@@ -73,7 +73,7 @@
                     @click="go2Edit(memoItem.id)"
                   >
                     <div class="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
-                      <UIcon class="w-4 h-4 text-green-600 dark:text-green-400" name="i-carbon-edit" />
+                      <UIcon class="w-4 h-4 text-green-600 dark:text-green-400" name="i-weui-pencil-outlined" />
                     </div>
                     <div class="flex-1">
                       <div class="text-sm text-gray-700 dark:text-gray-300 font-medium">编辑</div>
@@ -93,7 +93,7 @@
                     @click="confirmDelete"
                   >
                     <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
-                      <UIcon class="w-4 h-4 text-red-600 dark:text-red-400" name="i-carbon-trash-can" />
+                      <UIcon class="w-4 h-4 text-red-600 dark:text-red-400" name="i-weui-delete-outlined" />
                     </div>
                     <div class="flex-1">
                       <div class="text-sm text-gray-700 dark:text-gray-300 font-medium">删除</div>

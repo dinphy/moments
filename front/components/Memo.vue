@@ -144,10 +144,10 @@
             >
               <UIcon
                 v-if="liked"
-                name="i-carbon-favorite-filled"
-                class="w-4 h-4 text-red-400"
+                name="i-weui-like-filled"
+                class="w-5 h-5 text-red-400"
               />
-              <UIcon v-else name="i-carbon-favorite" class="w-4 h-4" />
+              <UIcon v-else name="i-weui-like-outlined" class="w-5 h-5" />
               <div>{{ liked ? "取消" : "赞" }}</div>
             </div>
             <template v-if="sysConfig.enableComment">
@@ -157,8 +157,8 @@
                 @click="doComment"
               >
                 <UIcon
-                  name="i-octicon-comment"
-                  class="w-4 h-4 relative top-[2px]"
+                  name="i-weui-comment-outlined"
+                  class="w-5 h-5 relative"
                 />
                 <div>评论</div>
               </div>
