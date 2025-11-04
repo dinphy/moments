@@ -1,51 +1,65 @@
 <template>
   <div 
     :class="[
-      'flex flex-col gap-2',
-      'fixed inset-x-0 bottom-0 bg-[#f7f7f7] dark:bg-[#202020] shadow-lg z-50 max-h-[50vh] overflow-y-auto overscroll-contain md:static md:mt-2 md:max-h-none md:border-0 md:shadow-none md:bg-transparent',
-      replyTo ? 'p-3 md:p-1' : 'p-3'
+      'flex flex-col',
+      'fixed inset-x-0 bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg z-50 md:static md:border-0 md:shadow-none',
+      replyTo ? 'p-3' : 'p-3'
     ]"
     v-if="currentCommentBox === pid"
     ref="commentBoxRef"
   >
-    <div :class="[
-      'relative flex items-start gap-2',
-      'pb-3 md:bg-transparent'
-    ]">
-      <UTextarea 
-        :rows="1" 
-        :maxrows="3"
-        autoresize
-        autofocus 
-        :placeholder="replyTo ? `回复${replyTo}:` : '说点什么...'" 
-        v-model="state.content"
-        class="flex-1 min-h-[32px] text-sm"
-        :ui="{
-          base: 'transition-all duration-200',
-          rounded: 'rounded-lg',
-          placeholder: 'placeholder:text-gray-400'
-        }"
-      />
-      <div class="flex gap-1 items-center flex-shrink-0">
-        <UIcon v-if="!global.userinfo.token" class="text-gray-400 w-7 h-7 cursor-pointer" name="i-carbon-user-avatar" @click="toggleUser"/>
-        <UIcon class="text-gray-400 w-7 h-7 cursor-pointer select-none" name="i-carbon-face-activated" @click="toggleEmoji"/>
+    <!-- 回复提示 -->
+    <div v-if="replyTo" class="text-xs text-gray-500 mb-2 px-1">
+      回复 <span class="text-blue-500">{{ replyTo }}</span>
+    </div>
+    
+    <!-- 输入区域 -->
+    <div class="flex items-end gap-2">
+      <div class="flex-1 relative">
+        <UTextarea 
+          :rows="1" 
+          :maxrows="4"
+          autoresize
+          autofocus 
+          :placeholder="'评论'" 
+          v-model="state.content"
+          class="w-full text-sm"
+          :ui="{
+            base: 'transition-all duration-200 px-4 py-2',
+            rounded: 'rounded-full',
+            placeholder: 'placeholder:text-gray-400',
+            background: 'bg-gray-100 dark:bg-gray-700'
+          }"
+        />
+      </div>
+      
+      <!-- 功能按钮和发送按钮 -->
+      <div class="flex items-center gap-2">
+        <UIcon v-if="!global.userinfo.token" class="text-gray-500 w-6 h-6 cursor-pointer" :name="userShow ? 'weui-keyboard-outlined' : 'i-ep-user'" @click="toggleUser"/>
+        <UIcon class="text-gray-500 w-6 h-6 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
         <UButton 
-          class="cursor-pointer text-sm" 
-          :color="state.content.trim() ? 'primary' : 'white'" 
+          class="cursor-pointer text-sm px-3" 
+          :color="state.content.trim() ? 'primary' : 'gray'" 
+          :variant="state.content.trim() ? 'solid' : 'ghost'"
           :disabled="!state.content.trim()"
+          size="sm"
           @click="comment">
           发送
         </UButton>
       </div>
     </div>
-    <Emoji v-if="emojiShow" @selected="emojiSelected"/>
-    <div v-if="userShow" :class="[
-      'flex gap-1 flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2'
-    ]">
+    
+    <!-- 表情选择器 -->
+    <div v-if="emojiShow" class="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+      <Emoji @selected="emojiSelected"/>
+    </div>
+    
+    <!-- 用户信息输入 -->
+    <div v-if="userShow" class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
       <template v-if="!global.userinfo.token">
-        <UInput placeholder="姓名" v-model="state.username"/>
-        <UInput placeholder="网站" v-model="state.website"/>
-        <UInput placeholder="邮箱" v-model="state.email"/>
+        <UInput placeholder="姓名" v-model="state.username" size="sm"/>
+        <UInput placeholder="网站" v-model="state.website" size="sm"/>
+        <UInput placeholder="邮箱" v-model="state.email" size="sm"/>
       </template>
     </div>
   </div>
