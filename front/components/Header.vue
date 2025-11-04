@@ -121,7 +121,7 @@
         class="flex"
       >
         <UIcon
-          name="i-carbon-add"
+          name="i-weui-add-friends-outlined"
           class="w-6 h-6 cursor-pointer"
           @click="$emit('add-friend')"
         />
@@ -217,7 +217,7 @@
 
               <UIcon
                 v-else
-                name="i-carbon-laptop"
+                name="i-weui-display-outlined"
                 class="w-5 h-5"
               />
             </button>

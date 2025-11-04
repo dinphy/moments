@@ -48,7 +48,7 @@
         <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
         <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
           <div class="w-14 h-14 bg-green-500 bg-opacity-10 dark:bg-green-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
-            <UIcon name="i-carbon-friendship" class="w-8 h-8 text-green-600 dark:text-green-400"/>
+            <UIcon name="i-weui-contacts-outlined" class="w-8 h-8 text-green-600 dark:text-green-400"/>
           </div>
           <div class="text-center sm:text-left">
             <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">友情链接</h3>
@@ -77,7 +77,7 @@
             />
             <UIcon
               v-else
-              name="i-carbon-laptop"
+              name="i-weui-display-outlined"
               class="w-8 h-8 text-indigo-600 dark:text-indigo-400"
             />
           </div>
