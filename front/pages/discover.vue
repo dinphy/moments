@@ -126,11 +126,11 @@
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
       <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
       <div class="relative text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full mb-4 border border-slate-200 dark:border-slate-600">
+        <div class="hidden sm:inline-flex items-center justify-center w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full mb-4 border border-slate-200 dark:border-slate-600">
           <UIcon name="i-carbon-locked" class="w-8 h-8 text-slate-600 dark:text-slate-400" />
         </div>
         <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">解锁更多功能</h3>
-        <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">登录后，发现更多精彩内容，记录你的生活点滴</p>
+        <p class="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto hidden sm:block">登录后，发现更多精彩内容，记录你的生活点滴</p>
         <button 
           @click="loginReg = true" 
           class="inline-flex items-center justify-center px-6 py-3 bg-slate-600 dark:bg-slate-500 text-white rounded-xl font-medium hover:bg-slate-700 dark:hover:bg-slate-400 transition-all duration-300 transform hover:scale-105 shadow-md"

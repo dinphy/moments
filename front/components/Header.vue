@@ -5,8 +5,8 @@
   >
     <div
       v-if="$route.path !== '/'"
-      :class="{ 'bg-[#4c4c4c]/80': y > 100 }"
-      class="flex fixed justify-between items-center p-4 w-full md:w-[567px] text-white top-0 z-10"
+      :class="{ 'bg-[#F7F7F7]/95 backdrop-blur-md': y > 100 }"
+      class="flex fixed justify-between items-center p-4 w-full md:w-[567px] top-0 z-10"
     >
       <NuxtLink class="flex items-center" title="返回">
         <UIcon
@@ -130,7 +130,7 @@
 
     <!-- PC端顶部导航 -->
     <div 
-      class="hidden sm:flex fixed top-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-sm z-30 transition-all duration-300"
+      class="hidden sm:flex fixed top-0 left-0 right-0 bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md z-30 transition-all duration-300"
       :class="{ 'translate-y-0': y > 100, '-translate-y-full': y <= 100 }"
     >
       <div class="max-w-6xl mx-auto w-full flex items-center justify-between px-6 py-3">
@@ -150,7 +150,7 @@
           <!-- 动态 -->
           <div
             class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
-            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/' }"
+            :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/' }"
             @click="handleHomeClick"
           >
             <div class="flex items-center space-x-2">
@@ -163,7 +163,7 @@
           <NuxtLink
             to="/discover"
             class="relative px-4 py-2 rounded-lg transition-all duration-200"
-            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/discover' }"
+            :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/discover' }"
           >
             <div class="flex items-center space-x-2">
               <UIcon name="i-system-uicons-compass" class="w-5 h-5" />
@@ -176,7 +176,7 @@
             v-if="global.userinfo.token"
             to="/user/settings"
             class="relative px-4 py-2 rounded-lg transition-all duration-200"
-            :class="{ 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400': $route.path === '/user/settings' }"
+            :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/user/settings' }"
           >
             <div class="flex items-center space-x-2">
               <UIcon name="i-system-uicons-user-male" class="w-5 h-5" />
