@@ -17,7 +17,7 @@
         :class="{ 'text-[#07C160]': $route.path === '/discover' }"
         @click="navigate('/discover')"
       >
-        <UIcon name="i-system-uicons-compass" class="w-6 h-6" />
+        <UIcon :name="$route.path === '/discover' ? 'i-weui-discover-filled' : 'i-weui-discover-outlined'" class="w-6 h-6" />
         <span class="text-xs mt-0.5">发现</span>
       </div>
 
@@ -27,7 +27,7 @@
         :class="{ 'text-[#07C160]': $route.path === '/user/settings' }"
         @click="handleUserClick"
       >
-        <UIcon name="i-system-uicons-user-male" class="w-6 h-6" />
+        <UIcon :name="$route.path === '/user/settings' ? 'i-weui-me-filled' : 'i-weui-me-outlined'" class="w-6 h-6" />
         <span class="text-xs mt-0.5">我</span>
       </div>
     </div>

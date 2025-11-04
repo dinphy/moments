@@ -343,7 +343,7 @@
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
         <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <UIcon name="i-weui-info-outlined" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
           <h3 class="text-base font-medium text-gray-900 dark:text-white">关于</h3>
         </div>
       </div>

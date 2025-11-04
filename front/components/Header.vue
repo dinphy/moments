@@ -166,7 +166,7 @@
             :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/discover' }"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-system-uicons-compass" class="w-5 h-5" />
+              <UIcon :name="$route.path === '/discover' ? 'i-weui-discover-filled' : 'i-weui-discover-outlined'" class="w-5 h-5" />
               <span class="font-medium">发现</span>
             </div>
           </NuxtLink>
@@ -179,7 +179,7 @@
             :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/user/settings' }"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-system-uicons-user-male" class="w-5 h-5" />
+              <UIcon :name="$route.path === '/user/settings' ? 'i-weui-me-filled' : 'i-weui-me-outlined'" class="w-5 h-5" />
               <span class="font-medium">我</span>
             </div>
           </NuxtLink>
@@ -189,7 +189,7 @@
             class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
           >
             <div class="flex items-center space-x-2">
-              <UIcon name="i-heroicons-user" class="w-5 h-5" />
+              <UIcon :name="$route.path === '/user/settings' ? 'i-weui-me-filled' : 'i-weui-me-outlined'" class="w-5 h-5" />
               <span class="font-medium">我</span>
             </div>
           </div>

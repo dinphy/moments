@@ -102,20 +102,20 @@
           <NuxtLink to="/user/manage" class="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-amber-200 dark:border-amber-800/30">
             <div class="flex items-center">
               <div class="w-10 h-10 bg-amber-100 dark:bg-amber-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-                <UIcon name="i-heroicons-users" class="w-5 h-5 text-amber-600 dark:text-amber-400"/>
+                <UIcon name="i-weui-group-detail-outlined" class="w-5 h-5 text-amber-600 dark:text-amber-400"/>
               </div>
               <span class="font-medium text-gray-700 dark:text-gray-300">用户管理</span>
             </div>
-            <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+            <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
           </NuxtLink>
           <NuxtLink to="/sys/settings" class="group bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-blue-200 dark:border-blue-800/30">
             <div class="flex items-center">
               <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-                <UIcon name="i-heroicons-cog-6-tooth" class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
+                <UIcon name="i-weui-setting-outlined" class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
               </div>
               <span class="font-medium text-gray-700 dark:text-gray-300">系统设置</span>
             </div>
-            <UIcon name="i-heroicons-arrow-right" class="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+            <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
           </NuxtLink>
         </div>
       </div>
