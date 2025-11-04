@@ -29,7 +29,7 @@
               color="primary"
               variant="ghost"
               size="xs"
-              icon="i-heroicons-pencil-square"
+              icon="i-weui-pencil-outlined"
               @click="openEditModal(friend)"
               class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
             />
@@ -39,7 +39,7 @@
               color="red"
               variant="ghost"
               size="xs"
-              icon="i-carbon-trash-can"
+              icon="i-weui-delete-outlined"
               @click="showConfirmModal(friend.id)"
               class="hover:bg-red-50 dark:hover:bg-red-900/20"
             />
