@@ -5,8 +5,12 @@
   >
     <div
       v-if="$route.path !== '/'"
-      :class="{ 'bg-[#F7F7F7]/95 backdrop-blur-md': y > 100 }"
-      class="flex fixed justify-between items-center p-4 w-full md:w-[567px] top-0 z-10"
+      :class="{ 
+        'bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md': y > 100, 
+        'sm:mt-14': y > 100,
+        'mt-0': true
+      }"
+      class="flex fixed justify-between items-center p-4 w-full md:w-[567px] top-0 z-10 transition-all duration-300"
     >
       <NuxtLink class="flex items-center" title="返回">
         <UIcon
