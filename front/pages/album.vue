@@ -22,13 +22,13 @@
             <div 
               v-for="(image, imgIndex) in monthGroup.images" 
               :key="image.id"
-              class="relative aspect-square overflow-hidden rounded-lg cursor-pointer group"
+              class="relative w-full pb-[100%] overflow-hidden rounded-lg cursor-pointer group bg-gray-100 dark:bg-gray-800"
               @click="openImagePreview(yearIndex, monthIndex, imgIndex)"
             >
               <img 
                 :src="image.url" 
                 :alt="image.memoContent"
-                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
