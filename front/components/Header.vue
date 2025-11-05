@@ -175,6 +175,18 @@
             </div>
           </NuxtLink>
 
+          <!-- 相册 -->
+          <NuxtLink
+            to="/album"
+            class="relative px-4 py-2 rounded-lg transition-all duration-200"
+            :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/album' }"
+          >
+            <div class="flex items-center space-x-2">
+              <UIcon :name="$route.path === '/album' ? 'i-carbon-image' : 'i-carbon-image-copy'" class="w-5 h-5" />
+              <span class="font-medium">相册</span>
+            </div>
+          </NuxtLink>
+
           <!-- 我 -->
           <NuxtLink
             v-if="global.userinfo.token"
