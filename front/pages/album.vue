@@ -40,13 +40,15 @@
         </div>
       </div>
 
-      <div v-if="hasNext" class="flex justify-center mt-6">
-        <UButton @click="loadMore" :loading="loadingMore" class="px-6">
-          加载更多
-        </UButton>
+      <div
+        v-if="hasNext"
+        ref="loadMoreEle"
+        class="text-xs text-center text-gray-500 py-2 cursor-pointer"
+        @click="loadMore"
+      >
+        点击加载更多
       </div>
-
-      <div v-else class="text-center text-gray-500 dark:text-gray-400 mt-6">
+      <div class="text-xs text-center text-gray-500 py-2" v-else>
         已经到底啦
       </div>
     </div>
@@ -59,13 +61,23 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoVO, UserVO } from "~/types";
+import type { MemoVO, SysConfigVO, UserVO } from "~/types";
 import dayjs from 'dayjs';
+import { useElementVisibility } from "@vueuse/core";
 
 const currentUser = useState<UserVO>('userinfo');
 const loading = ref(true);
 const loadingMore = ref(false);
 const hasNext = ref(false);
+const loadMoreEle = ref(null);
+const targetIsVisible = useElementVisibility(loadMoreEle);
+const sysConfig = useState<SysConfigVO>("sysConfig");
+
+watch(targetIsVisible, async (visible) => {
+  if (visible && sysConfig.value?.enableAutoLoadNextPage && !loadingMore.value) {
+    await loadMore();
+  }
+});
 
 const state = reactive({
   page: 1,
@@ -178,11 +190,10 @@ const openImagePreview = (yearIndex: number, monthIndex: number, imgIndex: numbe
         }
       },
       caption: (fancybox, slide) => {
-        return slide.caption;
+        return slide.caption || false;
       },
       on: {
         init: () => {
-          // 添加自定义样式到 head
           const style = document.createElement('style');
           style.innerHTML = `
             .fancybox__caption {
