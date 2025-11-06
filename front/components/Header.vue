@@ -239,9 +239,9 @@
     <div class="absolute right-2 bottom-[-40px]">
       <div class="userinfo flex flex-col">
         <div class="flex flex-row items-center gap-4 justify-end">
-          <div class="username text-lg font-bold text-white">
+          <NuxtLink to="/" class="username text-lg font-bold text-white hover:text-primary-200 transition-colors">
             {{ props.user.nickname }}
-          </div>
+          </NuxtLink>
           <img
             :src="props.user.avatarUrl"
             class="avatar w-[70px] h-[70px] rounded-xl"
