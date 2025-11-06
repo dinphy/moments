@@ -29,7 +29,11 @@
                   v-for="(image, imgIndex) in monthGroup.images" 
                   :key="image.id"
                   class="relative w-full pb-[100%] overflow-hidden rounded-lg cursor-pointer group bg-gray-100 dark:bg-gray-800"
-                  @click="openImagePreview(yearIndex, monthIndex, imgIndex)"
+                  :data-fancybox="`gallery-${yearIndex}-${monthIndex}`"
+                  :data-src="image.url"
+                  :data-caption="image.memoContent || '暂无描述'"
+                  :data-date="image.displayDate"
+                  :data-memo-id="image.memoId"
                 >
                   <img 
                     :src="image.url" 
@@ -59,6 +63,7 @@
 <script setup lang="ts">
 import type { MemoVO, SysConfigVO, UserVO } from "~/types";
 import dayjs from 'dayjs';
+import { Fancybox } from '@fancyapps/ui';
 
 const props = defineProps({
   memos: {
@@ -74,6 +79,46 @@ const props = defineProps({
 const currentUser = useState<UserVO>('userinfo');
 const allMemos = computed(() => props.memos || []);
 const loading = computed(() => props.loading);
+
+// 初始化 Fancybox
+onMounted(() => {
+  Fancybox.bind('[data-fancybox]', {
+    Thumbs: false,
+    Toolbar: {
+      display: {
+        left: ["zoom"],
+        middle: [],
+        right: ["slideshow", "fullscreen", "close"]
+      }
+    },
+    caption: function (fancybox, slide) {
+      const caption = slide.caption || '';
+      const date = slide.triggerEl?.dataset.date || '';
+      const memoId = slide.triggerEl?.dataset.memoId || '';
+      
+      return `
+        <div class="p-4 text-white fixed bottom-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm text-xs">
+          <div class="line-clamp-2 mb-2 text-sm leading-6">${caption}</div>
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-gray-300">${date}</span>
+            <a href="/memo/${memoId}" class="flex items-center gap-1 text-white opacity-80 hover:opacity-100 transition-opacity">
+              详情
+              <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  });
+});
+
+// 组件卸载时解绑
+onUnmounted(() => {
+  Fancybox.unbind('[data-fancybox]');
+  Fancybox.close();
+});
 
 const groupedImages = computed(() => {
   const images: Array<{
@@ -139,73 +184,4 @@ const groupedImages = computed(() => {
 
   return result;
 });
-
-interface ImageInfo {
-  id: number;
-  url: string;
-  memoId: number;
-  memoContent: string;
-  createdAt: string;
-  displayDate: string;
-}
-
-const getMonthImagesForPreview = (yearIndex: number, monthIndex: number) => {
-  const monthGroup = groupedImages.value[yearIndex].months[monthIndex];
-  return monthGroup.images.map((image: ImageInfo) => ({
-    src: image.url,
-    caption: `
-      <div class="absolute bottom-0 left-0 right-0 p-3 bg-black/75 text-white backdrop-blur-sm">
-        <div class="line-clamp-2 mb-2 text-sm leading-6">${image.memoContent || '暂无描述'}</div>
-        <div class="flex justify-between items-center text-xs">
-          <span class="text-white/80">${image.displayDate}</span>
-          <a href="/memo/${image.memoId}" class="flex items-center gap-1 text-white opacity-80 hover:opacity-100 transition-opacity">
-            详情
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
-      </div>
-    `,
-    thumb: image.url,
-  }));
-};
-
-const openImagePreview = (yearIndex: number, monthIndex: number, imgIndex: number) => {
-  const currentMonthImages = getMonthImagesForPreview(yearIndex, monthIndex);
-  
-  import('@fancyapps/ui').then(({ Fancybox }) => {
-    Fancybox.show(currentMonthImages, {
-      startIndex: imgIndex,
-      Thumbs: {
-        type: "modern",
-      },
-      Toolbar: {
-        display: {
-          left: ["zoom"],
-          middle: [],
-          right: ["slideshow", "fullscreen", "download", "thumbs", "close"]
-        }
-      },
-      caption: (fancybox, slide) => {
-        return slide.caption || false;
-      },
-      on: {
-        init: () => {
-          const style = document.createElement('style');
-          style.innerHTML = `
-            .fancybox__caption {
-              z-index: 9999 !important;
-            }
-          `;
-          document.head.appendChild(style);
-        }
-      }
-    });
-  });
-};
-
-
-
-
 </script>
