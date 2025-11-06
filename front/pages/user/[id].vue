@@ -1,13 +1,13 @@
 <template>
   <Header v-if="memos.length > 0" v-bind:user="memos[0].user" />
 
-  <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4 bg-gray-50 dark:bg-gray-800 rounded-t-lg">
+  <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4 rounded-t-lg">
     <button
       @click="activeTab = 'memos'"
       class="flex-1 px-4 py-3 text-base font-medium transition-all duration-200 relative"
       :class="{
-        'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 shadow-sm': activeTab === 'memos',
-        'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50': activeTab !== 'memos'
+        'text-blue-600 dark:text-blue-400 shadow-sm': activeTab === 'memos',
+        'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300': activeTab !== 'memos'
       }"
     >
       <span class="flex items-center justify-center gap-2">
@@ -23,8 +23,8 @@
       @click="activeTab = 'album'"
       class="flex-1 px-4 py-3 text-base font-medium transition-all duration-200 relative"
       :class="{
-        'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-700 shadow-sm': activeTab === 'album',
-        'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50': activeTab !== 'album'
+        'text-blue-600 dark:text-blue-400 shadow-sm': activeTab === 'album',
+        'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300': activeTab !== 'album'
       }"
     >
       <span class="flex items-center justify-center gap-2">
