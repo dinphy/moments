@@ -6,8 +6,9 @@
     <div
       v-if="$route.path !== '/'"
       :class="{ 
-        'bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md': y > 100, 
-        'sm:mt-14': y > 100,
+        'bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md text-[#202020] dark:text-[#F5F5F5]': y > 100, 
+        'text-[#F5F5F5]': y <= 100,
+        'sm:mt-14': y > 100 && showNav,
         'mt-0': true
       }"
       class="flex fixed justify-between items-center p-4 w-full md:w-[567px] top-0 z-10 transition-all duration-300"
@@ -134,11 +135,11 @@
 
     <!-- PC端顶部导航 -->
     <div 
+      v-if="showNav"
       class="hidden sm:flex fixed top-0 left-0 right-0 bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md z-30 transition-all duration-300"
       :class="{ 'translate-y-0': y > 100, '-translate-y-full': y <= 100 }"
     >
       <div class="max-w-6xl mx-auto w-full flex items-center justify-between px-6 py-3">
-        <!-- Logo区域 -->
         <div class="flex items-center space-x-4">
           <NuxtLink to="/" class="flex items-center space-x-2 group">
             <img
@@ -149,9 +150,7 @@
           </NuxtLink>
         </div>
 
-        <!-- 导航链接区域 -->
         <div class="hidden md:flex items-center space-x-1">
-          <!-- 动态 -->
           <div
             class="relative px-4 py-2 rounded-lg cursor-pointer transition-all duration-200"
             :class="{ 'bg-[#07C160]/10 dark:bg-[#07C160]/20 text-[#07C600]': $route.path === '/' }"
@@ -163,7 +162,6 @@
             </div>
           </div>
 
-          <!-- 发现 -->
           <NuxtLink
             to="/discover"
             class="relative px-4 py-2 rounded-lg transition-all duration-200"
@@ -175,7 +173,6 @@
             </div>
           </NuxtLink>
 
-          <!-- 我 -->
           <NuxtLink
             v-if="global.userinfo.token"
             to="/user/settings"
@@ -184,7 +181,7 @@
           >
             <div class="flex items-center space-x-2">
               <UIcon :name="$route.path === '/user/settings' ? 'i-weui-me-filled' : 'i-weui-me-outlined'" class="w-5 h-5" />
-              <span class="font-medium">我</span>
+              <span class="font-medium">我的</span>
             </div>
           </NuxtLink>
           <div
@@ -201,7 +198,6 @@
 
         <!-- 操作区域 -->
         <div class="flex items-center space-x-3">
-          <!-- 主题切换 -->
           <div class="relative group" :title="modeText">
             <button
               @click="toggleMode"
@@ -227,7 +223,6 @@
             </button>
           </div>
 
-          <!-- 发表动态 -->
           <UButton
             v-if="global.userinfo.token"
             to="/new"
@@ -318,6 +313,11 @@ const handleUserClick = async () => {
     loginReg.value = true;
   }
 };
+
+// 添加计算属性判断是否显示导航栏
+const showNav = computed(() => {
+  return ['/', '/discover', '/user/settings'].includes(route.path);
+});
 
 const handleHomeClick = async () => {
   if (route.path === '/') {

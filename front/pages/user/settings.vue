@@ -78,7 +78,6 @@
       </div>
     </div>
 
-    <!-- 账号设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between">
@@ -108,21 +107,6 @@
       </div>
     </div>
 
-    <!-- 管理员功能区 - 仅管理员可见 -->
-    <div v-if="currentUser && currentUser.id === 1" class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="divide-y divide-gray-100 dark:divide-gray-700">
-        <NuxtLink to="/user/manage" class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-          <span class="text-gray-700 dark:text-gray-300">用户管理</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
-        </NuxtLink>
-        <NuxtLink to="/sys/settings" class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-          <span class="text-gray-700 dark:text-gray-300">设置</span>
-          <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
-        </NuxtLink>
-      </div>
-    </div>
-    
-    <!-- 保存按钮 -->
     <div class="py-3">
       <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="save" size="md">保存设置</UButton>
     </div>
