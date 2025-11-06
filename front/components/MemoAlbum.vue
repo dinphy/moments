@@ -12,34 +12,41 @@
         </h2>
 
         <div v-for="(monthGroup, monthIndex) in yearGroup.months" :key="monthGroup.month" class="mb-6">
-          <div class="flex items-center mb-3">
-            <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">{{ monthGroup.month }}月</h3>
-            <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">({{ monthGroup.images.length }}图)</span>
-          </div>
+          <div class="flex flex-row">
+            <div class="flex flex-col w-24 p-2 text-center">
+              <div class="flex">
+                <span class="text-xl font-bold">{{ dayjs().month(monthGroup.month - 1).format("MM") }}</span>
+                <span class="flex items-end text-xs">月</span>
+              </div>
+              <div class="flex justify-center text-[#576b95] font-medium dark:text-white text-xs mt-2 select-none">
+                {{ monthGroup.images.length }}图
+              </div>
+            </div>
 
-          <div class="grid grid-cols-3 gap-1 sm:gap-2">
-            <div 
-              v-for="(image, imgIndex) in monthGroup.images" 
-              :key="image.id"
-              class="relative w-full pb-[100%] overflow-hidden rounded-lg cursor-pointer group bg-gray-100 dark:bg-gray-800"
-              @click="openImagePreview(yearIndex, monthIndex, imgIndex)"
-            >
-              <img 
-                :src="image.url" 
-                :alt="image.memoContent"
-                class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <div class="absolute bottom-0 left-0 right-0 p-2 text-white text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {{ image.memoContent || '暂无描述' }}
+            <div class="flex w-full flex-col pr-4 py-2">
+              <div class="grid grid-cols-3 gap-1 sm:gap-2">
+                <div 
+                  v-for="(image, imgIndex) in monthGroup.images" 
+                  :key="image.id"
+                  class="relative w-full pb-[100%] overflow-hidden rounded-lg cursor-pointer group bg-gray-100 dark:bg-gray-800"
+                  @click="openImagePreview(yearIndex, monthIndex, imgIndex)"
+                >
+                  <img 
+                    :src="image.url" 
+                    :alt="image.memoContent"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div class="absolute bottom-0 left-0 right-0 p-2 text-white text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    {{ image.memoContent || '暂无描述' }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
 
     <div v-else class="flex flex-col items-center justify-center py-16">
