@@ -1,19 +1,20 @@
 <template>
   <div>
-    <Header v-bind:user="currentUser" />
-
     <div v-if="loading" class="flex justify-center items-center py-10">
       <UIcon name="i-carbon-circle-dash" class="animate-spin text-3xl text-gray-500" />
     </div>
 
     <div v-else-if="groupedImages.length > 0" class="px-2 sm:px-4 pb-8">
       <div v-for="(yearGroup, yearIndex) in groupedImages" :key="yearGroup.year" class="mb-8">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-700">{{ yearGroup.year }}年</h2>
+        <h2 class="py-4">
+          <span class="text-xl">{{ yearGroup.year }}</span>
+          <span class="text-sm">年</span>
+        </h2>
 
         <div v-for="(monthGroup, monthIndex) in yearGroup.months" :key="monthGroup.month" class="mb-6">
           <div class="flex items-center mb-3">
             <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">{{ monthGroup.month }}月</h3>
-            <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">({{ monthGroup.images.length }}张)</span>
+            <span class="ml-2 text-sm text-gray-500 dark:text-gray-400">({{ monthGroup.images.length }}图)</span>
           </div>
 
           <div class="grid grid-cols-3 gap-1 sm:gap-2">
@@ -31,24 +32,14 @@
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <div class="absolute bottom-0 left-0 right-0 p-2 text-white text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                {{ image.memoContent || '无描述' }}
+                {{ image.memoContent || '暂无描述' }}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div
-        v-if="hasNext"
-        ref="loadMoreEle"
-        class="text-xs text-center text-gray-500 py-2 cursor-pointer"
-        @click="loadMore"
-      >
-        点击加载更多
-      </div>
-      <div class="text-xs text-center text-gray-500 py-2" v-else>
-        已经到底啦
-      </div>
+
     </div>
 
     <div v-else class="flex flex-col items-center justify-center py-16">
@@ -61,28 +52,21 @@
 <script setup lang="ts">
 import type { MemoVO, SysConfigVO, UserVO } from "~/types";
 import dayjs from 'dayjs';
-import { useElementVisibility } from "@vueuse/core";
 
-const currentUser = useState<UserVO>('userinfo');
-const loading = ref(true);
-const loadingMore = ref(false);
-const hasNext = ref(false);
-const loadMoreEle = ref(null);
-const targetIsVisible = useElementVisibility(loadMoreEle);
-const sysConfig = useState<SysConfigVO>("sysConfig");
-
-watch(targetIsVisible, async (visible) => {
-  if (visible && sysConfig.value?.enableAutoLoadNextPage && !loadingMore.value) {
-    await loadMore();
+const props = defineProps({
+  memos: {
+    type: Array as () => Array<MemoVO>,
+    required: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
-const state = reactive({
-  page: 1,
-  size: 50,
-});
-
-const allMemos = ref<Array<MemoVO>>([]);
+const currentUser = useState<UserVO>('userinfo');
+const allMemos = computed(() => props.memos || []);
+const loading = computed(() => props.loading);
 
 const groupedImages = computed(() => {
   const images: Array<{
@@ -214,45 +198,7 @@ const openImagePreview = (yearIndex: number, monthIndex: number, imgIndex: numbe
   });
 };
 
-const loadInitialData = async () => {
-  loading.value = true;
-  try {
-    state.page = 1;
-    const res = await useMyFetch<{
-      list: Array<MemoVO>,
-      total: number,
-      hasNext: boolean
-    }>('/memo/list', state);
-    allMemos.value = res.list;
-    hasNext.value = res.hasNext;
-  } catch (error) {
-    console.error('加载相册数据失败:', error);
-  } finally {
-    loading.value = false;
-  }
-};
 
-const loadMore = async () => {
-  if (loadingMore.value || !hasNext.value) return;
 
-  loadingMore.value = true;
-  try {
-    state.page = state.page + 1;
-    const res = await useMyFetch<{
-      list: Array<MemoVO>,
-      total: number,
-      hasNext: boolean
-    }>('/memo/list', state);
-    allMemos.value = [...allMemos.value, ...res.list];
-    hasNext.value = res.hasNext;
-  } catch (error) {
-    console.error('加载更多相册数据失败:', error);
-  } finally {
-    loadingMore.value = false;
-  }
-};
 
-onMounted(async () => {
-  await loadInitialData();
-});
 </script>
