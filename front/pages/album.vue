@@ -8,9 +8,7 @@
 
     <div v-else-if="groupedImages.length > 0" class="px-2 sm:px-4 pb-8">
       <div v-for="(yearGroup, yearIndex) in groupedImages" :key="yearGroup.year" class="mb-8">
-        <div class="sticky top-14 z-20 bg-white dark:bg-gray-900 py-3 mb-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-xl font-bold text-gray-800 dark:text-white">{{ yearGroup.year }}年</h2>
-        </div>
+        <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-4 border-b border-gray-200 dark:border-gray-700">{{ yearGroup.year }}年</h2>
 
         <div v-for="(monthGroup, monthIndex) in yearGroup.months" :key="monthGroup.month" class="mb-6">
           <div class="flex items-center mb-3">
@@ -151,9 +149,18 @@ const groupedImages = computed(() => {
   return result;
 });
 
+interface ImageInfo {
+  id: number;
+  url: string;
+  memoId: number;
+  memoContent: string;
+  createdAt: string;
+  displayDate: string;
+}
+
 const getMonthImagesForPreview = (yearIndex: number, monthIndex: number) => {
   const monthGroup = groupedImages.value[yearIndex].months[monthIndex];
-  return monthGroup.images.map(image => ({
+  return monthGroup.images.map((image: ImageInfo) => ({
     src: image.url,
     caption: `
       <div class="absolute bottom-0 left-0 right-0 p-3 bg-black/75 text-white backdrop-blur-sm">
