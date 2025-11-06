@@ -1,31 +1,31 @@
 <template>
-  <div v-if="showNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md z-10">
+  <div v-if="showNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#202020] backdrop-blur-md z-10">
     <div class="flex justify-around items-center">
       <div
-        class="flex flex-col items-center py-1.5"
+        class="flex flex-col items-center py-1"
         :class="{ 'text-[#07C160]': $route.path === '/' }"
         @click="handleHomeClick"
       >
         <UIcon name="i-carbon-activity" class="w-6 h-6" />
-        <span class="text-xs mt-0.5">动态</span>
+        <span class="text-[10px] mt-0.5">动态</span>
       </div>
 
       <div
-        class="flex flex-col items-center py-1.5"
+        class="flex flex-col items-center py-1"
         :class="{ 'text-[#07C160]': $route.path === '/discover' }"
         @click="navigate('/discover')"
       >
         <UIcon :name="$route.path === '/discover' ? 'i-weui-discover-filled' : 'i-weui-discover-outlined'" class="w-6 h-6" />
-        <span class="text-xs mt-0.5">发现</span>
+        <span class="text-[10px] mt-0.5">发现</span>
       </div>
 
       <div
-        class="flex flex-col items-center py-1.5"
+        class="flex flex-col items-center py-1"
         :class="{ 'text-[#07C160]': $route.path === '/user/settings' }"
         @click="handleUserClick"
       >
         <UIcon :name="$route.path === '/user/settings' ? 'i-weui-me-filled' : 'i-weui-me-outlined'" class="w-6 h-6" />
-        <span class="text-xs mt-0.5">我的</span>
+        <span class="text-[10px] mt-0.5">我的</span>
       </div>
     </div>
   </div>

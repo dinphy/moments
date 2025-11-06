@@ -136,7 +136,7 @@
     <!-- PC端顶部导航 -->
     <div 
       v-if="showNav"
-      class="hidden sm:flex fixed top-0 left-0 right-0 bg-[#F5F5F5] dark:bg-[#202020] backdrop-blur-md z-30 transition-all duration-300"
+      class="hidden sm:flex fixed top-0 left-0 right-0 bg-white dark:bg-[#202020] backdrop-blur-md z-30 transition-all duration-300"
       :class="{ 'translate-y-0': y > 100, '-translate-y-full': y <= 100 }"
     >
       <div class="max-w-6xl mx-auto w-full flex items-center justify-between px-6 py-3">
