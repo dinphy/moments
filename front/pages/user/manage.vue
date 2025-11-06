@@ -8,14 +8,14 @@
             :color="viewMode === 'card' ? 'primary' : 'gray'"
             variant="ghost"
             @click="viewMode = 'card'"
-            icon="i-heroicons-squares-2x2"
+            icon="i-weui-photo-wall-outlined"
             :title="'卡片视图'"
           />
           <UButton
             :color="viewMode === 'table' ? 'primary' : 'gray'"
             variant="ghost"
             @click="viewMode = 'table'"
-            icon="i-heroicons-table-cells"
+            icon="i-carbon-list"
             :title="'列表视图'"
           />
           <UButton
@@ -35,15 +35,26 @@
         <UInput
           v-model="keyword"
           placeholder="用户名或昵称..."
-          icon="i-heroicons-magnifying-glass"
+          icon="i-weui-search-outlined"
           size="sm"
           @keyup.enter="handleSearch"
           class="w-48"
-        />
+          :ui="{ icon: { trailing: { pointer: '', wrapper: 'absolute inset-y-0 right-0 flex items-center' } } }"
+        >
+          <template #trailing v-if="keyword">
+            <UButton
+              icon="i-heroicons-x-mark-20-solid"
+              size="2xs"
+              color="gray"
+              variant="link"
+              :padded="false"
+              @click="keyword = ''; handleSearch()"
+            />
+          </template>
+        </UInput>
       </div>
     </div>
 
-    <!-- 加载骨架屏 -->
     <div v-if="loading && users.length === 0" class="space-y-4">
       <div
         v-if="viewMode === 'card'"
@@ -56,8 +67,12 @@
         <USkeleton v-for="i in 5" :key="i" class="h-16" />
       </div>
     </div>
+    <div v-if="!loading && users.length === 0" class="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+      <UIcon name="i-weui-search-outlined" class="text-4xl mb-2" />
+      <p>未找到匹配的用户</p>
+      <p class="text-sm mt-1">请尝试其他关键词</p>
+    </div>
 
-    <!-- 卡片视图 -->
     <div
       v-if="viewMode === 'card'"
       class="grid grid-cols-2 sm:grid-cols-3 gap-4"
@@ -73,7 +88,7 @@
               color="primary"
               variant="ghost"
               size="xs"
-              icon="i-heroicons-pencil-square"
+              icon="i-weui-pencil-outlined"
               @click="openUserSettings(user)"
               class="opacity-100 group-hover:opacity-100 transition-opacity"
             />
@@ -121,7 +136,7 @@
               color="primary"
               variant="soft"
               size="sm"
-              icon="i-heroicons-trash"
+              icon="i-weui-delete-outlined"
               @click="confirmDelete(user)"
               title="删除用户"
               class="w-full justify-center"
@@ -134,12 +149,10 @@
       </UCard>
     </div>
 
-    <!-- 列表视图 -->
     <div
       v-else-if="viewMode === 'table'"
       class="border rounded-lg overflow-hidden"
     >
-      <!-- 移动端优化视图 -->
       <div class="sm:hidden">
         <div
           v-for="user in users"
@@ -187,7 +200,7 @@
                       color="red"
                       variant="ghost"
                       size="xs"
-                      icon="i-heroicons-trash"
+                      icon="i-weui-delete-outlined"
                       @click="confirmDelete(user)"
                       class="hover:bg-red-50 dark:hover:bg-red-900/20"
                     />
@@ -197,7 +210,7 @@
                       color="primary"
                       variant="ghost"
                       size="xs"
-                      icon="i-heroicons-pencil-square"
+                      icon="i-weui-pencil-outlined"
                       @click="openUserSettings(user)"
                       class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
                     />
@@ -209,7 +222,6 @@
         </div>
       </div>
 
-      <!-- 桌面端表格视图 -->
       <div class="hidden sm:block">
         <UTable
           :columns="columns"
@@ -275,7 +287,7 @@
                   color="red"
                   variant="ghost"
                   size="xs"
-                  icon="i-heroicons-trash"
+                  icon="i-weui-delete-outlined"
                   @click="confirmDelete(row)"
                   class="hover:bg-red-50 dark:hover:bg-red-900/20"
                 />
@@ -285,7 +297,7 @@
                   color="primary"
                   variant="ghost"
                   size="xs"
-                  icon="i-heroicons-pencil-square"
+                  icon="i-weui-pencil-outlined"
                   @click="openUserSettings(row)"
                   class="hover:bg-primary-50 dark:hover:bg-primary-900/20"
                 />
@@ -295,21 +307,21 @@
         </UTable>
       </div>
     </div>
-    <div class="flex justify-center text-md text-gray-500 py-4">
-      已加载 {{ users.length }} 个用户
-    </div>
-    <!-- 加载更多 -->
     <div
-      ref="loadMoreEle"
-      class="text-xs text-center text-gray-500 py-4 cursor-pointer"
-      @click="loadMore"
       v-if="hasNext"
+      ref="loadMoreEle"
+      class="text-xs text-center text-gray-500 py-4 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+      @click="loadMore"
     >
       点击加载更多
     </div>
-    <div class="text-xs text-center text-gray-500 py-4" v-else>已经到底啦</div>
+    <div 
+      v-else-if="users.length > 0" 
+      class="text-xs text-center text-gray-400 dark:text-gray-500 py-4"
+    >
+      已经到底啦
+    </div>
 
-    <!-- 用户设置对话框 -->
     <UModal
       v-model="showUserSettingsModal"
       :ui="{
@@ -318,7 +330,7 @@
       }"
     >
       <div class="p-4 border-b border-gray-200 dark:border-gray-700 text-md font-semibold">
-        编辑用户 - {{ settingsTargetUser?.username }}
+        正在编辑 - {{ settingsTargetUser?.username }}
       </div>
 
       <UserSettings
@@ -329,7 +341,6 @@
       />
     </UModal>
 
-    <!-- 删除确认对话框 -->
     <UModal
       v-model="showDeleteModal"
       :ui="{
@@ -364,7 +375,7 @@ import { useElementVisibility } from "@vueuse/core";
 
 const currentUser = useState<UserVO>("userinfo");
 const sysConfig = useState<SysConfigVO>("sysConfig");
-// 表格配置 - 优化响应式设计
+
 const columns = [
   { key: "id", label: "ID", class: "w-12 md:w-16 hidden sm:table-cell" },
   { key: "username", label: "用户信息", class: "min-w-[200px] flex-1" },
@@ -372,7 +383,6 @@ const columns = [
   { key: "actions", label: "操作", class: "w-24 text-right" },
 ];
 
-// 表格UI配置
 const tableUi = {
   base: "divide-y divide-gray-200 dark:divide-gray-700",
   thead: "bg-gray-50 dark:bg-gray-800/50",
@@ -389,13 +399,11 @@ const tableUi = {
   },
 };
 
-// 列表数据
 const users = ref<UserVO[]>([]);
 const loading = ref(false);
 const hasNext = ref(false);
 const viewMode = ref<"table" | "card">("card");
 
-// 分页状态
 const state = reactive({
   page: 1,
   size: 12,
@@ -403,32 +411,25 @@ const state = reactive({
   keyword: "",
 });
 
-// 搜索关键词
 const keyword = ref("");
-
-// 排序状态
 const sortOrder = ref<"asc" | "desc">("desc");
 
 const loadMoreEle = ref(null);
 const targetIsVisible = useElementVisibility(loadMoreEle);
 
-// 定义响应数据接口
 interface UserListResponse {
   list: UserVO[];
   hasNext: boolean;
   keyword?: string;
 }
 
-// 用户设置相关
 const showUserSettingsModal = ref(false);
 const settingsTargetUser = ref<UserVO | null>(null);
 
-// 删除相关
 const showDeleteModal = ref(false);
 const deleteTarget = ref<UserVO | null>(null);
 const deleting = ref(false);
 
-// 加载用户列表
 const loadUsers = async () => {
   state.page = 1;
   state.sort = sortOrder.value;
@@ -440,7 +441,6 @@ const loadUsers = async () => {
   }
 };
 
-// 搜索处理
 const handleSearch = () => {
   loadUsers();
 };
@@ -462,13 +462,11 @@ watch(targetIsVisible, async (visible) => {
   }
 });
 
-// 确认删除
 const confirmDelete = (user: UserVO) => {
   deleteTarget.value = user;
   showDeleteModal.value = true;
 };
 
-// 执行删除
 const doDelete = async () => {
   if (!deleteTarget.value) return;
 
@@ -491,27 +489,23 @@ const doDelete = async () => {
   }
 };
 
-// 打开用户设置
 const openUserSettings = (user: UserVO) => {
   settingsTargetUser.value = user;
   showUserSettingsModal.value = true;
 };
 
-// 处理用户设置保存完成
 const handleUserSettingsSave = () => {
   showUserSettingsModal.value = false;
   state.page = 1;
   loadUsers();
 };
 
-// 切换排序
 const toggleSort = () => {
   sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
   loadUsers();
 };
 
 onMounted(async () => {
-  // 检查是否为管理员
   if (!currentUser.value || currentUser.value.id !== 1) {
     toast.warning("无权限访问用户管理页面");
     navigateTo("/");
