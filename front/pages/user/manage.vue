@@ -322,24 +322,41 @@
       已经到底啦
     </div>
 
-    <UModal
+    <USlideover
       v-model="showUserSettingsModal"
       :ui="{
-        container: 'flex justify-center items-start sm:items-center backdrop-blur-sm',
-
+        width: 'sm:max-w-md md:max-w-lg lg:max-w-xl w-screen',
+        overlay: {
+          base: 'fixed inset-0 bg-gray-900/50 backdrop-blur-sm',
+        },
+        background: 'bg-white dark:bg-gray-900',
+        ring: '',
+        rounded: '',
+        shadow: 'shadow-xl',
+        padding: 'p-0',
+        margin: '',
+        height: 'h-screen',
       }"
     >
-      <div class="p-4 border-b border-gray-200 dark:border-gray-700 text-md font-semibold">
-        正在编辑 - {{ settingsTargetUser?.username }}
+      <div class="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <h2 class="text-lg">正在编辑 - {{ settingsTargetUser?.username }}</h2>
+        <UButton
+          color="gray"
+          variant="ghost"
+          icon="i-heroicons-x-mark-20-solid"
+          @click="showUserSettingsModal = false"
+        />
       </div>
 
-      <UserSettings
-        v-if="settingsTargetUser"
-        :target-user="settingsTargetUser"
-        :is-admin-mode="true"
-        :on-save="handleUserSettingsSave"
-      />
-    </UModal>
+      <div class="h-[calc(100vh-72px)] overflow-y-auto">
+        <UserSettings
+          v-if="settingsTargetUser"
+          :target-user="settingsTargetUser"
+          :is-admin-mode="true"
+          :on-save="handleUserSettingsSave"
+        />
+      </div>
+    </USlideover>
 
     <UModal
       v-model="showDeleteModal"

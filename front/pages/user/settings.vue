@@ -1,7 +1,7 @@
 <template>
   <Header :user="currentUser" v-if="!isAdminMode"/>
 
-  <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-2 rounded-b-lg">
+  <div class="bg-gray-100 dark:bg-gray-900 p-2">
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showAvatar = !showAvatar">
