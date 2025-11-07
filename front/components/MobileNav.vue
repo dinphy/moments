@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-[#202020] backdrop-blur-md z-10">
+  <div v-if="showNav" class="md:hidden fixed bottom-0 left-0 right-0 bg-[#F9F9F9]/95 dark:bg-[#202020]/95 backdrop-blur-md z-10">
     <div class="flex justify-around items-center">
       <div
         class="flex flex-col items-center py-1"

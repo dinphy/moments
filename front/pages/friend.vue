@@ -75,14 +75,13 @@
       height: 'h-screen',
     }"
   >
-    <div class="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-      <h2 class="text-lg">{{ isEditMode ? "编辑友情链接" : "添加友情链接" }}</h2>
-      <UButton
-        color="gray"
-        variant="ghost"
-        icon="i-heroicons-x-mark-20-solid"
-        @click="closeModal"
+    <div class="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <UIcon
+        @click="goBack"
+        name="i-carbon-chevron-left"
+        class="w-5 h-5 cursor-pointer mr-4"
       />
+      <h2 class="text-lg">{{ isEditMode ? "编辑友链" : "添加友链" }}</h2>
     </div>
 
     <div class="h-[calc(100vh-72px)] overflow-y-auto p-4 sm:p-6">
@@ -236,7 +235,7 @@ const openEditModal = (friend: Friend) => {
   showModal.value = true;
 };
 
-const closeModal = () => {
+const goBack = () => {
   showModal.value = false;
   friendForm.value = { ...DEFAULT_FRIEND };
   editingFriendId.value = null;
@@ -276,7 +275,7 @@ const handleSubmit = async () => {
     }
 
     await getFriendList();
-    closeModal();
+    goBack();
   } catch (error) {
     const message =
       error instanceof Error

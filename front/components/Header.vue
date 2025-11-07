@@ -136,14 +136,14 @@
     <div
       v-if="$route.path === '/' && global.userinfo.token"
       :class="{ 
-        'bg-white dark:bg-[#202020] backdrop-blur-md z-10 shadow-md': y > 100, 
+        'bg-[#F9F9F9]/95 dark:bg-[#202020]/95 backdrop-blur-md z-10 shadow-md': y > 100, 
         'text-[#F5F5F5]': y <= 100
       }"
       class="flex md:justify-end justify-between items-center p-4 w-full md:w-[567px] md:absolute fixed top-0 transition-all duration-300"
       title="发表"
     >
       <div class="flex-1 flex justify-center md:hidden">
-        <h1 v-show="y > 100">Moments</h1>
+        <h1 v-show="y > 100">{{ props.user.nickname }}</h1>
       </div>
       <UIcon 
         :name="y > 100 ? 'i-weui-camera-outlined' : 'i-weui-camera-filled'" 

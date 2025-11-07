@@ -338,14 +338,13 @@
         height: 'h-screen',
       }"
     >
-      <div class="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-        <h2 class="text-lg">正在编辑 - {{ settingsTargetUser?.username }}</h2>
-        <UButton
-          color="gray"
-          variant="ghost"
-          icon="i-heroicons-x-mark-20-solid"
+      <div class="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <UIcon
           @click="showUserSettingsModal = false"
+          name="i-carbon-chevron-left"
+          class="w-5 h-5 cursor-pointer mr-4"
         />
+        <h2 class="text-lg">编辑 - {{ settingsTargetUser?.username }}</h2>
       </div>
 
       <div class="h-[calc(100vh-72px)] overflow-y-auto">
