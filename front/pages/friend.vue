@@ -59,17 +59,33 @@
     </div>
   </div>
 
-  <UModal
+  <USlideover
     v-model="showModal"
     :ui="{
-      container:
-        'flex justify-center items-center backdrop-blur-sm',
+      width: 'sm:max-w-md md:max-w-lg lg:max-w-xl w-screen',
+      overlay: {
+        base: 'fixed inset-0 bg-gray-900/50 backdrop-blur-sm',
+      },
+      background: 'bg-white dark:bg-gray-900',
+      ring: '',
+      rounded: '',
+      shadow: 'shadow-xl',
+      padding: 'p-0',
+      margin: '',
+      height: 'h-screen',
     }"
   >
-    <div class="p-4 sm:p-6">
-      <p class="text-center text-lg font-bold mb-2">
-        {{ isEditMode ? "编辑友情链接" : "添加友情链接" }}
-      </p>
+    <div class="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <h2 class="text-lg">{{ isEditMode ? "编辑友情链接" : "添加友情链接" }}</h2>
+      <UButton
+        color="gray"
+        variant="ghost"
+        icon="i-heroicons-x-mark-20-solid"
+        @click="closeModal"
+      />
+    </div>
+
+    <div class="h-[calc(100vh-72px)] overflow-y-auto p-4 sm:p-6">
       <UForm class="space-y-4" size="sm" :state="friendForm">
         <UFormGroup
           label="名称"
@@ -144,15 +160,14 @@
         >
           <UInput v-model="friendForm.desc" class="mb-2" />
         </UFormGroup>
-        <div class="flex justify-end gap-2 mt-4">
-          <UButton color="white" @click="closeModal">取消</UButton>
-          <UButton @click="handleSubmit">
-            {{ isEditMode ? "确认更新" : "确认添加" }}
+        <div class="py-3">
+          <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="handleSubmit">
+            {{ isEditMode ? "确认编辑" : "确认添加" }}
           </UButton>
         </div>
       </UForm>
     </div>
-  </UModal>
+  </USlideover>
 
   <UModal
     v-model="showDeleteModal"
