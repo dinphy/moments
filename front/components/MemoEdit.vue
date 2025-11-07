@@ -1,11 +1,11 @@
 <template>
   <div class="px-4 space-y-2">
     <div class="flex justify-between items-center pt-4 text-gray-600">
-      <NuxtLink class="flex items-center" title="返回">
+      <div class="flex items-center" title="返回">
         <UIcon @click="goBack" name="i-carbon-chevron-left" class="w-5 h-5 cursor-pointer mr-4"/>
-        <span v-if="$route.path==='/new'">新增内容</span>
-        <span v-else>修改内容</span>
-      </NuxtLink>
+        <span v-if="props.inDrawer || $route.path==='/new'">添加内容</span>
+        <span v-else>编辑内容</span>
+      </div>
       <UButton @click="saveMemo">发表</UButton>
     </div>
     <div class="flex gap-2 text-lg text-gray-600 pt-4 ">
@@ -143,7 +143,8 @@ import dayjs from "dayjs";
 const doubanType = ref<'book' | 'movie'>('book')
 const doubanData = ref<DoubanBook | DoubanMovie>({})
 const contentRef = ref(null)
-const props = defineProps<{ id?: number }>()
+const props = defineProps<{ id?: number, inDrawer?: boolean }>()
+const emit = defineEmits(['success', 'close'])
 const defaultState = {
   id: props.id || 0,
   createdAt: '' as string,
@@ -280,10 +281,14 @@ const clickTag = (tag: string) => {
 const router = useRouter();
 
 const goBack = () => {
-  if (window.history.length > 1) {
-    router.back();
+  if (props.inDrawer) {
+    emit('close');
   } else {
-    navigateTo("/");
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      navigateTo("/");
+    }
   }
 };
 
@@ -331,7 +336,12 @@ const saveMemo = async () => {
     createdAt: state.createdAt || dayjs().format(),
   })
   toast.success("保存成功!")
-  await navigateTo('/')
+
+  if (props.inDrawer) {
+    emit('success')
+  } else {
+    await navigateTo('/')
+  }
 }
 
 </script>

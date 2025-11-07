@@ -121,6 +121,7 @@
       >
         <UIcon name="i-carbon-logout" class="w-5 h-5 cursor-pointer" />
       </NuxtLink>
+
       <span
         v-else-if="$route.path === '/friend' && global.userinfo.id === 1"
         class="flex"
@@ -131,6 +132,24 @@
           @click="$emit('add-friend')"
         />
       </span>
+    </div>
+    <div
+      v-if="$route.path === '/' && global.userinfo.token"
+      :class="{ 
+        'bg-white dark:bg-[#202020] backdrop-blur-md z-10 shadow-md': y > 100, 
+        'text-[#F5F5F5]': y <= 100
+      }"
+      class="flex md:justify-end justify-between items-center p-4 w-full md:w-[567px] md:absolute fixed top-0 transition-all duration-300"
+      title="发表"
+    >
+      <div class="flex-1 flex justify-center md:hidden">
+        <h1 v-show="y > 100">Moments</h1>
+      </div>
+      <UIcon 
+        :name="y > 100 ? 'i-weui-camera-outlined' : 'i-weui-camera-filled'" 
+        class="w-5 h-5 cursor-pointer" 
+        @click="openMemoDrawer"
+      />
     </div>
 
     <!-- PC端顶部导航 -->
@@ -222,16 +241,6 @@
               />
             </button>
           </div>
-
-          <UButton
-            v-if="global.userinfo.token"
-            to="/new"
-            class="relative group"
-            title="发表动态"
-            tag="NuxtLink"
-          >
-            发表动态
-          </UButton>
         </div>
       </div>
     </div>
@@ -274,6 +283,28 @@
         </div>
       </UCard>
     </UModal>
+
+    <!-- 发表动态抽屉 -->
+    <USlideover
+      v-model="showMemoDrawer"
+      :ui="{
+        width: 'sm:max-w-md md:max-w-lg lg:max-w-xl w-screen',
+        overlay: {
+          base: 'fixed inset-0 bg-gray-900/50 backdrop-blur-sm',
+        },
+        background: 'bg-white dark:bg-gray-900',
+        ring: '',
+        rounded: '',
+        shadow: 'shadow-xl',
+        padding: 'p-0',
+        margin: '',
+        height: 'h-screen',
+      }"
+    >
+      <div class="h-[calc(100vh-72px)] overflow-y-auto">
+        <MemoEdit :inDrawer="true" @success="handleMemoSuccess" @close="closeMemoDrawer" />
+      </div>
+    </USlideover>
   </div>
 </template>
 <script setup lang="ts">
@@ -281,6 +312,7 @@ import { toast } from "vue-sonner";
 import type { UserVO, MemoVO } from "~/types";
 import { useGlobalState } from "~/store";
 import { memoReloadEvent } from "~/event";
+import MemoEdit from "~/components/MemoEdit.vue";
 
 const global = useGlobalState();
 const route = useRoute();
@@ -294,6 +326,8 @@ const mode = useColorMode();
 const { y } = useWindowScroll();
 const loginReg = useState<boolean>("loginReg", () => false);
 const moreToolbar = ref(false);
+
+const showMemoDrawer = ref(false);
 
 // 根据当前主题模式返回对应的文案
 const modeText = computed(() => {
@@ -410,6 +444,27 @@ const setPinned = async (id: number) => {
     memoReloadEvent.emit();
   }
   moreToolbar.value = false;
+};
+
+// 发表动态抽屉
+const openMemoDrawer = () => {
+  if (!global.value.userinfo.token) {
+    loginReg.value = true;
+    return;
+  }
+  showMemoDrawer.value = true;
+};
+
+const closeMemoDrawer = () => {
+  showMemoDrawer.value = false;
+};
+
+const handleMemoSuccess = async () => {
+  closeMemoDrawer();
+
+  if (route.path === '/') {
+    memoReloadEvent.emit('refresh');
+  }
 };
 </script>
 
