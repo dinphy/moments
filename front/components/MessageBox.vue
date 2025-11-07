@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute top-4 left-4 z-10">
+  <div class="absolute top-3 left-4 z-10">
     <!-- 自定义遮罩层 -->
     <div 
       v-if="showMessageBox" 
@@ -9,7 +9,7 @@
     
     <UPopover v-model:open="showMessageBox" :popper="{ placement: 'bottom-start', strategy: 'fixed' }">
       <div class="cursor-pointer relative">
-        <UIcon name="i-weui-bellring-on-outlined" class="text-[#9fc84a] w-5 h-5" />
+        <UIcon name="i-weui-bellring-on-outlined" class="text-[#F5F5F5] w-5 h-5" />
         <span
           v-if="unreadCount > 0"
           class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
