@@ -86,7 +86,7 @@ onMounted(() => {
     Thumbs: false,
     Toolbar: {
       display: {
-        left: ["zoom"],
+        left: ["zoom", "infobar"],
         middle: [],
         right: ["slideshow", "fullscreen", "close"]
       }
