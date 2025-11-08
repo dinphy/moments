@@ -306,6 +306,34 @@
       </div>
     </div>
 
+    <!-- 企业微信设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-simple-icons-wechat" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">企业微信</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">企业微信通知</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">有评论/回复时，能及时推送通知</span>
+          </div>
+          <UToggle v-model="state.enableWechatWebhook"/>
+        </div>
+
+        <template v-if="state.enableWechatWebhook">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Webhook Key" name="wechatWebhookUrl" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.wechatWebhookUrl" placeholder="73a***-***-***-***-***" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">填写企业微信群机器人 Webhook URL 中 key = 后的值</p>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <!-- 高级设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
@@ -433,6 +461,8 @@ const state = reactive({
   smtpPort: "",
   smtpUsername: "",
   smtpPassword: "",
+  enableWechatWebhook: false,
+  wechatWebhookUrl: "",
 })
 
 // 处理 rssMaxItems，确保其始终为数字

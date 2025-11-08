@@ -14,6 +14,7 @@ import (
 	"github.com/kingwrcy/moments/db"
 	"github.com/kingwrcy/moments/pkg/mail"
 	"github.com/kingwrcy/moments/pkg/util"
+	"github.com/kingwrcy/moments/pkg/wechat"
 	"github.com/kingwrcy/moments/vo"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/zerolog"
@@ -269,6 +270,11 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 			if err = c.commentEmailNotification(comment, frontendHost); err != nil {
 				c.base.log.Error().Msgf("邮件通知失败,原因:%s", err)
 			}
+			
+			// 发送企业微信通知
+			if err = c.sendWechatNotify(comment, frontendHost); err != nil {
+				c.base.log.Error().Msgf("企业微信通知失败,原因:%s", err)
+			}
 		}()
 		return SuccessResp(ctx, h{})
 	}
@@ -373,5 +379,65 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	}
 
 	c.base.log.Info().Msgf("成功发送邮件")
+	return nil
+}
+
+func (c CommentHandler) sendWechatNotify(comment db.Comment, host string) error {
+	var (
+		memo        db.Memo
+		sysConfig   db.SysConfig
+		sysConfigVO vo.FullSysConfigVO
+	)
+	c.base.db.First(&memo, comment.MemoId)
+	c.base.db.First(&sysConfig)
+	_ = json.Unmarshal([]byte(sysConfig.Content), &sysConfigVO)
+
+	// 未开启企业微信通知
+	if !sysConfigVO.EnableWechatWebhook || sysConfigVO.WechatWebhookUrl == "" {
+		return nil
+	}
+
+	// 构建完整的Webhook URL
+	webhookURL := fmt.Sprintf("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%s", sysConfigVO.WechatWebhookUrl)
+
+	// 检查评论者是否是动态发布者
+	var commenterUserId int32
+	if comment.Author != "" {
+		authorId, _ := strconv.ParseInt(comment.Author, 10, 32)
+		commenterUserId = int32(authorId)
+	}
+
+	// 如果评论者是动态发布者，则不发送企业微信通知
+	if commenterUserId > 0 && commenterUserId == memo.UserId {
+		return nil
+	}
+
+	// 构建通知标题和内容
+	var title string
+	var content string
+	if comment.ReplyTo != "" {
+		title = "💬 新的回复"
+		content = fmt.Sprintf("> <font color=\"comment\">%s</font> **回复** <font color=\"info\">%s</font> 说:\n\n%s\n\n----------\n\n<font color=\"warning\">%s</font>\n\n[🔗 查看详情](%s/memo/%d)",
+			comment.Username,
+			comment.ReplyTo,
+			comment.Content,
+			comment.CreatedAt.Format("2006-01-02 15:04:05"),
+			host,
+			comment.MemoId)
+	} else {
+		title = "💬 新的评论"
+		content = fmt.Sprintf("> <font color=\"comment\">%s</font> 说:\n\n%s\n\n----------\n\n<font color=\"warning\">%s</font>\n\n[🔗 查看详情](%s/memo/%d)",
+			comment.Username,
+			comment.Content,
+			comment.CreatedAt.Format("2006-01-02 15:04:05"),
+			host,
+			comment.MemoId)
+	}
+
+	// 发送企业微信通知
+	if err := wechat.SendWebhookNotification(webhookURL, title, content); err != nil {
+		return err
+	}
+
 	return nil
 }
