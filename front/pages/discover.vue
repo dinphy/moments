@@ -1,47 +1,10 @@
 <template>
   <Header :user="currentUser" />
   <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen rounded-b-lg p-4 overflow-hidden relative">
-    <!-- 功能卡片区域 -->
-    <div class="relative grid grid-cols-2 gap-4 mb-6">
-      <!-- 发动态卡片 -->
-      <div 
-        v-if="global.userinfo.token"
-        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
-        @click="navigateTo('/new')"
-      >
-        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
-          <div class="w-14 h-14 bg-blue-500 bg-opacity-10 dark:bg-blue-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
-            <UIcon name="i-carbon-camera" class="w-8 h-8 text-blue-600 dark:text-blue-400"/>
-          </div>
-          <div class="text-center sm:text-left">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">发表动态</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">分享你的精彩瞬间</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- 日历检索 -->
-      <div 
-        v-if="global.userinfo.token"
-        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
-        @click="navigateTo('/user/calendar')"
-      >
-        <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
-        <div class="relative flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 items-center">
-          <div class="w-14 h-14 bg-purple-500 bg-opacity-10 dark:bg-purple-400 dark:bg-opacity-10 rounded-xl flex items-center justify-center group-hover:bg-opacity-20 transition-all duration-300">
-            <UIcon name="i-jam-search-folder" class="w-8 h-8 text-purple-600 dark:text-purple-400"/>
-          </div>
-          <div class="text-center sm:text-left">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">日历检索</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">那往昔的美好时光</p>
-          </div>
-        </div>
-      </div>
-      
+    <div class="relative grid grid-cols-2 gap-4 mb-6"> 
       <!-- 友情链接 -->
       <div 
-        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="navigateTo('/friend')"
       >
         <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
@@ -50,7 +13,7 @@
             <UIcon name="i-weui-contacts-outlined" class="w-8 h-8 text-green-600 dark:text-green-400"/>
           </div>
           <div class="text-center sm:text-left">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">友情链接</h3>
+            <h3 class="font-bold text-md text-slate-800 dark:text-slate-200">友情链接</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">发现更多精彩博客</p>
           </div>
         </div>
@@ -58,7 +21,7 @@
       
       <!-- 主题切换 -->
       <div 
-        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
+        class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="toggleMode"
       >
         <div class="absolute top-0 right-0 w-32 h-32 bg-slate-300 dark:bg-slate-600 opacity-10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500"></div>
@@ -81,23 +44,23 @@
             />
           </div>
           <div class="text-center sm:text-left">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">{{ modeText }}</h3>
+            <h3 class="font-bold text-md text-slate-800 dark:text-slate-200">{{ modeText }}</h3>
             <p class="text-sm text-slate-600 dark:text-slate-400 opacity-90 hidden sm:block">主题切换</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 管理员功能区域 -->
-    <div v-if="global.userinfo.token && global.userinfo.id === 1" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl px-4 py-8 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
+    <!-- 管理功能 -->
+    <div v-if="global.userinfo.token && global.userinfo.id === 1" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-4 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
       <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
       <div class="relative">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center">
+        <h3 class="text-md font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center">
           <UIcon name="i-heroicons-shield-check" class="w-5 h-5 mr-2 text-amber-500" />
           系统与安全
         </h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3">
           <NuxtLink to="/user/manage" class="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-amber-200 dark:border-amber-800/30">
             <div class="flex items-center">
               <div class="w-10 h-10 bg-amber-100 dark:bg-amber-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
@@ -120,7 +83,7 @@
       </div>
     </div>
     
-    <!-- 未登录提示区域 -->
+    <!-- 未登录提示 -->
     <div v-if="!global.userinfo.token" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-8 overflow-hidden border border-slate-200 dark:border-slate-700">
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
       <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>

@@ -136,6 +136,19 @@
             #{{ tag }}
           </UBadge>
         </div>
+        <div v-if="!global.userinfo.token" class="flex flex-wrap justify-center gap-2 mt-2">
+          <UBadge
+            v-for="suggestion in ['学习', '生活', '旅行', '工作', '音乐']"
+            :key="suggestion"
+            size="sm"
+            color="gray"
+            variant="soft"
+            class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
+            @click="searchQuery = suggestion; performSearch()"
+          >
+            {{ suggestion }}
+          </UBadge>
+        </div>
       </div>
     </div>
   </USlideover>
@@ -252,13 +265,15 @@ watch(targetIsVisible, async (visible) => {
 
 // 获取标签列表
 const fetchTags = async () => {
-  try {
-    const response = await useMyFetch<{tags: string[]}>('/tag/list');
-    tags.value = response.tags || [];
-  } catch (error) {
-    console.error('获取标签列表失败:', error);
+  if (global.value.userinfo.token) {
+    try {
+      const response = await useMyFetch<{tags: string[]}>('/tag/list');
+      tags.value = response.tags || [];
+    } catch (error) {
+      console.error('获取标签列表失败:', error);
+    }
   }
-}
+};
 
 // 页面加载时获取标签
 onMounted(() => {
