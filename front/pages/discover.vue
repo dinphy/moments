@@ -88,31 +88,6 @@
       </div>
     </div>
 
-    <!-- 热门话题 -->
-    <div v-if="tags.length > 0" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-6 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
-      <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
-      <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
-      <div class="relative">
-        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center">
-          <UIcon name="i-carbon-tag" class="w-5 h-5 mr-2 text-red-500" />
-          热门话题
-        </h3>
-        <div class="flex flex-wrap gap-2">
-          <UBadge 
-            v-for="tag in tags" 
-            :key="tag" 
-            size="md" 
-            color="red" 
-            variant="soft"
-            class="cursor-pointer hover:bg-red-200 dark:hover:bg-red-600 transition-colors duration-300"
-            @click="navigateTo(`/tags/${global.userinfo.username}/${tag}`)"
-          >
-            #{{ tag }}
-          </UBadge>
-        </div>
-      </div>
-    </div>
-
     <!-- 管理员功能区域 -->
     <div v-if="global.userinfo.token && global.userinfo.id === 1" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl px-4 py-8 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
@@ -176,7 +151,6 @@ const global = useGlobalState();
 const currentUser = useState<UserVO>('userinfo');
 const mode = useColorMode();
 const loginReg = useState<boolean>("loginReg", () => false);
-const tags = ref<string[]>([]);
 
 const modeText = computed(() => {
   if (mode.preference === 'light') {
@@ -198,23 +172,6 @@ const toggleMode = () => {
     toast.success("显示模式将跟随系统设置");
   }
 };
-
-// 获取标签列表
-const fetchTags = async () => {
-  if (global.value.userinfo.token) {
-    try {
-      const response = await useMyFetch<{tags: string[]}>('/tag/list');
-      tags.value = response.tags || [];
-    } catch (error) {
-      console.error('获取标签列表失败:', error);
-    }
-  }
-};
-
-// 页面加载时获取标签
-onMounted(() => {
-  fetchTags();
-});
 </script>
 
 <style scoped>

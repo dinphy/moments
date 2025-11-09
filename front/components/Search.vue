@@ -22,22 +22,34 @@
           name="i-carbon-chevron-left"
           class="w-5 h-5 cursor-pointer mr-4"
         />
-        <h3 class="text-lg font-bold">搜索内容</h3>
+        <h3 class="text-lg font-bold">搜索</h3>
       </div>
       <!-- 搜索框 -->
       <div class="mb-4">
         <UInput
           v-model="searchQuery"
           placeholder="输入关键词搜索..."
-          size="xl"
+          size="md"
           icon="i-heroicons-magnifying-glass"
+          :ui="{ icon: { trailing: { pointer: '' } } }"
           @keyup.enter="performSearch"
           class="w-full"
-        />
+        >
+          <template #trailing>
+            <UButton
+              v-show="searchQuery !== ''"
+              color="gray"
+              variant="link"
+              icon="i-heroicons-x-mark-20-solid"
+              :padded="false"
+              @click="clearSearch"
+            />
+          </template>
+        </UInput>
       </div>
       <!-- 搜索结果 -->
-      <div v-if="searchResults.length > 0" class="space-y-3">
-        <p class="text-sm text-gray-500 mb-3">找到 {{ searchResults.length }} 条结果</p>
+      <div v-if="hasSearched && searchResults && searchResults.length > 0" class="space-y-3">
+        <p class="text-sm text-gray-500 mb-3">找到 {{ totalResults }} 条结果</p>
         <div class="space-y-3">
           <div v-for="result in searchResults" :key="result.id" 
               class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-200 cursor-pointer"
@@ -53,49 +65,77 @@
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center space-x-2 mb-2">
-                  <span class="font-medium text-sm">{{ result.user ? result.user.nickname : '匿名用户' }}</span>
+                  <span class="font-medium text-sm">{{ result.user.nickname }}</span>
                   <span class="text-xs text-gray-500">{{ formatDate(result.createdAt) }}</span>
                 </div>
                 <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
                   {{ result.content }}
                 </p>
-                <div v-if="result.images && result.images.length > 0" class="grid grid-cols-3 gap-2 mt-3">
-                  <img v-for="(img, index) in result.images.slice(0, 3)" 
+                <div v-if="result.imgs" class="grid grid-cols-3 gap-2 mt-3">
+                  <img v-for="(img, index) in getImages(result.imgs).slice(0, 3)" 
                       :key="index"
                       :src="img" 
                       :alt="`图片 ${index + 1}`"
                       class="w-full h-20 object-cover rounded-md">
-                </div>
-                <div v-if="result.tags && result.tags.length > 0" class="flex flex-wrap gap-1 mt-2">
-                  <span v-for="(tag, index) in result.tags.slice(0, 3)" 
-                        :key="index"
-                        class="inline-block px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full">
-                    #{{ typeof tag === 'string' ? tag : tag.name }}
-                  </span>
-                  <span v-if="result.tags.length > 3" 
-                        class="inline-block px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
-                    +{{ result.tags.length - 3 }}
-                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <!-- 加载更多 -->
-        <div v-if="hasMore" class="text-center mt-6">
-          <UButton @click="loadMore" :loading="loading" size="sm" variant="outline">加载更多</UButton>
+        <div ref="loadMoreEle" class="text-xs text-center text-gray-500 py-2 cursor-pointer mt-6" @click="loadMore" v-if="hasMore">
+          点击加载更多
+        </div>
+        <div class="text-xs text-center text-gray-500 py-2 mt-6" v-else-if="hasSearched">
+          已经到底啦
         </div>
       </div>
       <!-- 无结果提示 -->
-      <div v-else-if="hasSearched && !loading" class="text-center py-8">
-        <UIcon name="i-heroicons-magnifying-glass" class="w-10 h-10 mx-auto text-gray-400 mb-3" />
-        <p class="text-gray-500 text-sm">没有找到相关内容</p>
-        <p class="text-xs text-gray-400 mt-1">尝试使用不同的关键词</p>
+      <div v-else-if="hasSearched && !loading" class="text-center py-12">
+        <div class="relative inline-block mb-4">
+          <div class="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full blur-2xl opacity-30"></div>
+          <UIcon name="i-heroicons-magnifying-glass" class="relative w-16 h-16 mx-auto text-gray-400" />
+        </div>
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">未找到相关内容</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto mb-4">很抱歉，没有找到与 "{{ searchQuery }}" 相关的内容</p>
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+          <span class="text-xs text-gray-400 dark:text-gray-500">试试这些关键词：</span>
+        </div>
+        <div class="flex flex-wrap justify-center gap-2">
+          <UBadge
+            v-for="suggestion in ['学习', '生活', '旅行', '工作', '音乐']"
+            :key="suggestion"
+            size="sm"
+            color="gray"
+            variant="soft"
+            class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
+            @click="searchQuery = suggestion; performSearch()"
+          >
+            {{ suggestion }}
+          </UBadge>
+        </div>
       </div>
       <!-- 初始状态提示 -->
-      <div v-else-if="!hasSearched" class="text-center py-8">
-        <UIcon name="i-heroicons-magnifying-glass" class="w-10 h-10 mx-auto text-gray-400 mb-3" />
-        <p class="text-gray-500 text-sm">输入关键词开始搜索</p>
+      <div v-else-if="!hasSearched" class="text-center py-12">
+        <div class="relative inline-block mb-4">
+          <div class="absolute inset-0 bg-primary-200 dark:bg-primary-800 rounded-full blur-2xl opacity-30"></div>
+          <UIcon name="i-heroicons-magnifying-glass" class="relative w-14 h-14 mx-auto text-primary-500 dark:text-primary-400" />
+        </div>
+        <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">探索精彩内容</h3>
+        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto">输入关键词，发现感兴趣的内容、照片和回忆</p>
+        <div class="flex flex-wrap justify-center gap-2 mt-6" v-if="tags.length > 0">
+          <UBadge
+            v-for="tag in tags.slice(0, 8)"
+            :key="tag"
+            size="md"
+            color="primary"
+            variant="soft"
+            class="cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-600 transition-colors duration-300"
+            @click="navigateToTag(tag)"
+          >
+            #{{ tag }}
+          </UBadge>
+        </div>
       </div>
     </div>
   </USlideover>
@@ -103,8 +143,10 @@
 
 <script setup lang="ts">
 import type {MemoVO, UserVO} from "~/types";
+import {useElementVisibility} from '@vueuse/core'
+import { useGlobalState } from "~/store";
 
-// 使用全局状态来控制搜索抽屉
+const global = useGlobalState();
 const showSearchDrawer = useState<boolean>('showSearchDrawer', () => false)
 
 // 搜索相关状态
@@ -115,6 +157,12 @@ const loading = ref(false)
 const hasMore = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
+const totalResults = ref(0) // 存储总结果数
+const tags = ref<string[]>([]) // 热门标签
+
+// 加载更多元素引用
+const loadMoreEle = ref(null)
+const targetIsVisible = useElementVisibility(loadMoreEle)
 
 // 格式化日期
 const formatDate = (date: string) => {
@@ -123,6 +171,31 @@ const formatDate = (date: string) => {
     month: 'short',
     day: 'numeric'
   })
+}
+
+// 处理图片字符串，转换为数组
+const getImages = (imgs: string) => {
+  if (!imgs) return []
+  try {
+    return JSON.parse(imgs)
+  } catch (e) {
+    return imgs.split(',').filter(url => url.trim())
+  }
+}
+
+// 清空搜索
+const clearSearch = () => {
+  searchQuery.value = ''
+  hasSearched.value = false
+  searchResults.value = []
+  page.value = 1
+  hasMore.value = false
+}
+
+// 导航到标签页面并关闭抽屉
+const navigateToTag = (tag: string) => {
+  navigateTo(`/tags/${global.value.userinfo.username}/${tag}`)
+  showSearchDrawer.value = false
 }
 
 // 执行搜索
@@ -150,6 +223,7 @@ const performSearch = async (resetPage = true) => {
 
     if (resetPage) {
       searchResults.value = response.list
+      totalResults.value = response.total // 保存总结果数
     } else {
       searchResults.value = [...searchResults.value, ...response.list]
     }
@@ -168,6 +242,28 @@ const loadMore = () => {
   page.value++
   performSearch(false)
 }
+
+// 监听加载更多元素是否可见
+watch(targetIsVisible, async (visible) => {
+  if (visible && hasMore.value && !loading.value) {
+    await loadMore()
+  }
+})
+
+// 获取标签列表
+const fetchTags = async () => {
+  try {
+    const response = await useMyFetch<{tags: string[]}>('/tag/list');
+    tags.value = response.tags || [];
+  } catch (error) {
+    console.error('获取标签列表失败:', error);
+  }
+}
+
+// 页面加载时获取标签
+onMounted(() => {
+  fetchTags();
+})
 
 // 导航到详情页
 const navigateToMemo = (id: number) => {
