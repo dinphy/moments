@@ -292,7 +292,7 @@ import type { UserVO, MemoVO } from "~/types";
 import { useGlobalState } from "~/store";
 import { memoReloadEvent } from "~/event";
 import MemoEdit from "~/components/MemoEdit.vue";
-import Search from "~/components/search.vue";
+import Search from "../components/Search.vue";
 
 const global = useGlobalState();
 const route = useRoute();
