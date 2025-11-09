@@ -32,7 +32,7 @@
       <UIcon name="i-carbon-text-clear-format" @click="reset" class="w-6 h-6 cursor-pointer" title="清空"></UIcon>
     </div>
 
-    <div class="w-full" @contextmenu.prevent="onContextMenu">
+    <div class="w-full">
       <div class="relative">
         <UTextarea ref="contentRef" v-model="state.content" :rows="8" autoresize padded autofocus/>
         <UIcon class="text-[#9fc84a] w-6 h-6 animate-bounce absolute right-2 bottom-1 cursor-pointer select-none" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
@@ -40,72 +40,102 @@
 
       <Emoji v-if="emojiShow" @selected="emojiSelected" @close="emojiShow=false"/>
 
-      <USelectMenu v-model="selectedLabel" :options="existTags" show-create-option-when="always"
-                   multiple searchable creatable placeholder="选择标签" class="my-2" >
-        <template #label>
-          <span v-if="selectedLabel.length" class="truncate">{{ selectedLabel.join(',') }}</span>
-          <span v-else>选择标签</span>
-        </template>
-      </USelectMenu>
-
-      <UContextMenu v-model="isOpen" :virtual-element="virtualElement">
-        <div class="px-2 py-1 flex flex-col gap-2 text-xs">
-          <div class="mb-2 text-gray-300">点击标签插入</div>
-          <div v-for="(tag,index) in existTags" :key="index" class="cursor-pointer">
-            <UBadge size="xs" color="gray" variant="solid" @click="clickTag(tag)">{{ tag }}</UBadge>
+      <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mt-3">
+        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+          <!-- 标签设置 -->
+          <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showTags = !showTags">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-carbon-tag" class="w-4 h-4 text-gray-500"/>
+              <span class="text-gray-700 dark:text-gray-300">标签</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-gray-500 dark:text-gray-400 text-sm">{{ selectedLabel.length ? `已选择${selectedLabel.length}个` : "未添加" }}</span>
+              <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400 transition-transform" :class="{'rotate-90': showTags}"/>
+            </div>
           </div>
-        </div>
-      </UContextMenu>
-    </div>
-
-    <div class="flex justify-between items-center">
-      <div class="flex flex-row gap-1 items-center text-[#576b95] text-sm cursor-pointer group">
-        <UPopover :popper="{ arrow: true, placement: 'bottom-start' }" mode="click">
-          <div class="flex items-center gap-1 px-2 py-1 rounded-md transition-colors group-hover:bg-gray-100 dark:group-hover:bg-gray-900">
-            <UIcon name="i-carbon-location" class="w-4 h-4"/>
-            <span>{{ state.location ? locationLabel : '自定义位置' }}</span>
-          </div>
-          <template #panel="{close}">
-            <div class="p-4 bg-white rounded-lg shadow-lg min-w-64 dark:bg-gray-900">
-              <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-gray-500">所在位置</h3>
-                <UInput 
-                  v-model="state.location" 
-                  placeholder="例如：北京 朝阳区 三里屯"
-                  class="w-full"
-                  size="sm"
-                  autofocus
-                />
-                <p class="text-xs text-gray-500">多个位置用空格分隔，显示时会用"·"连接</p>
-                <div class="flex justify-end gap-2 pt-2">
-                  <UButton 
-                    @click="close" 
-                    color="gray" 
-                    variant="ghost" 
-                    size="sm"
-                    class="px-3"
-                  >
-                    取消
-                  </UButton>
-                  <UButton 
-                    @click="close" 
-                    color="primary" 
-                    variant="solid" 
-                    size="sm"
-                    class="px-3"
-                  >
-                    确定
-                  </UButton>
-                </div>
+          <div v-show="showTags" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+            <div class="mb-3">
+              <UInput 
+                v-model="newTag" 
+                placeholder="按 Enter 确认" 
+                size="md"
+                @keyup.enter="addTag"
+              >
+              </UInput>
+            </div>
+            <div v-if="selectedLabel.length" class="mb-3">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">已选择的标签</p>
+              <div class="flex flex-wrap gap-2">
+                <UBadge 
+                  v-for="(tag,index) in selectedLabel" 
+                  :key="index" 
+                  size="sm" 
+                  color="blue" 
+                  variant="soft"
+                  class="cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-600 transition-colors flex items-center gap-1"
+                >
+                  {{ tag }}
+                  <UIcon name="i-carbon-close" class="w-3 h-3" @click.stop="removeTag(index)"/>
+                </UBadge>
               </div>
             </div>
-          </template>
-        </UPopover>
+            <div v-if="existTags.length">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">常用标签</p>
+              <div class="flex flex-wrap gap-2">
+                <UBadge 
+                  v-for="(tag,index) in existTags" 
+                  :key="index" 
+                  size="sm" 
+                  color="gray" 
+                  variant="soft"
+                  class="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  :class="{ 'opacity-50': selectedLabel.includes(tag) }"
+                  @click="clickTag(tag)"
+                >
+                  {{ tag }}
+                </UBadge>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="divide-y divide-gray-100 dark:divide-gray-700">
+          <!-- 位置设置 -->
+          <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="toggleLocationPanel">
+            <div class="flex items-center gap-2">
+              <UIcon name="i-carbon-location" class="w-4 h-4 text-[#576b95]"/>
+              <span class="text-gray-700 dark:text-gray-300">所在位置</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.location ? locationLabel : "未设置" }}</span>
+              <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400 transition-transform" :class="{'rotate-90': showLocationPanel}"/>
+            </div>
+          </div>
+          <div v-show="showLocationPanel" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+            <UInput 
+              v-model="state.location" 
+              placeholder="例如：北京 朝阳区 三里屯"
+              size="md"
+              autofocus
+            />
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">多个位置用空格分隔，显示时会用"·"连接</p>
+          </div>
+        </div>
       </div>
+    </div>
 
-      <div class="flex gap-1 text-gray-500 items-center">
-        <span>{{ state.showType ? '公开' : '私密' }}</span>
-        <UToggle v-model="state.showType"/>
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mt-3">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <!-- 可见性设置 -->
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <UIcon name="i-carbon-user-multiple" class="w-4 h-4 text-gray-500"/>
+            <span class="text-gray-700 dark:text-gray-300">谁可以看</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.showType ? '公开' : '私密' }}</span>
+            <UToggle v-model="state.showType" color="primary"/>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -220,32 +250,11 @@ const handleVideo = (video: Video) => {
   state.video = video
 }
 
-const {x, y} = useMouse()
-const {y: windowY} = useWindowScroll()
-const isOpen = ref(false)
-const virtualElement = ref({getBoundingClientRect: () => ({})})
 const handleRemoveImage = (img: string) => {
   state.imgs = state.imgs
     .split(",")
     .filter(item => item && item != img)
     .join(",")
-}
-
-function onContextMenu() {
-  if (existTags.value.length <= 0) {
-    return
-  }
-  const top = unref(y) - unref(windowY)
-  const left = unref(x)
-
-  virtualElement.value.getBoundingClientRect = () => ({
-    width: 0,
-    height: 0,
-    top,
-    left
-  })
-
-  isOpen.value = true
 }
 
 const loadTags = async () => {
@@ -256,26 +265,40 @@ const loadTags = async () => {
 }
 
 const emojiShow = ref(false)
+const showLocationPanel = ref(false)
+const showTags = ref(false)
+const newTag = ref('')
 
 const toggleEmoji = () => {
   emojiShow.value = !emojiShow.value
+}
+
+const toggleLocationPanel = () => {
+  showLocationPanel.value = !showLocationPanel.value
+}
+
+const addTag = () => {
+  const tag = newTag.value.trim()
+  if (tag && !selectedLabel.value.includes(tag)) {
+    selectedLabel.value.push(tag)
+    if (!existTags.value.includes(tag)) {
+      existTags.value.push(tag)
+    }
+    newTag.value = ''
+  }
+}
+
+const removeTag = (index: number) => {
+  selectedLabel.value.splice(index, 1)
 }
 const emojiSelected = (emoji: string) => {
   state.content = state.content + emoji
 }
 
 const clickTag = (tag: string) => {
-  isOpen.value = false;
   if (!selectedLabel.value.includes(tag)){
-    if (selectedLabel.value) {
-      selectedLabel.value = [...selectedLabel.value , tag]
-    } else {
-      selectedLabel.value = [tag]
-    }
+    selectedLabel.value.push(tag)
   }
-
-  //@ts-ignore
-  (contentRef.value?.textarea as HTMLTextAreaElement).focus()
 }
 
 const router = useRouter();
