@@ -21,6 +21,14 @@
 
       <div
         class="flex flex-col items-center py-1"
+        @click="openSearchDrawer"
+      >
+        <UIcon name="i-heroicons-magnifying-glass" class="w-6 h-6" />
+        <span class="text-[10px] mt-0.5">搜索</span>
+      </div>
+
+      <div
+        class="flex flex-col items-center py-1"
         :class="{ 'text-[#07C160]': $route.path === '/user/settings' }"
         @click="handleUserClick"
       >
@@ -63,6 +71,12 @@ const handleHomeClick = async () => {
   } else {
     await navigateTo('/');
   }
+};
+
+// 打开搜索抽屉
+const openSearchDrawer = async () => {
+  const showSearchDrawer = useState<boolean>('showSearchDrawer');
+  showSearchDrawer.value = true;
 };
 </script>
 

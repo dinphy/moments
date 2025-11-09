@@ -217,30 +217,7 @@
 
         <!-- 操作区域 -->
         <div class="flex items-center space-x-3">
-          <div class="relative group" :title="modeText">
-            <button
-              @click="toggleMode"
-              class="p-2 rounded-full transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <UIcon
-                v-if="mode.preference === 'light'"
-                name="i-carbon-sun"
-                class="w-5 h-5"
-              />
-
-              <UIcon
-                v-else-if="mode.preference === 'dark'"
-                name="i-carbon-moon"
-                class="w-5 h-5"
-              />
-
-              <UIcon
-                v-else
-                name="i-weui-display-outlined"
-                class="w-5 h-5"
-              />
-            </button>
-          </div>
+          <UIcon @click="openSearchDrawer" name="i-heroicons-magnifying-glass" class="w-5 h-5 cursor-pointer" />
         </div>
       </div>
     </div>
@@ -305,6 +282,8 @@
         <MemoEdit :inDrawer="true" @success="handleMemoSuccess" @close="closeMemoDrawer" />
       </div>
     </USlideover>
+
+    <Search />
   </div>
 </template>
 <script setup lang="ts">
@@ -313,6 +292,7 @@ import type { UserVO, MemoVO } from "~/types";
 import { useGlobalState } from "~/store";
 import { memoReloadEvent } from "~/event";
 import MemoEdit from "~/components/MemoEdit.vue";
+import Search from "~/components/search.vue";
 
 const global = useGlobalState();
 const route = useRoute();
@@ -328,17 +308,6 @@ const loginReg = useState<boolean>("loginReg", () => false);
 const moreToolbar = ref(false);
 
 const showMemoDrawer = ref(false);
-
-// 根据当前主题模式返回对应的文案
-const modeText = computed(() => {
-  if (mode.preference === 'light') {
-    return '切换到暗色模式';
-  } else if (mode.preference === 'dark') {
-    return '切换到亮色模式';
-  } else {
-    return '跟随系统主题';
-  }
-});
 
 const handleUserClick = async () => {
   if (global.value.userinfo.token) {
@@ -378,17 +347,6 @@ const goBack = () => {
     router.back();
   } else {
     navigateTo("/");
-  }
-};
-
-const toggleMode = () => {
-  if (mode.preference === "system") {
-    mode.preference = "dark";
-  } else if (mode.preference === "dark") {
-    mode.preference = "light";
-  } else {
-    mode.preference = "system";
-    toast.success("显示模式将跟随系统设置");
   }
 };
 
@@ -465,6 +423,12 @@ const handleMemoSuccess = async () => {
   if (route.path === '/') {
     memoReloadEvent.emit('refresh');
   }
+};
+
+// 打开搜索抽屉
+const openSearchDrawer = () => {
+  const showSearchDrawer = useState<boolean>('showSearchDrawer');
+  showSearchDrawer.value = true;
 };
 </script>
 
