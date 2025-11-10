@@ -64,9 +64,10 @@
                   <span class="font-medium text-sm">{{ result.user.nickname }}</span>
                   <span class="text-xs text-gray-500">{{ formatDate(result.createdAt) }}</span>
                 </div>
-                <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3">
-                  {{ result.content }}
-                </p>
+                <div 
+                  class="markdown-content text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-3" 
+                  v-html="renderMarkdown(result.content)"
+                ></div>
                 <div v-if="result.imgs" class="grid grid-cols-3 gap-2 mt-3">
                   <img v-for="(img, index) in getImages(result.imgs).slice(0, 3)" 
                       :key="index"
@@ -151,6 +152,7 @@
 import type {MemoVO, UserVO} from "~/types";
 import {useElementVisibility} from '@vueuse/core'
 import { useGlobalState } from "~/store";
+import { md } from "~/utils";
 
 const global = useGlobalState();
 const showSearchDrawer = useState<boolean>('showSearchDrawer', () => false)
@@ -272,6 +274,17 @@ const fetchTags = async () => {
 onMounted(() => {
   fetchTags();
 })
+
+// 渲染Markdown内容
+const renderMarkdown = (content: string) => {
+  if (!content) return "";
+  try {
+    return md.render(content);
+  } catch (e) {
+    console.error("Markdown渲染错误:", e);
+    return content;
+  }
+};
 
 // 导航到详情页
 const navigateToMemo = (id: number) => {
