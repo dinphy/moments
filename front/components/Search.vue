@@ -94,8 +94,8 @@
           <UIcon name="i-heroicons-magnifying-glass" class="relative w-12 h-12 mx-auto text-gray-400" />
         </div>
         <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">未找到相关内容</h3>
-        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto mb-2">试试这些关键词，可能会有结果</p>
-        <div class="flex flex-wrap justify-center gap-2">
+        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto">试试这些关键词，可能会有结果</p>
+        <div class="flex flex-wrap justify-center gap-2 mt-4">
           <UBadge
             v-for="suggestion in ['学习', '生活', '旅行', '工作', '音乐']"
             :key="suggestion"
@@ -117,7 +117,7 @@
         </div>
         <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">探索精彩内容</h3>
         <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto">输入关键词，发现感兴趣的内容、照片和回忆</p>
-        <div class="flex flex-wrap justify-center gap-2 mt-6" v-if="tags.length > 0">
+        <div class="flex flex-wrap justify-center gap-2 mt-4" v-if="tags.length > 0">
           <UBadge
             v-for="tag in tags.slice(0, 8)"
             :key="tag"
@@ -127,10 +127,10 @@
             class="cursor-pointer hover:bg-primary-200 dark:hover:bg-primary-600 transition-colors duration-300"
             @click="navigateToTag(tag)"
           >
-            #{{ tag }}
+            {{ tag }}
           </UBadge>
         </div>
-        <div v-if="!global.userinfo.token" class="flex flex-wrap justify-center gap-2 mt-2">
+        <div v-if="!global.userinfo.token" class="flex flex-wrap justify-center gap-2 mt-4">
           <UBadge
             v-for="suggestion in ['学习', '生活', '旅行', '工作', '音乐']"
             :key="suggestion"
