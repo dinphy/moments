@@ -22,13 +22,9 @@
           name="i-carbon-chevron-left"
           class="w-5 h-5 cursor-pointer mr-4"
         />
-        <h3 class="text-lg font-bold">搜索</h3>
-      </div>
-      <!-- 搜索框 -->
-      <div class="mb-4">
         <UInput
           v-model="searchQuery"
-          placeholder="输入关键词搜索..."
+          placeholder="搜索"
           size="md"
           icon="i-heroicons-magnifying-glass"
           :ui="{ icon: { trailing: { pointer: '' } } }"
@@ -94,7 +90,7 @@
       <div v-else-if="hasSearched && !loading" class="text-center py-12">
         <div class="relative inline-block mb-4">
           <div class="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full blur-2xl opacity-30"></div>
-          <UIcon name="i-heroicons-magnifying-glass" class="relative w-16 h-16 mx-auto text-gray-400" />
+          <UIcon name="i-heroicons-magnifying-glass" class="relative w-12 h-12 mx-auto text-gray-400" />
         </div>
         <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">未找到相关内容</h3>
         <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto mb-4">很抱歉，没有找到与 "{{ searchQuery }}" 相关的内容</p>
@@ -119,7 +115,7 @@
       <div v-else-if="!hasSearched" class="text-center py-12">
         <div class="relative inline-block mb-4">
           <div class="absolute inset-0 bg-primary-200 dark:bg-primary-800 rounded-full blur-2xl opacity-30"></div>
-          <UIcon name="i-heroicons-magnifying-glass" class="relative w-14 h-14 mx-auto text-primary-500 dark:text-primary-400" />
+          <UIcon name="i-heroicons-magnifying-glass" class="relative w-12 h-12 mx-auto text-primary-500 dark:text-primary-400" />
         </div>
         <h3 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">探索精彩内容</h3>
         <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto">输入关键词，发现感兴趣的内容、照片和回忆</p>
