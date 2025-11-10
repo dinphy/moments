@@ -93,10 +93,7 @@
           <UIcon name="i-heroicons-magnifying-glass" class="relative w-12 h-12 mx-auto text-gray-400" />
         </div>
         <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">未找到相关内容</h3>
-        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto mb-4">很抱歉，没有找到与 "{{ searchQuery }}" 相关的内容</p>
-        <div class="flex flex-wrap justify-center gap-2 mb-4">
-          <span class="text-xs text-gray-400 dark:text-gray-500">试试这些关键词：</span>
-        </div>
+        <p class="text-gray-500 dark:text-gray-400 text-sm max-w-xs mx-auto mb-2">试试这些关键词，可能会有结果</p>
         <div class="flex flex-wrap justify-center gap-2">
           <UBadge
             v-for="suggestion in ['学习', '生活', '旅行', '工作', '音乐']"
