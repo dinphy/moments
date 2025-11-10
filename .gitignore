@@ -17,3 +17,6 @@ logs
 upload
 *.sqlite
 moments.exe
+
+.cnb
+.cnb.yml
