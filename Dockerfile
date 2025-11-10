@@ -1,17 +1,16 @@
 FROM node:20.19.1-bookworm AS front
 WORKDIR /app
-RUN npm install -g pnpm@10.10.0 --registry=https://mirrors.cloud.tencent.com/npm/
+RUN npm install -g pnpm@10.10.0
 COPY front/package.json .
 COPY front/pnpm-lock.yaml .
 COPY front/pnpm-workspace.yaml .
-RUN pnpm install --registry=https://mirrors.cloud.tencent.com/npm/
+RUN pnpm install
 COPY front/. .
 RUN pnpm run generate
 
 FROM golang:1.23.3-alpine AS backend
 ARG VERSION
 ARG COMMIT_ID
-ENV GOPROXY="https://mirrors.cloud.tencent.com/go/"
 WORKDIR /app
 RUN apk add --no-cache build-base tzdata
 COPY backend/go.mod .
