@@ -19,8 +19,7 @@
           name="i-carbon-chevron-left"
           class="w-5 h-5 cursor-pointer mr-4"
         />
-        <span v-if="$route.path === '/user/calendar'">日历检索</span>
-        <span v-else-if="$route.path === '/sys/settings'">系统设置</span>
+        <span v-if="$route.path === '/sys/settings'">系统设置</span>
         <span v-else-if="$route.path === '/user/manage'">用户管理</span>
         <span v-else-if="$route.path === '/user/settings'">个人资料</span>
         <span v-else-if="$route.path.indexOf('/tags/') >= 0">
