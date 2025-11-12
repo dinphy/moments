@@ -15,7 +15,7 @@
       height: 'h-screen',
     }"
   >
-    <div class="h-[calc(100vh-72px)] overflow-y-auto p-4 sm:p-6">
+    <div class="h-[calc(100vh-12px)] overflow-y-auto p-4 sm:p-6">
       <div class="flex items-center mb-4">
         <UIcon
           @click="showSearchDrawer = false"

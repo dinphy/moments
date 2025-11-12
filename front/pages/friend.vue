@@ -84,7 +84,7 @@
       <h2 class="text-lg">{{ isEditMode ? "编辑友链" : "添加友链" }}</h2>
     </div>
 
-    <div class="h-[calc(100vh-72px)] overflow-y-auto p-4 sm:p-6">
+    <div class="h-[calc(100vh-12px)] overflow-y-auto p-4 sm:p-6">
       <UForm class="space-y-4" size="sm" :state="friendForm">
         <UFormGroup
           label="名称"
