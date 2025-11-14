@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/kingwrcy/moments/db"
 	"github.com/kingwrcy/moments/handler"
@@ -38,6 +39,82 @@ func migrateTo3(tx *gorm.DB, log zerolog.Logger) {
 				log.Info().Msgf("用户不存在,初始化[admin/a123456]用户... 失败:%s", err)
 			} else {
 				log.Info().Msg("用户不存在,初始化[admin/a123456]用户... 成功!")
+
+				// 创建默认欢迎动态
+				var memoCount int64
+				tx.Table("Memo").Count(&memoCount)
+				if memoCount == 0 {
+					now := time.Now()
+					defaultMemo := db.Memo{
+						Content: `
+						嗨~您好！
+						欢迎使用 Moments 极简朋友圈开源项目。
+                        这是一个基于 Golang + Nuxt.js 开发的轻量级朋友圈系统，支持多用户、图文发布、社交互动等功能，可快速部署为个人或小团队的社交平台。
+						✨ 主要功能：
+						• 支持Markdown语法记录生活
+						• 图片上传与缩略图生成
+						• 音乐视频嵌入(网易云/B站)
+						• 豆瓣书籍电影引用
+						• 点赞评论互动
+						• 标签分类管理
+						• 暗黑模式适配
+						• 完美移动端体验
+						• 支持邮件通知、企业微信Webhook URL通知
+						• 支持用户注册与管理
+						• 支持数据备份，S3存储
+						• 支持友情链接（增删改）
+						• 支持全局搜索（私密内容除外）
+						• 支持动态预发布、置顶、编辑和删除
+						• 支持Google Recaptcha，自定义CSS、JS、备案号、Favicon等
+						• 更多功能正在开发中，敬请期待！
+						🚀 快速开始
+						通过导航栏 “我” ，默认账户（admin/a123456） 登录后台，修改个人信息及站点配置，即可开始记录和分享您的生活点滴。
+						
+						#极简 #朋友圈`,
+						UserId: admin.Id,
+						Pinned: func() *bool { b := true; return &b }(), // 设置为置顶
+						ShowType: func() *int32 { i := int32(1); return &i }(), // 公开显示
+						CreatedAt: &now,
+						UpdatedAt: &now,
+						Ext: "{}", // 空的扩展字段
+					}
+
+					if err := tx.Save(&defaultMemo).Error; err != nil {
+						log.Error().Msgf("创建默认欢迎动态失败: %s", err)
+					} else {
+						log.Info().Msg("创建默认欢迎动态成功!")
+
+						// 创建默认评论
+						defaultComment := db.Comment{
+							Content: "哎哟~不错哦！期待后续更多功能 🎉",
+							MemoId: defaultMemo.Id,
+							Username: admin.Nickname,
+							Author: fmt.Sprintf("%d", admin.Id),
+							CreatedAt: &now,
+							UpdatedAt: &now,
+						}
+
+						if err := tx.Save(&defaultComment).Error; err != nil {
+							log.Error().Msgf("创建默认评论失败: %s", err)
+						} else {
+							log.Info().Msg("创建默认评论成功!")
+						}
+
+						// 创建默认点赞
+						adminId := int(admin.Id)
+						defaultLike := db.Like{
+							MemoID: int(defaultMemo.Id),
+							UserID: &adminId,
+							CreatedAt: &now,
+						}
+
+						if err := tx.Save(&defaultLike).Error; err != nil {
+							log.Error().Msgf("创建默认点赞失败: %s", err)
+						} else {
+							log.Info().Msg("创建默认点赞成功!")
+						}
+					}
+				}
 			}
 		}
 		item.AdminUserName = admin.Username
