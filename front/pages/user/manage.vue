@@ -347,7 +347,7 @@
         <h2 class="text-lg">编辑 - {{ settingsTargetUser?.username }}</h2>
       </div>
 
-      <div class="h-[calc(100vh-72px)] overflow-y-auto">
+      <div class="h-[calc(100vh-12px)] overflow-y-auto">
         <UserSettings
           v-if="settingsTargetUser"
           :target-user="settingsTargetUser"

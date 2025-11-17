@@ -34,7 +34,7 @@
 
     <div class="w-full">
       <div class="relative">
-        <UTextarea ref="contentRef" v-model="state.content" :rows="8" autoresize padded autofocus/>
+        <UTextarea ref="contentRef" v-model="state.content" :rows="8" autoresize padded autofocus placeholder="这一刻的想法..."/>
         <UIcon class="text-[#9fc84a] w-6 h-6 animate-bounce absolute right-2 bottom-1 cursor-pointer select-none" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
       </div>
 
@@ -45,7 +45,7 @@
           <!-- 标签设置 -->
           <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="showTags = !showTags">
             <div class="flex items-center gap-2">
-              <UIcon name="i-carbon-tag" class="w-4 h-4 text-gray-500"/>
+              <UIcon name="i-weui-tag-outlined" class="w-5 h-5 text-gray-500"/>
               <span class="text-gray-700 dark:text-gray-300">标签</span>
             </div>
             <div class="flex items-center space-x-2">
@@ -102,7 +102,7 @@
           <!-- 位置设置 -->
           <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer" @click="toggleLocationPanel">
             <div class="flex items-center gap-2">
-              <UIcon name="i-carbon-location" class="w-4 h-4 text-[#576b95]"/>
+              <UIcon name="i-weui-location-outlined" class="w-5 h-5 text-[#576b95]"/>
               <span class="text-gray-700 dark:text-gray-300">所在位置</span>
             </div>
             <div class="flex items-center space-x-2">
@@ -128,7 +128,7 @@
         <!-- 可见性设置 -->
         <div class="px-4 py-3 flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <UIcon name="i-carbon-user-multiple" class="w-4 h-4 text-gray-500"/>
+            <UIcon name="i-weui-me-outlined" class="w-5 h-5 text-gray-500"/>
             <span class="text-gray-700 dark:text-gray-300">谁可以看</span>
           </div>
           <div class="flex items-center space-x-2">

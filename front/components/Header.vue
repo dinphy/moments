@@ -277,7 +277,7 @@
         height: 'h-screen',
       }"
     >
-      <div class="h-[calc(100vh-72px)] overflow-y-auto">
+      <div class="h-[calc(100vh-12px)] overflow-y-auto">
         <MemoEdit :inDrawer="true" @success="handleMemoSuccess" @close="closeMemoDrawer" />
       </div>
     </USlideover>
