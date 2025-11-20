@@ -74,7 +74,7 @@
                           <span class="mr-1">回复</span>
                           <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
                           <span class="mr-1">:</span>
-                          {{ message.content }}
+                          <span v-html="renderMarkdown(message.content)"></span>
                         </template>
                         <template v-else-if="message.type === 'like'">
                           <div class="flex items-center">
@@ -83,7 +83,7 @@
                           </div>
                         </template>
                         <template v-else>
-                          {{ message.content }}
+                          <span v-html="renderMarkdown(message.content)"></span>
                         </template>
                       </p>
                     </div>
@@ -165,7 +165,7 @@
                           <span class="mr-1">回复</span>
                           <span class="text-[#576b95] text-nowrap">{{ message.replyTo }}</span>
                           <span class="mr-1">:</span>
-                          {{ message.content }}
+                          <span v-html="renderMarkdown(message.content)"></span>
                         </template>
                         <template v-else-if="message.type === 'like'">
                           <div class="flex items-center">
@@ -174,7 +174,7 @@
                           </div>
                         </template>
                         <template v-else>
-                          {{ message.content }}
+                          <span v-html="renderMarkdown(message.content)"></span>
                         </template>
                       </p>
                     </div>
