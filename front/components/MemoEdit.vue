@@ -35,7 +35,7 @@
     <div class="w-full">
       <div class="relative">
         <UTextarea ref="contentRef" v-model="state.content" :rows="8" autoresize padded autofocus placeholder="这一刻的想法..."/>
-        <UIcon class="text-[#9fc84a] w-6 h-6 animate-bounce absolute right-2 bottom-1 cursor-pointer select-none" name="i-carbon-face-satisfied" @click="toggleEmoji"/>
+        <UIcon class="text-[#9fc84a] w-6 h-6 absolute left-2 bottom-2 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
       </div>
 
       <Emoji v-if="emojiShow" @selected="emojiSelected" @close="emojiShow=false"/>

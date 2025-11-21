@@ -1,9 +1,9 @@
 <template>
-  <div class="max-h-[300px] overflow-y-auto">
+  <div class="max-h-[200px] overflow-y-auto">
     <UTabs class="mt-2" :items="tabItems"
            :ui="{wrapper: 'space-y-0', list: {height: 'h-8', tab: {height: 'h-6', padding: 'px-1'}}}">
       <template #item="{ item: tabItem }">
-        <div class="grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-2 p-2">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(50px,1fr))] gap-1 p-2">
           <div 
             v-for="emoji in tabItem.emojis" 
             :key="emoji.code"
