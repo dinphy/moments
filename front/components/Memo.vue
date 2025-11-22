@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex gap-4 text-sm dark:bg-neutral-800 p-4"
+    class="relative flex gap-4 text-[15px] dark:bg-neutral-800 p-4"
     :class="[item.pinned ? 'bg-slate-100 dark:bg-neutral-700' : '']"
   >
     <div class="avatar">

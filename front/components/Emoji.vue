@@ -1,49 +1,99 @@
 <template>
-  <UTabs class="mt-2" :items="tabItems"
-         :ui="{wrapper: 'space-y-0', list: {height: 'h-8', tab: {height: 'h-6', padding: 'px-1'}}}">
-    <template #item="{ item: tabItem }">
-      <div class="flex flex-wrap gap-1 text-xl rounded border border-gray-200 dark:border-gray-800 p-2 select-none mt-2 *:cursor-pointer">
-        <div v-for="icon in tabItem.icons" @click="selectEmoji">{{ icon }}</div>
+  <div class="max-h-[230px] overflow-y-auto">
+    <!-- 最近使用 -->
+    <div v-if="recentEmojis.length > 0" class="border-b border-gray-200 dark:border-gray-700">
+      <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+        最近使用
       </div>
-    </template>
-  </UTabs>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-2 p-2">
+        <div 
+          v-for="emoji in recentEmojis" 
+          :key="emoji.code"
+          class="flex flex-col items-center rounded cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex-shrink-0"
+          @click="selectEmoji(emoji.code)"
+          :title="emoji.name"
+        >
+          <img 
+            :src="emoji.path" 
+            :alt="emoji.name"
+            class="w-7 h-7 object-contain"
+          />
+        </div>
+      </div>
+    </div>
+    
+    <!-- 所有表情 -->
+    <div>
+      <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+        所有表情
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-2 p-2">
+        <div 
+          v-for="emoji in allEmojis" 
+          :key="emoji.code"
+          class="flex flex-col items-center rounded cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          @click="selectEmoji(emoji.code)"
+          :title="emoji.name"
+        >
+          <img 
+            :src="emoji.path" 
+            :alt="emoji.name"
+            class="w-7 h-7 object-contain"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { getAllEmojis } from '~/utils/emoji'
+
 const emit = defineEmits(['selected'])
-const selectEmoji = (event:Event)=>{
-  const value = (event.target as HTMLDivElement).innerHTML
-  emit('selected',value)
+const RECENT_EMOJIS_KEY = 'recent_emojis'
+const MAX_RECENT_EMOJIS = 8
+const allEmojis = getAllEmojis()
+const recentEmojis = ref<any[]>([])
+
+const selectEmoji = (emojiCode: string) => {
+  addToRecent(emojiCode)
+  emit('selected', emojiCode)
 }
-const tabItems = [
-  {
-    key: 'common',
-    label: '常用',
-    icons: [...'😀😁😂😄😅😆😉😊😋😎😍😘😗😙😚😇😐😑😶😏😣😥😮😯😪😫😴😌😛😜😝😒😓😔😕😲😷😖😞😟😤😢😭😦😧😨😬😰😱😳😵😡😠👻👽💘💓💔💕💖💞💰💯']
-  },
-  {
-    key: 'character',
-    label: '人物',
-    icons: [...'👦👧🎅🙅🙆💁🙋🙌🙏👤👥🏃👯💏👪💪👈👆👌👍✊👏📶👣👖👗👔👜👠💄💍🌂🌏☔🌟⛲🐵🐶🐕😿🐈🐆🐮🐷🐗🐏🐘🐇🐻🐼🐔🐣🐸🐍🐉🐳🐟🐡🐙🐚🐛🐝🦋']
-  },
-  {
-    key: 'food',
-    label: '食物',
-    icons: [...'🍇🍈🍉🍊🍋🍌🍍🍎🍏🍐🍑🍒🍓🍅🍆🌽🍄🌰🍞🍖🍗🍔🍟🍕🍳🍲🍱🍘🍙🍚🍛🍜🍝🍠🍢🍣🍤🍥🍡🍦🍧🍨🍩🍪🎂🍰🍫🍬🍭🍮🍯🍼☕🍵🍶🍷🍸🍹🍺🍻🍴']
-  },
-  {
-    key: 'thing',
-    label: '物品',
-    icons: [...'💌💎💈🚪🚿🛁⌛⏰🎈🎉🎎🎏🎐🎀🎁📱☎📞📟📠🔋🔌💻💾💿📺📷📼🔍🔬🔭📡💡📃📰💰📧📨📦📫📭✏📝📂📅📇📈📊📋📌📍📏📐🔓🔏🔑🔨🔫🔗💉💊🚩💦']
-  },
-  {
-    key: 'logo',
-    label: '标志',
-    icons: [...'♠♥♦♣🀄🎴🔇🔈🔉🔊📢📣💤💢💬💭♨🌀🔔🔕✡✝🔯📛🔰🔱⭕✅❌➕➖➗➰➿〽✳✴❇‼⁉❓❔🎦🔠🔤🅰🆎🅱🆑🆒🆔🆖🆗🆙🆚🈁🈶🈯🉐🈹🈚🈲🉑🈸🈴🈳🈺🈵']
+
+const addToRecent = (emojiCode: string) => {
+  try {
+    const recentCodes = getRecentCodes()
+    const filteredCodes = recentCodes.filter(code => code !== emojiCode)
+    const newRecentCodes = [emojiCode, ...filteredCodes].slice(0, MAX_RECENT_EMOJIS)
+    localStorage.setItem(RECENT_EMOJIS_KEY, JSON.stringify(newRecentCodes))
+
+    updateRecentEmojis(newRecentCodes)
+  } catch (error) {
+    console.error('保存最近使用的表情失败:', error)
   }
-]
+}
+
+const getRecentCodes = (): string[] => {
+  try {
+    const stored = localStorage.getItem(RECENT_EMOJIS_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+const updateRecentEmojis = (codes: string[]) => {
+  recentEmojis.value = codes.map(code => {
+    return allEmojis.find(emoji => emoji.code === code)
+  }).filter(Boolean)
+}
+
+onMounted(() => {
+  const recentCodes = getRecentCodes()
+  updateRecentEmojis(recentCodes)
+})
 </script>
 
 <style scoped>
-
 </style>

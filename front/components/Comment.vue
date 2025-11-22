@@ -17,7 +17,7 @@
       <span class="text-[#576b95] text-nowrap">{{props.comment.replyTo}}</span>
     </template>
     <span class="mr-1">:</span>
-    <span class="inline break-all cursor-pointer" @click="toggle">{{ props.comment.content }}</span>
+    <span class="cursor-pointer inline" @click="toggle" v-html="renderedContent"></span>
     <span class="text-xs text-gray-400 ml-2 hidden sm:inline-block">{{$dayjs(props.comment.createdAt).fromNow()}}</span>
     <span class="text-xs text-gray-400 ml-2 inline-flex" v-if="(global.userinfo.id === props.memoUserId || global.userinfo.id === 1) && props.isDetailPage">
       <Confirm @ok="removeComment">
@@ -35,6 +35,7 @@ import CommentBox from "~/components/CommentBox.vue";
 import {toast} from "vue-sonner";
 import {memoChangedEvent, messageChangedEvent} from "~/event";
 import {useGlobalState} from "~/store";
+import { md } from "~/utils";
 
 const global = useGlobalState()
 const currentCommentBox = useState('currentCommentBox')
@@ -52,6 +53,10 @@ const props = defineProps<{
   memoUserId: number
   isDetailPage?: boolean
 }>()
+
+// 渲染评论内容，支持表情包
+const renderedContent = md.renderInline(props.comment.content || '')
+
 const removeComment = async () => {
   await useMyFetch('/comment/remove?id=' + props.comment.id)
   toast.success("删除成功!")

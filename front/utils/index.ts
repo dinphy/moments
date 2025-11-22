@@ -4,6 +4,7 @@ import { useGlobalState } from "~/store"
 import markdownit from "markdown-it"
 import { fromHighlighter } from "@shikijs/markdown-it/core"
 import { createHighlighterCore } from "shiki/core"
+import { parseEmojis } from "./emoji"
 
 const global = useGlobalState()
 
@@ -188,12 +189,22 @@ export const useUpload = async (
   return uploadFile2Server(files, onProgress)
 }
 
-export const md = markdownit({
+// 创建 markdown 渲染器并添加表情包支持
+const mdRenderer = markdownit({
   html: true,
   linkify: true,
   typographer: true,
   breaks: true,
 })
+
+// 添加表情包渲染规则
+mdRenderer.renderer.rules.text = (tokens, idx, options, env, self) => {
+  const content = tokens[idx].content;
+  // 解析表情包语法
+  return parseEmojis(content);
+};
+
+export const md = mdRenderer
 
 createHighlighterCore({
   themes: [import("shiki/themes/github-dark.mjs")],

@@ -31,7 +31,7 @@
                   class="relative w-full pb-[100%] overflow-hidden rounded-lg cursor-pointer group bg-gray-100 dark:bg-gray-800"
                   :data-fancybox="`gallery-${yearIndex}-${monthIndex}`"
                   :data-src="image.url"
-                  :data-caption="image.memoContent || '暂无描述'"
+                  :data-caption="image.memoContentHtml || '暂无描述'"
                   :data-date="image.displayDate"
                   :data-memo-id="image.memoId"
                 >
@@ -42,9 +42,7 @@
                     loading="lazy"
                   />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div class="absolute bottom-0 left-0 right-0 p-2 text-white text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {{ image.memoContent || '暂无描述' }}
-                  </div>
+                  <div class="absolute bottom-0 left-0 right-0 p-2 text-white text-xs truncate opacity-0 group-hover:opacity-100 transition-opacity duration-300" v-html="image.memoContentHtml || '暂无描述'"></div>
                 </div>
               </div>
             </div>
@@ -64,6 +62,7 @@
 import type { MemoVO, SysConfigVO, UserVO } from "~/types";
 import dayjs from 'dayjs';
 import { Fancybox } from '@fancyapps/ui';
+import { md } from '~/utils';
 
 const props = defineProps({
   memos: {
@@ -120,31 +119,47 @@ onUnmounted(() => {
   Fancybox.close();
 });
 
+// 处理内容，渲染emoji
+const processContent = (content: string) => {
+  if (content && content.length > 0) {
+    try {
+      return md.render(content);
+    } catch (e) {
+      console.log("内容渲染错误", e);
+      return content;
+    }
+  }
+  return content;
+};
+
 const groupedImages = computed(() => {
   const images: Array<{
     id: number;
     url: string;
     memoId: number;
     memoContent: string;
+    memoContentHtml: string;
     createdAt: string;
     displayDate: string;
   }> = [];
 
   allMemos.value.forEach(memo => {
-    if (memo.imgs) {
-      const imgUrls = memo.imgs.split(',').filter(Boolean);
-      imgUrls.forEach(url => {
-        images.push({
-          id: memo.id,
-          url,
-          memoId: memo.id,
-          memoContent: memo.content,
-          createdAt: memo.createdAt,
-          displayDate: dayjs(memo.createdAt).format('YYYY-MM-DD'),
+      if (memo.imgs) {
+        const imgUrls = memo.imgs.split(',').filter(Boolean);
+        const processedContent = processContent(memo.content || '');
+        imgUrls.forEach(url => {
+          images.push({
+            id: memo.id,
+            url,
+            memoId: memo.id,
+            memoContent: memo.content,
+            memoContentHtml: processedContent,
+            createdAt: memo.createdAt,
+            displayDate: dayjs(memo.createdAt).format('YYYY-MM-DD'),
+          });
         });
-      });
-    }
-  });
+      }
+    });
 
   images.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
