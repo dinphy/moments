@@ -17,7 +17,7 @@
       <span class="text-[#576b95] text-nowrap">{{props.comment.replyTo}}</span>
     </template>
     <span class="mr-1">:</span>
-    <span class="inline-flex break-all cursor-pointer" @click="toggle" v-html="renderedContent"></span>
+    <span class="cursor-pointer inline" @click="toggle" v-html="renderedContent"></span>
     <span class="text-xs text-gray-400 ml-2 hidden sm:inline-block">{{$dayjs(props.comment.createdAt).fromNow()}}</span>
     <span class="text-xs text-gray-400 ml-2 inline-flex" v-if="(global.userinfo.id === props.memoUserId || global.userinfo.id === 1) && props.isDetailPage">
       <Confirm @ok="removeComment">
@@ -55,7 +55,7 @@ const props = defineProps<{
 }>()
 
 // 渲染评论内容，支持表情包
-const renderedContent = md.render(props.comment.content || '')
+const renderedContent = md.renderInline(props.comment.content || '')
 
 const removeComment = async () => {
   await useMyFetch('/comment/remove?id=' + props.comment.id)

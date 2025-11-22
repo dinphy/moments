@@ -275,9 +275,9 @@ watch(showMessageBox, (newValue) => {
 const renderMarkdown = (content: string) => {
   if (content.length > 20 && !showMoreClicked.value) {
     const truncated = content.substring(0, 20) + '...';
-    return md.render(truncated);
+    return md.renderInline(truncated);
   }
-  return md.render(content);
+  return md.renderInline(content);
 }
 
 // 获取动态图片和扩展信息
