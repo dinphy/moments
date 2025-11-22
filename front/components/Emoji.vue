@@ -1,63 +1,99 @@
 <template>
-  <div class="max-h-[200px] overflow-y-auto">
-    <UTabs class="mt-2" :items="tabItems"
-           :ui="{wrapper: 'space-y-0', list: {height: 'h-8', tab: {height: 'h-6', padding: 'px-1'}}}">
-      <template #item="{ item: tabItem }">
-        <div class="grid grid-cols-[repeat(auto-fill,minmax(50px,1fr))] gap-1 p-2">
-          <div 
-            v-for="emoji in tabItem.emojis" 
-            :key="emoji.code"
-            class="flex flex-col items-center p-1 rounded cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-            @click="selectEmoji(emoji.code)"
-            :title="emoji.name"
-          >
-            <img 
-              :src="emoji.path" 
-              :alt="emoji.name"
-              class="w-6 h-6 object-contain"
-            />
-            <span class="text-[10px] text-gray-600 dark:text-gray-400 mt-0.5 text-center leading-tight">{{ emoji.name }}</span>
-          </div>
+  <div class="max-h-[300px] overflow-y-auto">
+    <!-- 最近使用 -->
+    <div v-if="recentEmojis.length > 0" class="border-b border-gray-200 dark:border-gray-700">
+      <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+        最近使用
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-2 p-2">
+        <div 
+          v-for="emoji in recentEmojis" 
+          :key="emoji.code"
+          class="flex flex-col items-center rounded cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 flex-shrink-0"
+          @click="selectEmoji(emoji.code)"
+          :title="emoji.name"
+        >
+          <img 
+            :src="emoji.path" 
+            :alt="emoji.name"
+            class="w-7 h-7 object-contain"
+          />
         </div>
-      </template>
-    </UTabs>
+      </div>
+    </div>
+    
+    <!-- 所有表情 -->
+    <div>
+      <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
+        所有表情
+      </div>
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-2 p-2">
+        <div 
+          v-for="emoji in allEmojis" 
+          :key="emoji.code"
+          class="flex flex-col items-center rounded cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          @click="selectEmoji(emoji.code)"
+          :title="emoji.name"
+        >
+          <img 
+            :src="emoji.path" 
+            :alt="emoji.name"
+            class="w-7 h-7 object-contain"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { getAllEmojis } from '~/utils/emoji'
 
 const emit = defineEmits(['selected'])
+const RECENT_EMOJIS_KEY = 'recent_emojis'
+const MAX_RECENT_EMOJIS = 8
+const allEmojis = getAllEmojis()
+const recentEmojis = ref<any[]>([])
 
 const selectEmoji = (emojiCode: string) => {
+  addToRecent(emojiCode)
   emit('selected', emojiCode)
 }
 
-// 获取所有本地表情包
-const allEmojis = getAllEmojis()
+const addToRecent = (emojiCode: string) => {
+  try {
+    const recentCodes = getRecentCodes()
+    const filteredCodes = recentCodes.filter(code => code !== emojiCode)
+    const newRecentCodes = [emojiCode, ...filteredCodes].slice(0, MAX_RECENT_EMOJIS)
+    localStorage.setItem(RECENT_EMOJIS_KEY, JSON.stringify(newRecentCodes))
 
-// 将表情包按类别分组（只保留常用和所有表情两组）
-const tabItems = [
-  {
-    key: 'common',
-    label: '常用',
-    emojis: [
-      // 前30个基础表情
-      ...allEmojis.slice(0, 30),
-      // 添加常用的手势表情
-      ...allEmojis.filter(emoji => [
-        '强', '弱', '握手', '胜利', 'OK', '抱拳', '勾引', '拳头', '合十'
-      ].includes(emoji.name))
-    ]
-  },
-  {
-    key: 'all',
-    label: '所有表情',
-    emojis: allEmojis
+    updateRecentEmojis(newRecentCodes)
+  } catch (error) {
+    console.error('保存最近使用的表情失败:', error)
   }
-]
+}
+
+const getRecentCodes = (): string[] => {
+  try {
+    const stored = localStorage.getItem(RECENT_EMOJIS_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+const updateRecentEmojis = (codes: string[]) => {
+  recentEmojis.value = codes.map(code => {
+    return allEmojis.find(emoji => emoji.code === code)
+  }).filter(Boolean)
+}
+
+onMounted(() => {
+  const recentCodes = getRecentCodes()
+  updateRecentEmojis(recentCodes)
+})
 </script>
 
 <style scoped>
-/* 移除自定义CSS，使用Tailwind类替代 */
 </style>
