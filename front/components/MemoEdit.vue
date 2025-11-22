@@ -34,7 +34,15 @@
 
     <div class="w-full">
       <div class="relative">
-        <UTextarea ref="contentRef" v-model="state.content" :rows="8" autoresize padded autofocus placeholder="这一刻的想法..."/>
+        <UTextarea 
+          ref="contentRef" 
+          v-model="state.content" 
+          :rows="isSmallScreen ? 6 : 8" 
+          autoresize 
+          padded 
+          autofocus 
+          placeholder="这一刻的想法..."
+        />
         <UIcon class="text-[#9fc84a] w-7 h-7 animate-bounce absolute left-2 bottom-2 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
       </div>
 
@@ -153,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import {useMouse, useWindowScroll} from '@vueuse/core'
+import {useMouse, useWindowScroll, useBreakpoints} from '@vueuse/core'
 import type {
   DoubanBook,
   DoubanMovie,
@@ -268,6 +276,8 @@ const emojiShow = ref(false)
 const showLocationPanel = ref(false)
 const showTags = ref(false)
 const newTag = ref('')
+
+const isSmallScreen = useBreakpoints({ sm: 640 }).smaller('sm')
 
 const toggleEmoji = () => {
   emojiShow.value = !emojiShow.value
