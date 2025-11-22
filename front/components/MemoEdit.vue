@@ -46,7 +46,7 @@
         <UIcon class="text-[#9fc84a] w-7 h-7 animate-bounce absolute left-2 bottom-2 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
       </div>
 
-      <Emoji v-if="emojiShow" @selected="emojiSelected" @close="emojiShow=false"/>
+      <Emoji v-if="emojiShow" @selected="emojiSelected" @close="emojiShow=false" class="rounded-lg mt-2 bg-gray-50 dark:bg-gray-800 shadow-md"/>
 
       <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden mt-3">
         <div class="divide-y divide-gray-100 dark:divide-gray-700">
