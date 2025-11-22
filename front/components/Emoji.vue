@@ -1,5 +1,5 @@
 <template>
-  <div class="max-h-[300px] overflow-y-auto">
+  <div class="max-h-[230px] overflow-y-auto">
     <!-- 最近使用 -->
     <div v-if="recentEmojis.length > 0" class="border-b border-gray-200 dark:border-gray-700">
       <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
