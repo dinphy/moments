@@ -35,10 +35,10 @@
             v-if="!messages || messages.length === 0"
             class="py-10 text-center text-gray-500 dark:text-gray-400"
           >
-            暂无消息
+            大家都很懒，暂无消息~
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto scrollbar">
+          <div v-else class="max-h-96 min-h-64 overflow-y-auto scrollbar">
             <!-- 未读消息 -->
             <div v-for="message in messages" :key="message.id">
               <div v-if="!message.isRead">
