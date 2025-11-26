@@ -3,7 +3,7 @@
     <!-- 自定义遮罩层 -->
     <div 
       v-if="showMessageBox" 
-      class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm"
+      class="fixed inset-0 bg-gray-900/60"
       @click="showMessageBox = false"
     ></div>
     
@@ -21,7 +21,7 @@
       <template #panel>
         <div class="w-[360px] max-w-[90vw] rounded-lg bg-white dark:bg-gray-800 shadow-lg pb-2">
           <div class="flex justify-between items-center p-3 pb-0 relative border-b border-gray-100 dark:border-gray-700">
-            <h3 class="flex flex-1 justify-center font-medium pb-2">消息</h3>
+            <h3 class="flex flex-1 justify-center font-medium pb-2">互动消息</h3>
             <div
               v-if="messages.length > 0"
               @click="handleDeleteAllMessages()"
@@ -35,10 +35,10 @@
             v-if="!messages || messages.length === 0"
             class="py-10 text-center text-gray-500 dark:text-gray-400"
           >
-            暂无消息
+            大家都很懒，暂无消息~
           </div>
 
-          <div v-else class="max-h-96 overflow-y-auto scrollbar">
+          <div v-else class="max-h-96 min-h-64 overflow-y-auto scrollbar">
             <!-- 未读消息 -->
             <div v-for="message in messages" :key="message.id">
               <div v-if="!message.isRead">
@@ -213,37 +213,39 @@
               </div>
             </div>
           </div>
+
+          <!-- 清空消息弹框 -->
+          <div v-if="showDeleteConfirm" class="absolute inset-0 z-50 flex justify-center items-center bg-black/30 rounded-lg">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl py-4 max-w-sm w-full mx-8">
+              <h3 class="font-medium text-center py-6">清空所有消息</h3>
+              <div class="flex justify-center pb-6 space-x-6">
+                <UButton
+                  color="red"
+                  variant="solid"
+                  size="lg"
+                  class="px-8 py-2 shadow-md hover:shadow-lg transition-shadow"
+                  @click="confirmDeleteAllMessages"
+                >
+                  清空
+                </UButton>
+                <UButton
+                  color="gray"
+                  variant="solid"
+                  size="lg"
+                  class="px-8 py-2 hover:shadow-lg transition-shadow"
+                  @click="showDeleteConfirm = false"
+                >
+                  取消
+                </UButton>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
     </UPopover>
   </div>
 
-  <UModal v-model="showDeleteConfirm" :ui="{
-    container: 'flex justify-center items-center backdrop-blur-sm',
-  }">
-    <div class="p-5">
-      <h3 class="font-medium text-lg mb-4">清空提示</h3>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        确定要清空所有消息吗？此操作不可恢复。
-      </p>
-      <div class="flex justify-end space-x-3">
-        <UButton
-          color="gray"
-          variant="solid"
-          @click="showDeleteConfirm = false"
-        >
-          取消
-        </UButton>
-        <UButton
-          color="primary"
-          variant="solid"
-          @click="confirmDeleteAllMessages"
-        >
-          确认
-        </UButton>
-      </div>
-    </div>
-  </UModal>
+
 </template>
 
 <script setup lang="ts">

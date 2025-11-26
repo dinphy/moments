@@ -1,18 +1,13 @@
 <template>
   <div 
     :class="[
-      'flex flex-col',
+      'flex flex-col mt-1 rounded',
       'fixed inset-x-0 bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg z-50 md:static md:border-0 md:shadow-none',
-      replyTo ? 'p-3' : 'p-3'
+      replyTo ? 'p-3' : 'p-3 md:mx-3'
     ]"
     v-if="currentCommentBox === pid"
     ref="commentBoxRef"
   >
-    <!-- 回复提示 -->
-    <div v-if="replyTo" class="text-xs text-gray-500 mb-2 px-1">
-      回复 <span class="text-blue-500">{{ replyTo }}</span>
-    </div>
-    
     <!-- 输入区域 -->
     <div class="flex items-end gap-2">
       <div class="flex-1 relative">
@@ -21,7 +16,7 @@
           :maxrows="4"
           autoresize
           autofocus 
-          :placeholder="'评论'" 
+          :placeholder="replyTo  ? `回复 ${replyTo}` : '评论'" 
           v-model="state.content"
           class="w-full text-sm"
           :ui="{
@@ -35,10 +30,10 @@
       
       <!-- 功能按钮和发送按钮 -->
       <div class="flex items-center gap-2">
-        <UIcon v-if="!global.userinfo.token" class="text-gray-500 w-6 h-6 cursor-pointer" :name="userShow ? 'weui-keyboard-outlined' : 'i-ep-user'" @click="toggleUser"/>
-        <UIcon class="text-gray-500 w-6 h-6 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
+        <UIcon v-if="!global.userinfo.token" class="text-gray-500 w-7 h-7 cursor-pointer" :name="userShow ? 'weui-keyboard-outlined' : 'i-ep-user'" @click="toggleUser"/>
+        <UIcon class="text-gray-500 w-7 h-7 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
         <UButton 
-          class="cursor-pointer text-sm px-3" 
+          class="cursor-pointer text-md px-3" 
           :color="state.content.trim() ? 'primary' : 'gray'" 
           :variant="state.content.trim() ? 'solid' : 'ghost'"
           :disabled="!state.content.trim()"

@@ -1,5 +1,5 @@
 <template>
-  <div class="max-h-[230px] overflow-y-auto">
+  <div :class="recentEmojis.length ? 'max-h-[233px]' : 'max-h-[180px]'" class="overflow-y-auto scrollbar">
     <!-- 最近使用 -->
     <div v-if="recentEmojis.length > 0" class="border-b border-gray-200 dark:border-gray-700">
       <div class="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 font-medium">
@@ -96,4 +96,31 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 自定义滚动条样式 */
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+
+/* 暗色模式下的滚动条样式 */
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.8);
+}
 </style>
