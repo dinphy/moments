@@ -85,6 +85,12 @@ export type SysConfigVO = {
     smtpPort: string
     smtpUsername: string
     smtpPassword: string
+    enableOIDC: boolean
+    oidcIssuer: string
+    oidcClientId: string
+    oidcClientSecret: string
+    oidcRedirectUri: string
+    oidcScopes: string
 }
 
 

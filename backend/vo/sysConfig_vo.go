@@ -30,7 +30,12 @@ type SysConfigVO struct {
 	EnableRegister         bool   `json:"enableRegister"`             //是否开启注册用户
 	Version                string `json:"version,omitempty"`
 	CommitId               string `json:"commitId,omitempty"`
-	S3                     S3VO   `json:"s3"` //S3相关信息
+	S3                     S3VO   `json:"s3"`                        //S3相关信息
+	EnableOIDC             bool   `json:"enableOIDC"`                //是否启用OIDC认证
+	OidcIssuer             string `json:"oidcIssuer,omitempty"`      //OIDC Issuer URL
+	OidcClientId           string `json:"oidcClientId,omitempty"`    //OIDC Client ID
+	OidcRedirectUri        string `json:"oidcRedirectUri,omitempty"` //OIDC Redirect URI
+	OidcScopes             string `json:"oidcScopes,omitempty"`      //OIDC Scopes
 }
 
 type FullSysConfigVO struct {
@@ -59,8 +64,14 @@ type FullSysConfigVO struct {
 	SmtpPort               string `json:"smtpPort,omitempty"`         //smtp port
 	SmtpUsername           string `json:"smtpUsername,omitempty"`     //smtp username
 	SmtpPassword           string `json:"smtpPassword,omitempty"`     //smtp password
-	EnableWechatWebhook    bool   `json:"enableWechatWebhook"`       //是否启用企业微信Webhook通知
+	EnableWechatWebhook    bool   `json:"enableWechatWebhook"`        //是否启用企业微信Webhook通知
 	WechatWebhookUrl       string `json:"wechatWebhookUrl,omitempty"` //企业微信Webhook URL
 	Version                string `json:"version,omitempty"`
 	CommitId               string `json:"commitId,omitempty"`
+	EnableOIDC             bool   `json:"enableOIDC"`                 //是否启用OIDC认证
+	OidcIssuer             string `json:"oidcIssuer,omitempty"`       //OIDC Issuer URL
+	OidcClientId           string `json:"oidcClientId,omitempty"`     //OIDC Client ID
+	OidcClientSecret       string `json:"oidcClientSecret,omitempty"` //OIDC Client Secret
+	OidcRedirectUri        string `json:"oidcRedirectUri,omitempty"`  //OIDC Redirect URI
+	OidcScopes             string `json:"oidcScopes,omitempty"`       //OIDC Scopes
 }

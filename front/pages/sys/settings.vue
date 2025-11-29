@@ -213,6 +213,58 @@
       </div>
     </div>
 
+    <!-- OIDC设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-key" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">OIDC认证</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">启用OIDC认证</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">使用OIDC标准协议进行用户认证</span>
+          </div>
+          <UToggle v-model="state.enableOIDC"/>
+        </div>
+
+        <template v-if="state.enableOIDC">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Issuer" name="oidcIssuer" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcIssuer" placeholder="https://accounts.example.com" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OIDC提供商的Issuer URL</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Client ID" name="oidcClientId" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcClientId" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">在OIDC提供商处注册的客户端ID</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Client Secret" name="oidcClientSecret" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcClientSecret" type="password" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">在OIDC提供商处注册的客户端密钥</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Redirect URI" name="oidcRedirectUri" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcRedirectUri" placeholder="https://your-site.com/api/auth/oidc/callback" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OIDC认证后的回调地址</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Scopes" name="oidcScopes" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcScopes" placeholder="openid profile email" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">请求的OIDC作用域，空格分隔</p>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <!-- 存储设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
@@ -463,6 +515,12 @@ const state = reactive({
   smtpPassword: "",
   enableWechatWebhook: false,
   wechatWebhookUrl: "",
+  enableOIDC: false,
+  oidcIssuer: "",
+  oidcClientId: "",
+  oidcClientSecret: "",
+  oidcRedirectUri: "",
+  oidcScopes: "openid profile email",
 })
 
 // 处理 rssMaxItems，确保其始终为数字
