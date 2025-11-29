@@ -440,6 +440,28 @@ func (s *OIDCHandler) getUserInfo(issuer, accessToken string) (*OIDCUserInfo, er
 
 // processUserInfo 处理OIDC用户信息，创建或更新系统用户
 func (s *OIDCHandler) processUserInfo(userInfo *OIDCUserInfo, sysConfig vo.SysConfigVO) (*db.User, error) {
+	// 检查Id为1的用户的OidcSub是否为空
+	var adminUser db.User
+	adminUserResult := s.base.db.Where("id = ?", 1).First(&adminUser)
+
+	// 如果Id为1的用户存在且其OidcSub为空，则将当前OIDC信息绑定到该用户
+	if adminUserResult.Error == nil && adminUser.OidcSub == "" {
+		// 更新用户信息，绑定OIDC
+		adminUser.OidcSub = userInfo.Sub
+		adminUser.Nickname = userInfo.NickName
+		if userInfo.PreferredUsername != "" {
+			adminUser.Username = userInfo.PreferredUsername
+		}
+		if userInfo.Email != "" {
+			adminUser.Email = userInfo.Email
+		}
+		if userInfo.Picture != "" {
+			adminUser.AvatarUrl = userInfo.Picture
+		}
+		s.base.db.Save(&adminUser)
+		return &adminUser, nil
+	}
+
 	// 查找是否已存在该OIDC用户
 	var existingUser db.User
 	result := s.base.db.Where("oidcSub = ?", userInfo.Sub).First(&existingUser)
@@ -486,6 +508,8 @@ func (s *OIDCHandler) processUserInfo(userInfo *OIDCUserInfo, sysConfig vo.SysCo
 		Email:     userInfo.Email,
 		AvatarUrl: userInfo.Picture,
 		Password:  "", // OIDC用户不需要密码
+		CoverUrl:  "/cover.webp",
+		Favicon:   "/favicon.png",
 	}
 
 	// 保存用户
