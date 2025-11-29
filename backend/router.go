@@ -99,7 +99,9 @@ func setupRouter(injector do.Injector) {
 
 	// 注册OIDC相关接口
 	oidcGroup := apiGroup.Group("/oidc")
-	oidcGroup.POST("/config", oidcHandler.GetOIDCConfig)
+		oidcGroup.POST("/config", oidcHandler.GetOIDCConfig)
+		// OIDC回调接口，使用GET方法
+		apiGroup.GET("/oidc/callback", oidcHandler.GetOIDCCallback)
 
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)

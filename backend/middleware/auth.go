@@ -20,6 +20,7 @@ func Auth(injector do.Injector) echo.MiddlewareFunc {
 		"/api/user/reg",
 		"/api/user/login",
 		"/api/oidc/config",
+		"/api/oidc/callback",
 		"/api/memo/list",
 		"/api/user/profile",
 		"/api/sysConfig/get",
