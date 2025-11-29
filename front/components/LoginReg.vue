@@ -13,12 +13,13 @@
     <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-h-[85dvh] sm:max-h-[80vh] flex flex-col">
       <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg  text-gray-900 dark:text-white">
+          <h3 class="text-lg text-gray-900 dark:text-white">
             {{ isLogin ? "用户登录" : "注册账户" }}
           </h3>
           <UIcon @click="loginReg = false" name="i-heroicons-x-mark" class="text-gray-400 hover:text-gray-500 p-2 cursor-pointer" />
         </div>
       </div>
+      
       <div class="flex-1 overflow-y-auto">
         <div class="p-4 sm:p-5">
           <UForm

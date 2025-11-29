@@ -312,8 +312,8 @@ func (s *OIDCHandler) GetOIDCCallback(c echo.Context) error {
 		s.base.log.Error().Msgf("生成jwt token异常:%s", err)
 		return FailRespWithMsg(c, Fail, "登录异常")
 	}
-	// 重定向到登录成功页面，并在URL参数中携带token、userId和username
-	return c.Redirect(http.StatusFound, fmt.Sprintf("/login-success?token=%s&userId=%d&username=%s", tokenString, systemUser.Id, systemUser.Username))
+	// 重定向到OIDC回调页面，并在URL参数中携带token、userId和username
+	return c.Redirect(http.StatusFound, fmt.Sprintf("/oidc?token=%s&userId=%d&username=%s", tokenString, systemUser.Id, systemUser.Username))
 }
 
 // getAccessToken 通过授权码获取access token
