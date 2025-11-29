@@ -145,6 +145,23 @@
               >
                 {{ isLogin ? "登录" : "注册" }}
               </UButton>
+              
+              <!-- OIDC登录按钮，仅在OIDC启用时显示 -->
+              <UButton
+                v-if="isLogin && oidcEnabled"
+                @click="loginWithOIDC"
+                :disabled="oidcPending || !oidcAuthURL"
+                :loading="oidcPending"
+                size="md"
+                block
+                class="rounded-md font-medium"
+                :ui="{ 
+                  base: 'w-full py-2.5 text-sm',
+                  rounded: 'rounded-md'
+                }"
+              >
+                使用第三方账号登录
+              </UButton>
 
               <div class="text-center">
                 <UButton
@@ -185,6 +202,39 @@ const state = reactive({
 
 const pending = ref(false);
 const captchaCode = ref("");
+// OIDC相关状态
+const oidcEnabled = ref(false);
+const oidcAuthURL = ref("");
+const oidcPending = ref(false);
+const oidcState = ref("");
+
+// 获取OIDC配置
+const fetchOIDCConfig = async () => {
+  try {
+    oidcPending.value = true;
+    const response = await useMyFetch<{ enabled: boolean; authURL?: string; state?: string }>("/oidc/config");
+    if (response) {
+      oidcEnabled.value = response.enabled;
+      oidcAuthURL.value = response.authURL || "";
+      oidcState.value = response.state || "";
+    }
+  } catch (error) {
+    console.error("获取OIDC配置失败:", error);
+    oidcEnabled.value = false;
+  } finally {
+    oidcPending.value = false;
+  }
+};
+
+// OIDC登录
+const loginWithOIDC = () => {
+  if (oidcAuthURL.value) {
+    // 存储state到localStorage以便回调时验证
+    localStorage.setItem("oidc_state", oidcState.value);
+    // 跳转到OIDC授权页面
+    window.location.href = oidcAuthURL.value;
+  }
+};
 
 const generateCaptcha = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -200,7 +250,11 @@ const validateCaptcha = () => {
 };
 
 onMounted(() => {
-  generateCaptcha()
+  generateCaptcha();
+  // 仅在登录模式下获取OIDC配置
+  if (isLogin.value) {
+    fetchOIDCConfig();
+  }
 });
 
 const doLoginReg = async () => {
@@ -257,8 +311,12 @@ const doLoginReg = async () => {
 watch(isLogin, (newVal) => {
   if (newVal) {
     delete state.repeatPassword;
+    // 切换到登录模式时获取OIDC配置
+    fetchOIDCConfig();
   } else {
     state.repeatPassword = "";
+    // 切换到注册模式时隐藏OIDC按钮
+    oidcEnabled.value = false;
   }
   generateCaptcha();
   state.captcha = "";

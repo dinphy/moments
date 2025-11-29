@@ -19,6 +19,8 @@ func setupRouter(injector do.Injector) {
 	tagHandler := handler.NewTagHandler(injector)
 	rssHandler := handler.NewRssHandler(injector)
 	messageHandler := handler.NewMessageHandler(injector)
+	// 创建OIDC Handler
+	oidcHandler := handler.NewOIDCHandler(injector)
 	e := do.MustInvoke[*echo.Echo](injector)
 	cfg := do.MustInvoke[*vo.AppConfig](injector)
 
@@ -94,6 +96,10 @@ func setupRouter(injector do.Injector) {
 	messageGroup.POST("/read-all", messageHandler.MarkAllMessagesAsRead)
 	messageGroup.DELETE("/delete", messageHandler.DeleteMessage)
 	messageGroup.DELETE("/delete-all", messageHandler.DeleteAllMessages)
+
+	// 注册OIDC相关接口
+	oidcGroup := apiGroup.Group("/oidc")
+	oidcGroup.POST("/config", oidcHandler.GetOIDCConfig)
 
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)

@@ -16,9 +16,17 @@ export const useMyFetch = async <T>(url: string, data?: any) => {
     headers["x-api-token"] = userinfo.token
   }
 
-  const res = await $fetch<ResultVO<T>>(`/api${url}`, {
+  // 规范化URL，避免/api重复
+  let fullUrl = url
+  if (!url.startsWith('/api') && !url.startsWith('http')) {
+    fullUrl = `/api${url.startsWith('/') ? '' : '/'}${url}`
+  }
+  
+  console.log('请求URL:', fullUrl)
+  
+  const res = await $fetch<ResultVO<T>>(fullUrl, {
     method: "post",
-    body: data ? JSON.stringify(data) : null,
+    body: data,
     headers: headers,
   })
 

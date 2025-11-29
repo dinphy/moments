@@ -19,6 +19,7 @@ func Auth(injector do.Injector) echo.MiddlewareFunc {
 	ignores := []string{
 		"/api/user/reg",
 		"/api/user/login",
+		"/api/oidc/config",
 		"/api/memo/list",
 		"/api/user/profile",
 		"/api/sysConfig/get",
