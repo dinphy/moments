@@ -171,7 +171,7 @@
                   size="sm"
                   class="text-xs sm:text-sm font-medium"
                 >
-                  使用第三方账号登录
+                  OIDC登录
                 </UButton>
               </div>
             </div>
