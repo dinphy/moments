@@ -147,24 +147,7 @@
                 {{ isLogin ? "登录" : "注册" }}
               </UButton>
               
-              <!-- OIDC登录按钮，仅在OIDC启用时显示 -->
-              <UButton
-                v-if="isLogin && oidcEnabled"
-                @click="loginWithOIDC"
-                :disabled="oidcPending || !oidcAuthURL"
-                :loading="oidcPending"
-                size="md"
-                block
-                class="rounded-md font-medium"
-                :ui="{ 
-                  base: 'w-full py-2.5 text-sm',
-                  rounded: 'rounded-md'
-                }"
-              >
-                使用第三方账号登录
-              </UButton>
-
-              <div class="text-center">
+              <div class="flex items-center justify-center mt-4">
                 <UButton
                   color="gray"
                   variant="link"
@@ -174,6 +157,21 @@
                   size="sm"
                 >
                   {{ isLogin ? "没有账户？请注册" : "已有账户？请登录" }}
+                </UButton>
+
+                <span v-if="isLogin && oidcEnabled && sysConfig.enableRegister" class="text-gray-400 text-xs">|</span>
+
+                <UButton
+                  v-if="isLogin && oidcEnabled"
+                  @click="loginWithOIDC"
+                  :disabled="oidcPending || !oidcAuthURL"
+                  :loading="oidcPending"
+                  color="gray"
+                  variant="link"
+                  size="sm"
+                  class="text-xs sm:text-sm font-medium"
+                >
+                  使用第三方账号登录
                 </UButton>
               </div>
             </div>

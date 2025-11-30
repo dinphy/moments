@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mb-5"></div>
-    <p class="text-gray-800 text-base">登录成功，正在处理...000</p>
+    <p class="text-gray-800 text-base">登录成功，正在处理...</p>
   </div>
 </template>
 
