@@ -105,8 +105,8 @@ func (s *OIDCHandler) GetOIDCCallback(c echo.Context) error {
 	code := c.QueryParam("code")
 	state := c.QueryParam("state")
 
-	if code == "" || state == "" {
-		s.base.log.Warn().Msgf("OIDC回调缺少必要参数，code=%s, state=%s", code, state)
+	if code == "" {
+		s.base.log.Warn().Msgf("OIDC回调缺少必要参数，code=%s", code)
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"error": "缺少必要参数",
 		})
