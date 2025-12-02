@@ -6,7 +6,7 @@
         <span v-if="props.inDrawer || $route.path==='/new'">添加内容</span>
         <span v-else>编辑内容</span>
       </div>
-      <UButton @click="saveMemo">发表</UButton>
+      <UButton @click="saveMemo" :disabled="!hasContent">发表</UButton>
     </div>
     <div class="flex gap-2 text-lg text-gray-600 pt-4 ">
       <ExternalUrl v-model:favicon="state.externalFavicon" v-model:title="state.externalTitle"
@@ -241,6 +241,19 @@ const reset = () => {
 
 const locationLabel = computed(() => {
   return state.location.split(" ").join(" · ")
+})
+
+const hasContent = computed(() => {
+  return !!(
+    state.content.trim() ||
+    state.imgs.trim() ||
+    state.externalUrl.trim() ||
+    (state.music.id && state.music.type && state.music.server) ||
+    state.video.value ||
+    (doubanData.value && doubanData.value.title) ||
+    state.location.trim() ||
+    selectedLabel.value.length > 0
+  )
 })
 
 const handleDragImage = (imgs: string[]) => {
