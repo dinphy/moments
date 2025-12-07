@@ -37,6 +37,7 @@ type SysConfigVO struct {
 	OidcClientSecret       string `json:"oidcClientSecret,omitempty"` //OIDC Client Secret
 	OidcRedirectUri        string `json:"oidcRedirectUri,omitempty"`  //OIDC Redirect URI
 	OidcScopes             string `json:"oidcScopes,omitempty"`       //OIDC Scopes
+	EnableAI               bool   `json:"enableAI"`                   //是否启用AI润色功能
 }
 
 type FullSysConfigVO struct {
@@ -75,4 +76,7 @@ type FullSysConfigVO struct {
 	OidcClientSecret       string `json:"oidcClientSecret,omitempty"` //OIDC Client Secret
 	OidcRedirectUri        string `json:"oidcRedirectUri,omitempty"`  //OIDC Redirect URI
 	OidcScopes             string `json:"oidcScopes,omitempty"`       //OIDC Scopes
+	EnableAI               bool   `json:"enableAI"`                   //是否启用AI润色功能
+	AIApiKey               string `json:"aiApiKey,omitempty"`         //AI API Key
+	AIApiUrl               string `json:"aiApiUrl,omitempty"`         //AI API URL
 }

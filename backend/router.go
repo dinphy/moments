@@ -21,6 +21,8 @@ func setupRouter(injector do.Injector) {
 	messageHandler := handler.NewMessageHandler(injector)
 	// 创建OIDC Handler
 	oidcHandler := handler.NewOIDCHandler(injector)
+	// 创建AI Handler
+	aiHandler := handler.NewAIHandler(injector)
 	e := do.MustInvoke[*echo.Echo](injector)
 	cfg := do.MustInvoke[*vo.AppConfig](injector)
 
@@ -96,6 +98,11 @@ func setupRouter(injector do.Injector) {
 	messageGroup.POST("/read-all", messageHandler.MarkAllMessagesAsRead)
 	messageGroup.DELETE("/delete", messageHandler.DeleteMessage)
 	messageGroup.DELETE("/delete-all", messageHandler.DeleteAllMessages)
+
+	// AI相关接口
+	aiGroup := apiGroup.Group("/ai")
+	aiGroup.POST("/polish", aiHandler.AIPolish)
+	aiGroup.POST("/chat", aiHandler.AIChat)
 
 	// 注册OIDC相关接口
 	oidcGroup := apiGroup.Group("/oidc")

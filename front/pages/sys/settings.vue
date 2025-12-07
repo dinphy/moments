@@ -386,6 +386,40 @@
       </div>
     </div>
 
+    <!-- AI设置 -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+        <div class="flex items-center space-x-2">
+          <UIcon name="i-heroicons-sparkles" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+          <h3 class="text-base font-medium text-gray-900 dark:text-white">AI润色</h3>
+        </div>
+      </div>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">启用AI润色</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">使用AI智能润色文本内容</span>
+          </div>
+          <UToggle v-model="state.enableAI"/>
+        </div>
+
+        <template v-if="state.enableAI">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="API Key" name="aiApiKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.aiApiKey" type="password" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">智谱AI的API Key，用于调用AI润色服务</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="API URL" name="aiApiUrl" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.aiApiUrl" placeholder="留空则使用默认API地址" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">智谱AI的API地址，留空则使用默认地址</p>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <!-- 高级设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
@@ -521,6 +555,9 @@ const state = reactive({
   oidcClientSecret: "",
   oidcRedirectUri: "",
   oidcScopes: "openid profile email",
+  enableAI: false,
+  aiApiKey: "",
+  aiApiUrl: "",
 })
 
 // 处理 rssMaxItems，确保其始终为数字
