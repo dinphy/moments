@@ -32,7 +32,7 @@
       </div>
 
       <!-- 对话内容区 -->
-      <div class="flex-1 min-h-[25vh] max-h-[50vh] overflow-y-auto p-4 space-y-6 bg-gray-50 dark:bg-gray-900/50 scrollbar">
+      <div ref="chatContainer" class="flex-1 min-h-[25vh] max-h-[50vh] overflow-y-auto p-4 space-y-6 bg-gray-50 dark:bg-gray-900/50 scrollbar">
         <div v-for="(message, index) in messages" :key="index" class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
           <div v-if="message.role === 'assistant'" class="flex items-start space-x-3 max-w-[85%]">
             <div class="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center">
@@ -123,6 +123,16 @@ const messages = ref<Array<{role: string, content: string}>>([]);
 const userInput = ref('');
 const isLoading = ref(false);
 const lastAIResponse = ref('');
+const chatContainer = ref<HTMLElement | null>(null);
+
+// 滚动到最新消息
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (chatContainer.value) {
+      chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
+    }
+  });
+};
 
 // 预设指令
 const presetPrompts = ref([
@@ -150,6 +160,9 @@ ${props.content}`
       role: 'assistant',
       content: '您好！我是AI润色助手。'
     });
+
+    // 滚动到最新消息
+    scrollToBottom();
   }
 });
 
@@ -188,6 +201,9 @@ const sendMessage = async () => {
 
       // 保存最后一条AI回复，用于应用到内容
       lastAIResponse.value = response.message.content;
+
+      // 滚动到最新消息
+      scrollToBottom();
     } else {
       toast.error("AI回复失败");
     }
@@ -212,8 +228,11 @@ const clearHistory = () => {
   // 添加欢迎消息
   messages.value.push({
     role: 'assistant',
-    content: '对话已清空，您可以开始新的对话。'
+    content: '对话已清空，即将开始新的对话。'
   });
+
+  // 滚动到最新消息
+  scrollToBottom();
 };
 
 // 应用AI回复到内容
