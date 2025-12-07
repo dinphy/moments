@@ -32,24 +32,24 @@
       </div>
 
       <!-- 对话内容区 -->
-      <div class="flex-1 min-h-[25vh] overflow-y-auto p-4 space-y-6 bg-gray-50 dark:bg-gray-900/50">
+      <div class="flex-1 min-h-[25vh] max-h-[50vh] overflow-y-auto p-4 space-y-6 bg-gray-50 dark:bg-gray-900/50 scrollbar">
         <div v-for="(message, index) in messages" :key="index" class="flex" :class="message.role === 'user' ? 'justify-end' : 'justify-start'">
           <div v-if="message.role === 'assistant'" class="flex items-start space-x-3 max-w-[85%]">
-            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center">
-              <UIcon name="i-carbon-bot" class="w-5 h-5 text-white" />
+            <div class="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center">
+              <UIcon name="i-carbon-bot" class="w-3 h-3 text-white" />
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none px-5 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
-              <p class="text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{{ message.content }}</p>
+            <div class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
+              <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed">{{ message.content }}</p>
             </div>
           </div>
           
           <!-- 用户消息 -->
           <div v-else class="flex items-start space-x-3 max-w-[85%] justify-end">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg rounded-tr-none px-5 py-3 shadow-sm text-white">
-              <p class="whitespace-pre-wrap leading-relaxed">{{ message.content }}</p>
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg rounded-tr-none px-4 py-2 shadow-sm text-white">
+              <p class="text-sm whitespace-pre-wrap leading-relaxed">{{ message.content }}</p>
             </div>
-            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex-shrink-0 flex items-center justify-center">
-              <UIcon name="i-carbon-user" class="w-5 h-5 text-white" />
+            <div class="w-5 h-5 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex-shrink-0 flex items-center justify-center">
+              <UIcon name="i-carbon-user" class="w-3 h-3 text-white" />
             </div>
           </div>
         </div>
@@ -58,11 +58,11 @@
           <div class="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0 flex items-center justify-center">
             <UIcon name="i-carbon-bot" class="w-5 h-5 text-white" />
           </div>
-          <div class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none px-5 py-4 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="bg-white dark:bg-gray-800 rounded-lg rounded-tl-none px-4 py-3 shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="flex space-x-2">
-              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-              <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+              <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+              <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+              <div class="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
             </div>
           </div>
         </div>
@@ -103,8 +103,6 @@
               </UButton>
             </div>
           </div>
-
-          <!-- 操作按钮 已移到标题栏右上 -->
         </div>
       </div>
     </div>
@@ -214,7 +212,7 @@ const clearHistory = () => {
   // 添加欢迎消息
   messages.value.push({
     role: 'assistant',
-    content: '对话历史已清空。您可以开始新的对话，或者使用预设指令快速开始。'
+    content: '对话已清空，您可以开始新的对话。'
   });
 };
 
@@ -231,3 +229,31 @@ const closeDialog = () => {
   emit('close');
 };
 </script>
+<style scoped>
+/* 自定义滚动条样式 */
+.scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.8);
+}
+
+/* 暗色模式下的滚动条样式 */
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(75, 85, 99, 0.8);
+}
+</style>
