@@ -9,25 +9,25 @@
           </div>
           <h3 class="text-md text-gray-900 dark:text-white">AI 润色助手</h3>
         </div>
-        <div class="flex items-center space-x-2">
-          <UButton
-            @click="clearHistory"
-            variant="ghost"
-            size="xs"
-            class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <UIcon name="i-carbon-trash-can" class="w-4 h-4" />
-          </UButton>
-          <UButton
-            @click="applyToContent"
-            :disabled="!lastAIResponse"
-            variant="ghost"
-            size="xs"
-            class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <UIcon name="i-carbon-checkmark" class="w-4 h-4" />
-          </UButton>
-          <UIcon name="i-carbon-close" class="w-6 h-6 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" @click="closeDialog"/>
+        <div class="flex items-center space-x-5">
+          <div class="group relative">
+            <UIcon name="i-weui-delete-outlined" class="w-5 h-5 cursor-pointer text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition-all duration-200 transform hover:scale-110 px-3" @click="clearHistory" />
+            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">清空历史</span>
+          </div>
+          <div class="group relative">
+            <UIcon name="i-weui-done-filled" 
+              class="w-5 h-5 cursor-pointer transition-all duration-200 transform hover:scale-110 px-3" 
+              :class="!lastAIResponse ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed' : 'text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300'" 
+              @click="applyToContent" 
+              :disabled="!lastAIResponse" />
+            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">应用内容</span>
+          </div>
+          <div class="group relative">
+            <UIcon name="i-weui-close-outlined" 
+              class="w-5 h-5 cursor-pointer text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all duration-200 transform hover:scale-110 hover:rotate-90 px-3" 
+              @click="closeDialog" />
+            <span class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">关闭</span>
+          </div>
         </div>
       </div>
 
@@ -104,28 +104,7 @@
             </div>
           </div>
 
-          <!-- 操作按钮 -->
-          <div class="flex items-center">
-            <UButton 
-              @click="clearHistory" 
-              variant="ghost" 
-              size="sm"
-              class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <UIcon name="i-carbon-trash-can" class="w-4 h-4 mr-1" />
-              清空对话
-            </UButton>
-            <UButton 
-              @click="applyToContent" 
-              :disabled="!lastAIResponse" 
-              variant="ghost" 
-              size="sm"
-              class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            >
-              <UIcon name="i-carbon-checkmark" class="w-4 h-4 mr-1" />
-              确认插入
-            </UButton>
-          </div>
+          <!-- 操作按钮 已移到标题栏右上 -->
         </div>
       </div>
     </div>
