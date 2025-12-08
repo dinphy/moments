@@ -70,11 +70,11 @@
 
       <div class="border-t border-gray-200 dark:border-gray-800 p-4 bg-white dark:bg-gray-900">
         <!-- 预设指令 -->
-        <div class="flex items-center flex-wrap gap-2 mb-4">
+        <div v-if="props.content" class="flex items-center flex-wrap gap-2 mb-4">
           <UBadge 
             v-for="(prompt, index) in presetPrompts" 
             :key="index"
-            @click="applyPresetPrompt(prompt)"
+            @click="applyPresetPromptAndSend(prompt)"
             class="cursor-pointer bg-gray-100 hover:bg-blue-100 dark:bg-gray-800 dark:hover:bg-blue-900/50 text-gray-700 dark:text-gray-300 transition-colors px-3 py-1 text-sm"
           >
             {{ prompt.title }}
@@ -136,10 +136,10 @@ const scrollToBottom = () => {
 
 // 预设指令
 const presetPrompts = ref([
-  { title: "润色", prompt: "请将以下内容润色，保持原意不变：" },
-  { title: "简化", prompt: "请将以下内容简化，保持原意不变：" },
-  { title: "扩展", prompt: "请将以下内容扩展，增加细节描述：" },
-  { title: "续写", prompt: "请将以下内容续写，保持原意不变：" },
+  { title: "润色", prompt: "请将内容斧正、润色，保持原意不变。" },
+  { title: "简化", prompt: "请将内容提炼，用更简洁的语言表达。" },
+  { title: "扩展", prompt: "请对内容扩展，丰富细节和背景信息。" },
+  { title: "续写", prompt: "请基于内容进行逻辑连贯的续写，保持风格一致。" },
 ]);
 
 // 初始化对话，添加原始内容
@@ -147,8 +147,7 @@ onMounted(() => {
   if (props.content) {
     messages.value.push({
       role: 'user',
-      content: `请润色以下内容：
-${props.content}`
+      content: `${props.content}`
     });
     // 自动发送第一条消息
     nextTick(() => {
@@ -158,7 +157,7 @@ ${props.content}`
     // 添加欢迎消息
     messages.value.push({
       role: 'assistant',
-      content: '您好！我是AI润色助手。'
+      content: '嗨，您好！有需要尽管吩咐哦~'
     });
 
     // 滚动到最新消息
@@ -220,6 +219,12 @@ const applyPresetPrompt = (preset: any) => {
   userInput.value = preset.prompt;
 };
 
+// 应用预设指令并发送
+const applyPresetPromptAndSend = (preset: any) => {
+  userInput.value = preset.prompt;
+  sendMessage();
+};
+
 // 清空对话历史
 const clearHistory = () => {
   messages.value = [];
@@ -228,7 +233,7 @@ const clearHistory = () => {
   // 添加欢迎消息
   messages.value.push({
     role: 'assistant',
-    content: '对话已清空，即将开始新的对话。'
+    content: '已清空，开始新的对话吧~'
   });
 
   // 滚动到最新消息
