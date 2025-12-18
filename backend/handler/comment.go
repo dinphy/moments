@@ -219,8 +219,22 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	comment.CreatedAt = &now
 	comment.UpdatedAt = &now
 	comment.ReplyTo = req.ReplyTo
-	comment.ReplyEmail = req.ReplyEmail
 	comment.MemoId = req.MemoID
+	
+	// 如果是回复评论，需要获取被回复评论的邮箱
+	if req.ReplyTo != "" {
+		// 从数据库中查找被回复的评论
+		var parentComment db.Comment
+		// 通过用户名和memoId查找被回复的评论
+		if err := c.base.db.Where("username = ? AND memoId = ?", req.ReplyTo, req.MemoID).First(&parentComment).Error; err == nil {
+			comment.ReplyEmail = parentComment.Email
+		} else {
+			// 如果找不到，使用前端传递的邮箱
+			comment.ReplyEmail = req.ReplyEmail
+		}
+	} else {
+		comment.ReplyEmail = req.ReplyEmail
+	}
 
 	if err = c.base.db.Save(&comment).Error; err == nil {
 		// 创建消息通知
