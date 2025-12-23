@@ -14,9 +14,7 @@ type ListMemoReq struct {
 	ShowType        *int       `json:"showType,omitempty"`        //是否是公开的,1:公开,0:私有
 	UserId          *int       `json:"userId,omitempty"`          //用户id
 }
-type RemoveImageReq struct {
-	Img string `json:"img,omitempty"` //图片路径
-}
+
 type Music struct {
 	ID     string `json:"id,omitempty"`     //MetingJS的音乐ID
 	Server string `json:"server,omitempty"` //音乐的平台

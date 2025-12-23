@@ -1,5 +1,5 @@
 <template>
-  <Header :user="currentUser"/>
+  <Header :user="currentUser" :show-clean-cache="true" @clean-cache="showCleanFileModal = true"/>
 
   <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-2 rounded-b-lg">
 
@@ -489,6 +489,29 @@
       <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="save" size="md">保存设置</UButton>
     </div>
   </div>
+  <UModal
+  v-model="showCleanFileModal"
+  :ui="{
+    container: 'flex justify-center items-center backdrop-blur-sm',
+    width: 'sm:max-w-md',
+    rounded: 'rounded-lg',
+    shadow: 'shadow-lg'
+  }"
+>
+  <div class="p-6 bg-white dark:bg-gray-800 rounded-lg">
+    <h3 class="text-lg text-gray-900 dark:text-white mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">谨慎操作</h3>
+    
+    <div class="text-gray-700 dark:text-gray-300 mb-6 space-y-2">
+      <h3>确认要清理未使用的文件（图片、视频）吗？</h3>
+      <p class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">文件将移至 {uploadDir}/removed 下，可手动删除以释放空间。</p>
+    </div>
+    
+    <div class="flex justify-end gap-3">
+      <UButton color="gray" variant="soft" @click="showCleanFileModal = false">取消</UButton>
+      <UButton color="red" @click="cleanFile">确认</UButton>
+    </div>
+  </div>
+</UModal>
 </template>
 
 <script setup lang="ts">
@@ -560,6 +583,7 @@ const state = reactive({
   aiApiUrl: "",
 })
 
+const showCleanFileModal = ref<boolean>(false);
 // 处理 rssMaxItems，确保其始终为数字
 const rssMaxItemsComputed = computed({
   get: () => state.rssMaxItems,
@@ -598,6 +622,14 @@ const uploadFavicon = async (files: FileList) => {
   if (result.length) {
     toast.success("上传成功")
     state.favicon = result[0]
+  }
+}
+
+const cleanFile = async () => {
+  const res = await useMyFetch<{num: number}>('/file/clean', undefined)
+  if (res) {
+    toast.success(`成功清理 ${res.num} 个未使用的文件`)
+    showCleanFileModal.value = false
   }
 }
 

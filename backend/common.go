@@ -25,10 +25,6 @@ func handleEmptyConfig(log zerolog.Logger, cfg *vo.AppConfig) {
 		Bool("是否启用Swagger文档[ENABLE_SWAGGER]", cfg.EnableSwagger).
 		Bool("是否输出SQL[ENABLE_SQL_OUTPUT]", cfg.EnableSQLOutput).
 		Msgf("基本信息")
-	if cfg.DB != "" && cfg.UploadDir != "" {
-		return
-	}
-	log.Debug().Msgf("没有配置默认所必需的环境变量,使用当前目录[%s]作为项目目录", currentDir)
 
 	if cfg.DB == "" {
 		cfg.DB = filepath.Join(currentDir, "db.sqlite")
@@ -36,6 +32,7 @@ func handleEmptyConfig(log zerolog.Logger, cfg *vo.AppConfig) {
 			log.Debug().Msgf("当前目录[%s]没有[db.sqlite]数据库文件,自动生成成功", currentDir)
 		}
 	}
+
 	if cfg.UploadDir == "" {
 		cfg.UploadDir = filepath.Join(currentDir, "upload")
 		if _, err = os.Stat(cfg.UploadDir); err != nil {
@@ -47,6 +44,7 @@ func handleEmptyConfig(log zerolog.Logger, cfg *vo.AppConfig) {
 			}
 		}
 	}
+
 	if cfg.JwtKey == "" {
 		cfg.JwtKey = strings.ReplaceAll(uuid.NewString(), "-", "")
 		log.Debug().Msgf("JWT_KEY没有配置,随机生成为%s,每次重启服务需要重新登录,配置后则不会", cfg.JwtKey)

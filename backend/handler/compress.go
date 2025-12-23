@@ -6,6 +6,12 @@ import (
 	"github.com/disintegration/imaging"
 )
 
+// 判断是否支持压缩
+func SupportCompress(filename string) bool {
+	_, err := imaging.FormatFromFilename(filename)
+	return err == nil
+}
+
 // CompressImage 接收图片路径并进行压缩
 // 返回错误信息
 func CompressImage(f FileHandler, originImagePath string, thumbImagePath string, quality int) error {
