@@ -419,6 +419,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	// 附加头部字段
 	from := sysConfigVO.SmtpUsername
 	to := []string{targetEmail}
+	toHeader := strings.Join(to, ", ")
 	subject := sysConfigVO.Title
 	domain := getDomain(sysConfigVO.SmtpUsername)
 	email := fmt.Sprintf(
@@ -431,7 +432,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 			"Content-Type: text/html; charset=utf-8\r\n"+
 			"\r\n"+
 			"%s",
-		from, to, subject, domain, emailbody)
+		from, toHeader, subject, domain, emailbody)
 
 	// 发送邮件
 	if err := client.SendMail(from, to, strings.NewReader(email)); err != nil {
