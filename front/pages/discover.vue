@@ -2,7 +2,6 @@
   <Header :user="currentUser" />
   <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 min-h-screen rounded-b-lg p-4 overflow-hidden relative">
     <div class="relative grid grid-cols-2 gap-4 mb-6"> 
-      <!-- 友情链接 -->
       <div 
         class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="navigateTo('/friend')"
@@ -18,8 +17,7 @@
           </div>
         </div>
       </div>
-      
-      <!-- 主题切换 -->
+
       <div 
         class="group relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-2xl p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-slate-200 dark:border-slate-600"
         @click="toggleMode"
@@ -51,39 +49,43 @@
       </div>
     </div>
 
-    <!-- 管理功能 -->
     <div v-if="global.userinfo.token && global.userinfo.id === 1" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-4 overflow-hidden border border-slate-200 dark:border-slate-700 mb-6">
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
       <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
       <div class="relative">
-        <h3 class="text-md font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center">
-          <UIcon name="i-heroicons-shield-check" class="w-5 h-5 mr-2 text-amber-500" />
-          系统与安全
-        </h3>
-        <div class="grid grid-cols-1 gap-3">
-          <NuxtLink to="/user/manage" class="group bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-amber-200 dark:border-amber-800/30">
-            <div class="flex items-center">
-              <div class="w-10 h-10 bg-amber-100 dark:bg-amber-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-                <UIcon name="i-weui-group-detail-outlined" class="w-5 h-5 text-amber-600 dark:text-amber-400"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <NuxtLink to="/user/manage" class="block bg-slate-100 dark:bg-gray-700/50 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-weui-group-detail-outlined" class="w-5 h-5 text-amber-600 dark:text-amber-400"/>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-800 dark:text-gray-200">用户管理</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">管理系统用户</p>
+                </div>
               </div>
-              <span class="font-medium text-gray-700 dark:text-gray-300">用户管理</span>
+              <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-gray-400" />
             </div>
-            <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
           </NuxtLink>
-          <NuxtLink to="/sys/settings" class="group bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-4 flex items-center justify-between hover:shadow-md transition-all duration-300 border border-blue-200 dark:border-blue-800/30">
-            <div class="flex items-center">
-              <div class="w-10 h-10 bg-blue-100 dark:bg-blue-800/30 rounded-lg flex items-center justify-center mr-3 group-hover:scale-110 transition-transform duration-300">
-                <UIcon name="i-weui-setting-outlined" class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
+          <NuxtLink to="/sys/settings" class="block bg-slate-100 dark:bg-gray-700/50 rounded-lg p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                  <UIcon name="i-weui-setting-outlined" class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
+                </div>
+                <div>
+                  <h3 class="font-medium text-gray-800 dark:text-gray-200">系统设置</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">配置系统参数</p>
+                </div>
               </div>
-              <span class="font-medium text-gray-700 dark:text-gray-300">系统设置</span>
+              <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-gray-400" />
             </div>
-            <UIcon name="i-weui-arrow-outlined" class="w-4 h-4 text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
           </NuxtLink>
         </div>
       </div>
     </div>
-    
-    <!-- 未登录提示 -->
+
     <div v-if="!global.userinfo.token" class="relative bg-white dark:bg-gray-800 bg-opacity-90 backdrop-blur-md shadow-lg rounded-2xl p-8 overflow-hidden border border-slate-200 dark:border-slate-700">
       <div class="absolute top-0 right-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -mr-20 -mt-20"></div>
       <div class="absolute bottom-0 left-0 w-40 h-40 bg-slate-200 dark:bg-slate-700 opacity-20 rounded-full -ml-20 -mb-20"></div>
