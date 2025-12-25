@@ -40,8 +40,19 @@ const columns = document.body.clientWidth < 520 ? 1 : 2
 </script>
 
 <template>
-  <VCalendarDatePicker v-if="date.start && date.end" v-model.range="date" :columns="columns" v-bind="{ ...attrs, ...$attrs }" />
-  <VCalendarDatePicker v-else v-model="date" v-bind="{ ...attrs, ...$attrs }" />
+  <VCalendarDatePicker
+    v-if="date.start && date.end"
+    is-required
+    v-model.range="date"
+    :columns="columns"
+    v-bind="{ ...attrs, ...$attrs }"
+  />
+  <VCalendarDatePicker
+    v-else
+    is-required
+    v-model="date"
+    v-bind="{ ...attrs, ...$attrs }"
+  />
 </template>
 
 <style>

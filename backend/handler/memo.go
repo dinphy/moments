@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -42,50 +41,6 @@ func NewMemoHandler(injector do.Injector) *MemoHandler {
 		base: do.MustInvoke[BaseHandler](injector),
 		hc:   http.Client{},
 	}
-}
-
-// RemoveImage godoc
-//
-//	@Tags			Memo
-//	@Summary		删除memo的图片
-//	@Description	目前只会删除本地上传的,不会删除S3上的
-//	@Accept			json
-//	@Produce		json
-//	@Param			object		body	vo.RemoveImageReq	true	"删除memo的图片"
-//	@Param			x-api-token	header	string				true	"登录TOKEN"
-//	@Success		200
-//	@Router			/memo/removeImage [post]
-func (m MemoHandler) RemoveImage(c echo.Context) error {
-	var (
-		req vo.RemoveImageReq
-	)
-	err := c.Bind(&req)
-	if err != nil {
-		return FailResp(c, ParamError)
-	}
-
-	if !strings.HasPrefix(req.Img, "/upload/") || strings.Contains(req.Img, "..") {
-		return SuccessResp(c, h{})
-	}
-
-	img := strings.ReplaceAll(req.Img, "/upload/", "")
-
-	imageFilePath := filepath.Join(m.base.cfg.UploadDir, img)
-	if fs_util.Exists(imageFilePath) {
-		if err := os.Remove(imageFilePath); err != nil {
-			return FailRespWithMsg(c, ParamError, fmt.Sprintf("删除图片失败:%s", err))
-		}
-	}
-
-	thumbImageFilename := strings.ReplaceAll(req.Img+"_thumb", "/upload/", "")
-	thumbImageFilePath := filepath.Join(m.base.cfg.UploadDir, thumbImageFilename)
-	if fs_util.Exists(thumbImageFilePath) {
-		if err := os.Remove(thumbImageFilePath); err != nil {
-			m.base.log.Error().Msgf("删除缩略图失败, thumbImageFilePath=%s, err=%v", thumbImageFilePath, err)
-		}
-	}
-
-	return SuccessResp(c, h{})
 }
 
 type memoListResp struct {
@@ -264,21 +219,6 @@ func (m MemoHandler) RemoveMemo(c echo.Context) error {
 	if m.base.db.Delete(&memo).RowsAffected != 1 {
 		return FailRespWithMsg(c, Fail, "删除失败")
 	}
-
-	if memo.Imgs != "" {
-		imgs := strings.Split(memo.Imgs, ",")
-		for _, img := range imgs {
-			if img == "" || !strings.HasPrefix(img, "/upload/") {
-				continue
-			}
-
-			img := strings.ReplaceAll(img, "/upload/", "")
-			_ = os.Remove(filepath.Join(m.base.cfg.UploadDir, img))
-			thumbImg := strings.ReplaceAll(img+"_thumb", "/upload/", "")
-			_ = os.Remove(filepath.Join(m.base.cfg.UploadDir, thumbImg))
-		}
-	}
-
 	return SuccessResp(c, h{})
 }
 
@@ -388,7 +328,6 @@ func (m MemoHandler) SaveMemo(c echo.Context) error {
 		*memo.CreatedAt = req.CreatedAt.Local()
 	}
 
-	m.base.log.Info().Msgf("memo is %+v", memo)
 	m.base.db.Save(&memo)
 
 	return SuccessResp(c, h{})

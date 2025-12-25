@@ -1,4 +1,5 @@
 import type { ResultVO, SysConfigVO } from "~/types"
+import CryptoJS from "crypto-js"
 import { toast } from "vue-sonner"
 import { useGlobalState } from "~/store"
 import markdownit from "markdown-it"
@@ -16,9 +17,17 @@ export const useMyFetch = async <T>(url: string, data?: any) => {
     headers["x-api-token"] = userinfo.token
   }
 
-  const res = await $fetch<ResultVO<T>>(`/api${url}`, {
+  // 规范化URL，避免/api重复
+  let fullUrl = url
+  if (!url.startsWith('/api') && !url.startsWith('http')) {
+    fullUrl = `/api${url.startsWith('/') ? '' : '/'}${url}`
+  }
+
+  console.log('请求URL:', fullUrl)
+
+  const res = await $fetch<ResultVO<T>>(fullUrl, {
     method: "post",
-    body: data ? JSON.stringify(data) : null,
+    body: data,
     headers: headers,
   })
 
@@ -37,6 +46,27 @@ export const useMyFetch = async <T>(url: string, data?: any) => {
   }
 
   return res.data
+}
+
+export const sha256 = async (file: File) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsArrayBuffer(file)
+    reader.onload = () => {
+      if (!reader.result) {
+        reject(new Error("File read failed"))
+        return
+      }
+
+      if (typeof reader.result === "string") {
+        resolve(CryptoJS.SHA256(reader.result).toString(CryptoJS.enc.Hex))
+        return
+      }
+
+      const wordArray = CryptoJS.lib.WordArray.create(reader.result)
+      resolve(CryptoJS.SHA256(wordArray).toString(CryptoJS.enc.Hex))
+    }
+  })
 }
 
 type OnProgressCallback = (progress: number) => void
@@ -97,7 +127,7 @@ const upload2S3 = async (
       })
       result.push(res.imageUrl)
     } catch (err) {
-      toast.error(`上传图片到 S3 失败, ${err}`)
+      toast.error(`上传文件到 S3 失败, ${err}`)
     }
   }
 
@@ -148,6 +178,23 @@ const uploadFile2Server = async (
   for (let i = 0; i < files.length; i++) {
     try {
       const file = files[i]
+      if (onProgress) {
+        onProgress(files.length, i + 1, file.name, 0)
+      }
+
+      // const hash = await sha256(file)
+      // const ext = file.name.split(".").pop()
+      // const filename = `${hash}.${ext}`
+      // const res = await useMyFetch<{ exist: boolean, path: string }>(`/file/exist?filename=${filename}`)
+      // if (res.exist) {
+      //   result.push(res.path)
+      //   if (onProgress) {
+      //     onProgress(files.length, i + 1, file.name, 1)
+      //   }
+
+      //   continue
+      // }
+
       const urlList = await uploadFile2ServerWithProgress(
         "/api/file/upload",
         file,
@@ -159,13 +206,13 @@ const uploadFile2Server = async (
       )
 
       if (!urlList.length) {
-        toast.error(`上传图片到服务器失败`)
+        toast.error(`上传文件到服务器失败`)
         continue
       }
 
       result.push(...urlList)
     } catch (e) {
-      toast.error(`上传图片到服务器失败, ${e}`)
+      toast.error(`上传文件到服务器失败, ${e}`)
     }
   }
 

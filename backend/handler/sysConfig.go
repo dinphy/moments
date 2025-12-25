@@ -48,6 +48,9 @@ func (s SysConfigHandler) GetConfig(c echo.Context) error {
 	result.S3 = vo.S3VO{
 		ThumbnailSuffix: suffix,
 	}
+	// 过滤敏感的OIDC信息，只保留必要字段
+	result.OidcClientId = ""
+	result.OidcRedirectUri = ""
 	return SuccessResp(c, result)
 }
 
@@ -102,30 +105,51 @@ func (s SysConfigHandler) SaveConfig(c echo.Context) error {
 	context := c.(CustomContext)
 	currentUser := context.CurrentUser()
 	if currentUser == nil || currentUser.Id != 1 {
+		s.base.log.Info().Msgf("配置保存：用户未登录或不是管理员")
 		return FailRespWithMsg(c, Fail, "需要先登录")
 	}
 
+	// 记录开始保存配置
+	s.base.log.Info().Msgf("开始保存系统配置，管理员ID：%d", currentUser.Id)
+
 	if err := c.Bind(&result); err != nil {
-		s.base.log.Info().Msgf("保存配置错误,%s", err)
+		s.base.log.Info().Msgf("保存配置错误, %s", err)
 		return FailResp(c, ParamError)
 	}
 
+	// 记录绑定的配置数据（不记录敏感信息）
+	s.base.log.Info().Msgf("配置数据绑定成功，标题：%s，是否启用OIDC：%v", result.Title, result.EnableOIDC)
+
 	data, err := json.Marshal(result)
 	if err != nil {
+		s.base.log.Info().Msgf("配置数据序列化失败：%s", err)
 		return FailRespWithMsg(c, Fail, "读取系统配置异常")
 	}
 
+	s.base.log.Info().Msgf("配置数据序列化成功，准备保存到数据库")
+
 	if err := s.base.db.First(&config).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		s.base.log.Info().Msgf("配置记录不存在，创建新配置记录")
 		config.Content = string(data)
 		if err = s.base.db.Save(&config).Error; err != nil {
+			s.base.log.Info().Msgf("保存新配置记录失败：%s", err)
 			return FailRespWithMsg(c, Fail, "保存系统配置异常")
 		}
+		s.base.log.Info().Msgf("新配置记录保存成功")
 	} else {
+		s.base.log.Info().Msgf("配置记录已存在，更新现有记录")
 		config.Content = string(data)
 		if err = s.base.db.Updates(&config).Error; err != nil {
+			s.base.log.Info().Msgf("更新配置记录失败：%s", err)
 			return FailRespWithMsg(c, Fail, "保存系统配置异常")
 		}
+		s.base.log.Info().Msgf("配置记录更新成功")
 	}
+
+	// 更新管理员用户名
+	s.base.log.Info().Msgf("准备更新管理员用户名：%s", result.AdminUserName)
 	s.base.db.Table("User").Where("id=?", 1).Update("username", result.AdminUserName)
+	s.base.log.Info().Msgf("管理员用户名更新成功")
+
 	return SuccessResp(c, h{})
 }

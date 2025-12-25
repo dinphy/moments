@@ -13,12 +13,13 @@
     <div class="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-h-[85dvh] sm:max-h-[80vh] flex flex-col">
       <div class="px-4 py-3 sm:px-5 sm:py-3 border-b border-gray-200 dark:border-gray-700">
         <div class="flex items-center justify-between">
-          <h3 class="text-lg  text-gray-900 dark:text-white">
+          <h3 class="text-lg text-gray-900 dark:text-white">
             {{ isLogin ? "用户登录" : "注册账户" }}
           </h3>
           <UIcon @click="loginReg = false" name="i-heroicons-x-mark" class="text-gray-400 hover:text-gray-500 p-2 cursor-pointer" />
         </div>
       </div>
+      
       <div class="flex-1 overflow-y-auto">
         <div class="p-4 sm:p-5">
           <UForm
@@ -145,8 +146,8 @@
               >
                 {{ isLogin ? "登录" : "注册" }}
               </UButton>
-
-              <div class="text-center">
+              
+              <div class="flex items-center justify-center mt-4">
                 <UButton
                   color="gray"
                   variant="link"
@@ -156,6 +157,21 @@
                   size="sm"
                 >
                   {{ isLogin ? "没有账户？请注册" : "已有账户？请登录" }}
+                </UButton>
+
+                <span v-if="isLogin && oidcEnabled && sysConfig.enableRegister" class="text-gray-400 text-xs">|</span>
+
+                <UButton
+                  v-if="isLogin && oidcEnabled"
+                  @click="loginWithOIDC"
+                  :disabled="oidcPending || !oidcAuthURL"
+                  :loading="oidcPending"
+                  color="gray"
+                  variant="link"
+                  size="sm"
+                  class="text-xs sm:text-sm font-medium"
+                >
+                  OIDC登录
                 </UButton>
               </div>
             </div>
@@ -185,6 +201,39 @@ const state = reactive({
 
 const pending = ref(false);
 const captchaCode = ref("");
+// OIDC相关状态
+const oidcEnabled = ref(false);
+const oidcAuthURL = ref("");
+const oidcPending = ref(false);
+const oidcState = ref("");
+
+// 获取OIDC配置
+const fetchOIDCConfig = async () => {
+  try {
+    oidcPending.value = true;
+    const response = await useMyFetch<{ enabled: boolean; authURL?: string; state?: string }>("/oidc/config");
+    if (response) {
+      oidcEnabled.value = response.enabled;
+      oidcAuthURL.value = response.authURL || "";
+      oidcState.value = response.state || "";
+    }
+  } catch (error) {
+    console.error("获取OIDC配置失败:", error);
+    oidcEnabled.value = false;
+  } finally {
+    oidcPending.value = false;
+  }
+};
+
+// OIDC登录
+const loginWithOIDC = () => {
+  if (oidcAuthURL.value) {
+    // 存储state到localStorage以便回调时验证
+    localStorage.setItem("oidc_state", oidcState.value);
+    // 跳转到OIDC授权页面
+    window.location.href = oidcAuthURL.value;
+  }
+};
 
 const generateCaptcha = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -200,7 +249,11 @@ const validateCaptcha = () => {
 };
 
 onMounted(() => {
-  generateCaptcha()
+  generateCaptcha();
+  // 仅在登录模式下获取OIDC配置
+  if (isLogin.value) {
+    fetchOIDCConfig();
+  }
 });
 
 const doLoginReg = async () => {
@@ -257,8 +310,12 @@ const doLoginReg = async () => {
 watch(isLogin, (newVal) => {
   if (newVal) {
     delete state.repeatPassword;
+    // 切换到登录模式时获取OIDC配置
+    fetchOIDCConfig();
   } else {
     state.repeatPassword = "";
+    // 切换到注册模式时隐藏OIDC按钮
+    oidcEnabled.value = false;
   }
   generateCaptcha();
   state.captcha = "";

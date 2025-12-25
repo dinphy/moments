@@ -69,7 +69,7 @@ func migrateTo3(tx *gorm.DB, log zerolog.Logger) {
 						• 更多功能正在开发中，敬请期待！
 						🚀 快速开始
 						通过导航栏 “我” ，默认账户（admin/a123456） 登录后台，修改个人信息及站点配置，即可开始记录和分享您的生活点滴。
-						
+
 						#极简 #朋友圈`,
 						UserId: admin.Id,
 						Pinned: func() *bool { b := true; return &b }(), // 设置为置顶
@@ -299,8 +299,6 @@ func migrateIframeVideoUrl(tx *gorm.DB, log zerolog.Logger) {
 
 		if strings.HasPrefix(ext.Video.Value, "//") {
 			ext.Video.Value = fmt.Sprintf("https:%s", ext.Video.Value)
-		} else if strings.HasPrefix(ext.Video.Value, "http://") {
-			ext.Video.Value = strings.Replace(ext.Video.Value, "http://", "https://", 1)
 		} else if ext.Video.Type == "bilibili" {
 			matchResult := bilibiliUrlReg.FindStringSubmatch(ext.Video.Value)
 			if matchResult == nil {

@@ -1,17 +1,8 @@
 <template>
-  <Header :user="currentUser"/>
+  <Header :user="currentUser" :show-clean-cache="true" @clean-cache="showCleanFileModal = true"/>
 
   <div class="bg-gray-100 dark:bg-gray-900 min-h-screen p-2 rounded-b-lg">
-
-
-    <!-- 基本设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-cog-6-tooth" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">基本</h3>
-        </div>
-      </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showAdminUserName = !showAdminUserName">
           <span class="text-gray-700 dark:text-gray-300">管理账号</span>
@@ -57,61 +48,6 @@
             </div>
           </label>
         </div>
-      </div>
-    </div>
-
-    <!-- 功能设置 -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-puzzle-piece" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">扩展</h3>
-        </div>
-      </div>
-      <div class="divide-y divide-gray-100 dark:divide-gray-700">
-        <div class="px-4 py-3 flex items-center justify-between">
-          <div class="flex flex-col">
-            <span class="text-gray-700 dark:text-gray-300">自动加载内容</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">滚动时自动加载更多内容</span>
-          </div>
-          <UToggle v-model="state.enableAutoLoadNextPage"/>
-        </div>
-
-        <div class="px-4 py-3 flex items-center justify-between">
-          <div class="flex flex-col">
-            <span class="text-gray-700 dark:text-gray-300">用户主页布局</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">以列表形式展示用户动态</span>
-          </div>
-          <UToggle v-model="state.enableNewMemo"/>
-        </div>
-
-        <div class="px-4 py-3 flex items-center justify-between">
-          <div class="flex flex-col">
-            <span class="text-gray-700 dark:text-gray-300">评论功能</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">允许用户对动态进行评论</span>
-          </div>
-          <UToggle v-model="state.enableComment"/>
-        </div>
-
-        <div class="px-4 py-3 flex items-center justify-between">
-          <div class="flex flex-col">
-            <span class="text-gray-700 dark:text-gray-300">开放注册</span>
-            <span class="text-xs text-gray-500 dark:text-gray-400">允许新用户注册账号</span>
-          </div>
-          <UToggle v-model="state.enableRegister"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- 显示设置 -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-eye" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">显示</h3>
-        </div>
-      </div>
-      <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showBeiAnNo = !showBeiAnNo">
           <span class="text-gray-700 dark:text-gray-300">备案号</span>
           <div class="flex items-center space-x-2">
@@ -122,7 +58,11 @@
         <div v-show="showBeiAnNo" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
           <UInput v-model="state.beiAnNo" placeholder="没有可以不填写" size="md" class="h-10"/>
         </div>
+      </div>
+    </div>
 
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showRssMaxItems = !showRssMaxItems">
           <span class="text-gray-700 dark:text-gray-300">RSS最大条数</span>
           <div class="flex items-center space-x-2">
@@ -184,17 +124,72 @@
       </div>
     </div>
 
-    <!-- 安全设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-shield-check" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">安全</h3>
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showCss = !showCss">
+          <span class="text-gray-700 dark:text-gray-300">自定义CSS</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.css ? "已设置" : "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showCss" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UTextarea v-model="state.css" :rows="5" placeholder="输入自定义CSS代码"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showJs = !showJs">
+          <span class="text-gray-700 dark:text-gray-300">自定义JS</span>
+          <div class="flex items-center space-x-2">
+            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.js ? "已设置" : "未设置" }}</span>
+            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+          </div>
+        </div>
+        <div v-show="showJs" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
+          <UTextarea v-model="state.js" :rows="5" placeholder="输入自定义JS代码"/>
         </div>
       </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between">
-          <span class="text-gray-700 dark:text-gray-300">启用Google Recaptcha</span>
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">自动加载内容</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">滚动时自动加载更多内容</span>
+          </div>
+          <UToggle v-model="state.enableAutoLoadNextPage"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">用户主页布局</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">以列表形式展示用户动态</span>
+          </div>
+          <UToggle v-model="state.enableNewMemo"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">评论功能</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">允许用户对动态进行评论</span>
+          </div>
+          <UToggle v-model="state.enableComment"/>
+        </div>
+
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">开放注册</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">允许新用户注册账号</span>
+          </div>
+          <UToggle v-model="state.enableRegister"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">Google Recaptcha</span>
           <UToggle v-model="state.enableGoogleRecaptcha"/>
         </div>
 
@@ -211,19 +206,54 @@
           </div>
         </template>
       </div>
-    </div>
-
-    <!-- 存储设置 -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-server" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">存储</h3>
-        </div>
-      </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between">
-          <span class="text-gray-700 dark:text-gray-300">启用S3存储</span>
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">OIDC认证</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">使用OIDC标准协议进行用户认证</span>
+          </div>
+          <UToggle v-model="state.enableOIDC"/>
+        </div>
+
+        <template v-if="state.enableOIDC">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Issuer" name="oidcIssuer" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcIssuer" placeholder="https://accounts.example.com" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OIDC提供商的Issuer URL</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Client ID" name="oidcClientId" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcClientId" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">在OIDC提供商处注册的客户端ID</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Client Secret" name="oidcClientSecret" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcClientSecret" type="password" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">在OIDC提供商处注册的客户端密钥</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Redirect URI" name="oidcRedirectUri" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcRedirectUri" placeholder="https://your-site.com/api/auth/oidc/callback" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">OIDC认证后的回调地址</p>
+            </UFormGroup>
+          </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="Scopes" name="oidcScopes" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.oidcScopes" placeholder="openid profile email" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">请求的OIDC作用域，空格分隔</p>
+            </UFormGroup>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
+      <div class="divide-y divide-gray-100 dark:divide-gray-700">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <span class="text-gray-700 dark:text-gray-300">S3存储</span>
           <UToggle v-model="state.enableS3"/>
         </div>
 
@@ -267,17 +297,10 @@
       </div>
     </div>
 
-    <!-- 邮件设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-envelope" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">邮件</h3>
-        </div>
-      </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between">
-          <span class="text-gray-700 dark:text-gray-300">启用邮件通知</span>
+          <span class="text-gray-700 dark:text-gray-300">邮件通知</span>
           <UToggle v-model="state.enableEmail"/>
         </div>
 
@@ -304,16 +327,6 @@
           </div>
         </template>
       </div>
-    </div>
-
-    <!-- 企业微信设置 -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-simple-icons-wechat" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">企业微信</h3>
-        </div>
-      </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
         <div class="px-4 py-3 flex items-center justify-between">
           <div class="flex flex-col">
@@ -334,40 +347,33 @@
       </div>
     </div>
 
-    <!-- 高级设置 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
-      <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center space-x-2">
-          <UIcon name="i-heroicons-wrench-screwdriver" class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-          <h3 class="text-base font-medium text-gray-900 dark:text-white">高级</h3>
-        </div>
-      </div>
       <div class="divide-y divide-gray-100 dark:divide-gray-700">
-        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showCss = !showCss">
-          <span class="text-gray-700 dark:text-gray-300">自定义CSS</span>
-          <div class="flex items-center space-x-2">
-            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.css ? "已设置" : "未设置" }}</span>
-            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-gray-700 dark:text-gray-300">AI润色</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">使用AI智能润色文本内容</span>
           </div>
-        </div>
-        <div v-show="showCss" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
-          <UTextarea v-model="state.css" :rows="5" placeholder="输入自定义CSS代码"/>
+          <UToggle v-model="state.enableAI"/>
         </div>
 
-        <div class="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer" @click="showJs = !showJs">
-          <span class="text-gray-700 dark:text-gray-300">自定义JS</span>
-          <div class="flex items-center space-x-2">
-            <span class="text-gray-500 dark:text-gray-400 text-sm">{{ state.js ? "已设置" : "未设置" }}</span>
-            <UIcon name="i-heroicons-chevron-right" class="w-4 h-4 text-gray-400"/>
+        <template v-if="state.enableAI">
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="API Key" name="aiApiKey" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.aiApiKey" type="password" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">智谱AI的API Key，用于调用AI润色服务</p>
+            </UFormGroup>
           </div>
-        </div>
-        <div v-show="showJs" class="px-4 py-3 bg-gray-50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-600">
-          <UTextarea v-model="state.js" :rows="5" placeholder="输入自定义JS代码"/>
-        </div>
+          <div class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+            <UFormGroup label="API URL" name="aiApiUrl" :ui="{label:{base:'font-bold'}}" class="w-full">
+              <UInput v-model="state.aiApiUrl" placeholder="留空则使用默认API地址" size="md" class="h-10"/>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">智谱AI的API地址，留空则使用默认地址</p>
+            </UFormGroup>
+          </div>
+        </template>
       </div>
     </div>
 
-    <!-- 版本信息 -->
     <div class="bg-white dark:bg-gray-800 shadow-sm mb-2 rounded-lg overflow-hidden">
       <div class="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
         <div class="flex items-center space-x-2">
@@ -398,11 +404,33 @@
       </div>
     </div>
 
-    <!-- 保存按钮 -->
     <div class="py-3">
       <UButton class="w-full justify-center bg-blue-500 hover:bg-blue-600" @click="save" size="md">保存设置</UButton>
     </div>
   </div>
+  <UModal
+    v-model="showCleanFileModal"
+    :ui="{
+      container: 'flex justify-center items-center backdrop-blur-sm',
+      width: 'sm:max-w-md',
+      rounded: 'rounded-lg',
+      shadow: 'shadow-lg'
+    }"
+  >
+    <div class="p-6 bg-white dark:bg-gray-800 rounded-lg">
+      <h3 class="text-lg text-gray-900 dark:text-white mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">谨慎操作</h3>
+      
+      <div class="text-gray-700 dark:text-gray-300 mb-6 space-y-2">
+        <h3>确认要清理未使用的文件（图片、视频）吗？</h3>
+        <p class="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">文件将移至 {uploadDir}/removed 下，可手动删除以释放空间。</p>
+      </div>
+      
+      <div class="flex justify-end gap-3">
+        <UButton color="gray" variant="soft" @click="showCleanFileModal = false">取消</UButton>
+        <UButton color="red" @click="cleanFile">确认</UButton>
+      </div>
+    </div>
+  </UModal>
 </template>
 
 <script setup lang="ts">
@@ -463,8 +491,18 @@ const state = reactive({
   smtpPassword: "",
   enableWechatWebhook: false,
   wechatWebhookUrl: "",
+  enableOIDC: false,
+  oidcIssuer: "",
+  oidcClientId: "",
+  oidcClientSecret: "",
+  oidcRedirectUri: "",
+  oidcScopes: "openid profile email",
+  enableAI: false,
+  aiApiKey: "",
+  aiApiUrl: "",
 })
 
+const showCleanFileModal = ref<boolean>(false);
 // 处理 rssMaxItems，确保其始终为数字
 const rssMaxItemsComputed = computed({
   get: () => state.rssMaxItems,
@@ -503,6 +541,14 @@ const uploadFavicon = async (files: FileList) => {
   if (result.length) {
     toast.success("上传成功")
     state.favicon = result[0]
+  }
+}
+
+const cleanFile = async () => {
+  const res = await useMyFetch<{num: number}>('/file/clean', undefined)
+  if (res) {
+    toast.success(`成功清理 ${res.num} 个未使用的文件`)
+    showCleanFileModal.value = false
   }
 }
 

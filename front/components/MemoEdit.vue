@@ -6,16 +6,15 @@
         <span v-if="props.inDrawer || $route.path==='/new'">添加内容</span>
         <span v-else>编辑内容</span>
       </div>
-      <UButton @click="saveMemo">发表</UButton>
+      <UButton @click="saveMemo" :disabled="!hasContent">发表</UButton>
     </div>
     <div class="flex gap-2 text-lg text-gray-600 pt-4 ">
-      <ExternalUrl v-model:favicon="state.externalFavicon" v-model:title="state.externalTitle"
-                   v-model:url="state.externalUrl"/>
-
       <upload-image v-model:imgs="state.imgs"/>
       <music v-bind="state.music" @confirm="updateMusic"/>
       <upload-video @confirm="handleVideo" v-bind="state.video"/>
       <douban-edit v-model:type="doubanType" v-model:data="doubanData"/>
+      <ExternalUrl v-model:favicon="state.externalFavicon" v-model:title="state.externalTitle"
+                   v-model:url="state.externalUrl"/>
       <UPopover :popper="{ arrow: true }" mode="click">
         <UIcon name="i-carbon-calendar" class="w-6 h-6" title="自定义时间"/>
         <template #panel="{close}">
@@ -43,7 +42,10 @@
           autofocus 
           placeholder="这一刻的想法..."
         />
-        <UIcon class="text-[#9fc84a] w-7 h-7 animate-bounce absolute left-2 bottom-2 cursor-pointer select-none" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
+        <div class="absolute left-2 bottom-2">
+          <UIcon class="text-[#9fc84a] w-7 h-7 cursor-pointer select-none mr-2" :name="emojiShow ? 'weui-keyboard-outlined' : 'i-weui-sticker-outlined'" @click="toggleEmoji"/>
+          <UIcon v-if="aiConfig.enableAI" name="i-heroicons-sparkles" @click="openAIChat" class="animate-pulse w-6 h-6 cursor-pointer text-purple-500" title="AI润色"/>
+        </div>
       </div>
 
       <Emoji v-if="emojiShow" @selected="emojiSelected" @close="emojiShow=false" class="rounded-lg mt-2 bg-gray-50 dark:bg-gray-800 shadow-md"/>
@@ -158,6 +160,14 @@
       <video-preview v-if="state.video.type === 'online' && state.video.value" :url="state.video.value"/>
     </div>
   </div>
+  
+  <!-- AI对话组件 -->
+  <AIChat 
+    v-if="showAIChat" 
+    :content="state.content" 
+    @close="closeAIChat" 
+    @applyContent="applyAIContent"
+  />
 </template>
 
 <script setup lang="ts">
@@ -176,6 +186,7 @@ import type {
 import {toast} from "vue-sonner";
 import UploadImage from "~/components/UploadImage.vue";
 import Emoji from "~/components/Emoji.vue";
+import AIChat from "~/components/AIChat.vue";
 import dayjs from "dayjs";
 
 const doubanType = ref<'book' | 'movie'>('book')
@@ -243,6 +254,19 @@ const locationLabel = computed(() => {
   return state.location.split(" ").join(" · ")
 })
 
+const hasContent = computed(() => {
+  return !!(
+    state.content.trim() ||
+    state.imgs.trim() ||
+    state.externalUrl.trim() ||
+    (state.music.id && state.music.type && state.music.server) ||
+    state.video.value ||
+    (doubanData.value && doubanData.value.title) ||
+    state.location.trim() ||
+    selectedLabel.value.length > 0
+  )
+})
+
 const handleDragImage = (imgs: string[]) => {
   state.imgs = imgs.filter(Boolean).join(",")
 }
@@ -276,6 +300,9 @@ const emojiShow = ref(false)
 const showLocationPanel = ref(false)
 const showTags = ref(false)
 const newTag = ref('')
+const aiConfig = ref({enableAI: false})
+const isLoadingAI = ref(false)
+const showAIChat = ref(false)
 
 const isSmallScreen = useBreakpoints({ sm: 640 }).smaller('sm')
 
@@ -326,6 +353,12 @@ const goBack = () => {
 };
 
 onMounted(async () => {
+  // 加载AI配置
+  const config = await useMyFetch<any>('/sysConfig/get')
+  if (config) {
+    aiConfig.value = {enableAI: config.enableAI || false}
+  }
+  
   if (state.id > 0) {
     const res = await useMyFetch<MemoVO>('/memo/get?id=' + state.id)
     Object.assign(state, res)
@@ -346,6 +379,51 @@ onMounted(async () => {
 //     tagPopoverOpen.value = true
 //   }
 // }
+
+const openAIChat = () => {
+  showAIChat.value = true;
+};
+
+const closeAIChat = () => {
+  showAIChat.value = false;
+};
+
+const applyAIContent = (content: string) => {
+  state.content = content;
+  toast.success("已应用AI润色内容");
+};
+
+const polishContent = async () => {
+  if (!state.content.trim()) {
+    toast.error("内容不能为空")
+    return
+  }
+  
+  if (isLoadingAI.value) {
+    toast.error("AI正在处理中，请稍候")
+    return
+  }
+  
+  isLoadingAI.value = true
+  
+  try {
+    const response = await useMyFetch<any>('/ai/polish', {
+      content: state.content
+    })
+    
+    if (response && response.polishedContent) {
+      state.content = response.polishedContent
+      toast.success("AI润色完成")
+    } else {
+      toast.error("AI润色失败")
+    }
+  } catch (error) {
+    console.error("AI润色错误:", error)
+    toast.error("AI润色失败，请检查配置或稍后重试")
+  } finally {
+    isLoadingAI.value = false
+  }
+}
 
 const saveMemo = async () => {
 

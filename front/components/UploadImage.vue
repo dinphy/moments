@@ -66,7 +66,7 @@
 import { useUpload } from "~/utils";
 import { toast } from "vue-sonner";
 
-const imgs = defineModel<string>('imgs')
+const imgs = defineModel<string>('imgs', { default: '' })
 const progress = ref(0)
 const filename = ref('')
 const total = ref(0)
@@ -81,21 +81,21 @@ const imgList = computed(() => {
 const upload = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
-  
+
   if (!files || files.length === 0) {
     return
   }
 
   const fileArray = Array.from(files)
   const containsOtherFile = fileArray.some(file => !file.type.startsWith('image/'))
-  
+
   if (containsOtherFile) {
     toast.error("只能上传图片")
     return
   }
 
   isUploading.value = true
-  
+
   try {
     const result = await useUpload(files, (totalSize: number, index: number, name: string, p: number) => {
       progress.value = Math.round(p * 100)
@@ -103,7 +103,7 @@ const upload = async (event: Event) => {
       total.value = totalSize
       current.value = index
     })
-    
+
     if (result && result.length) {
       toast.success("上传成功")
       imgs.value = [...imgList.value, ...result].filter(Boolean).join(',')
@@ -122,18 +122,12 @@ const addImg = () => {
     return
   }
 
-  const imgsArr = imgList.value
-  if (imgsArr.includes(imgUrlToAdd.value)) {
-    toast.error("不能使用重复的图片地址")
-    return
-  }
-
-  imgs.value = [...imgsArr, imgUrlToAdd.value].join(',')
+  imgs.value = [imgs.value, imgUrlToAdd.value].filter(Boolean).join(',')
   imgUrlToAdd.value = ''
 }
 
 const removeImg = (index: number) => {
-  const imgsArr = imgList.value
+  const imgsArr = imgs.value.split(',').filter(Boolean)
   imgsArr.splice(index, 1)
   imgs.value = imgsArr.join(',')
 }

@@ -112,6 +112,15 @@
         </template>
       </UPopover>
 
+      <span
+        v-else-if="$route.path === '/sys/settings' && props.showCleanCache"
+        class="flex"
+        title="清理缓存"
+        @click="emit('clean-cache')"
+      >
+        <UIcon name="i-weui-delete-outlined" class="w-5 h-5 cursor-pointer" />
+      </span>
+
       <NuxtLink
         v-else-if="$route.path === '/user/settings' && global.userinfo.token"
         class="flex"
@@ -300,7 +309,9 @@ const router = useRouter();
 const props = defineProps<{
   user: UserVO;
   memoItem?: MemoVO;
+  showCleanCache?: boolean;
 }>();
+const emit = defineEmits(["add-friend", "clean-cache"]);
 const mode = useColorMode();
 const { y } = useWindowScroll();
 const loginReg = useState<boolean>("loginReg", () => false);

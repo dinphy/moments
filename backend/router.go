@@ -19,6 +19,8 @@ func setupRouter(injector do.Injector) {
 	tagHandler := handler.NewTagHandler(injector)
 	rssHandler := handler.NewRssHandler(injector)
 	messageHandler := handler.NewMessageHandler(injector)
+	oidcHandler := handler.NewOIDCHandler(injector)
+	aiHandler := handler.NewAIHandler(injector)
 	e := do.MustInvoke[*echo.Echo](injector)
 	cfg := do.MustInvoke[*vo.AppConfig](injector)
 
@@ -45,7 +47,6 @@ func setupRouter(injector do.Injector) {
 	memoGroup.POST("/getFaviconAndTitle", memoHandler.GetFaviconAndTitle)
 	memoGroup.POST("/getDoubanMovieInfo", memoHandler.GetDoubanMovieInfo)
 	memoGroup.POST("/getDoubanBookInfo", memoHandler.GetDoubanBookInfo)
-	memoGroup.POST("/removeImage", memoHandler.RemoveImage)
 
 	commentGroup := apiGroup.Group("/comment")
 	commentGroup.POST("/add", commentHandler.AddComment)
@@ -66,7 +67,9 @@ func setupRouter(injector do.Injector) {
 	tagGroup.POST("/list", tagHandler.List)
 
 	fileGroup := apiGroup.Group("/file")
+	fileGroup.POST("/exist", fileHandler.Exist)
 	fileGroup.POST("/upload", fileHandler.Upload)
+	fileGroup.POST("/clean", fileHandler.Clean)
 	fileGroup.POST("/s3PreSigned", fileHandler.S3PreSigned)
 
 	uploadGroup := e.Group("/upload")
@@ -94,6 +97,14 @@ func setupRouter(injector do.Injector) {
 	messageGroup.POST("/read-all", messageHandler.MarkAllMessagesAsRead)
 	messageGroup.DELETE("/delete", messageHandler.DeleteMessage)
 	messageGroup.DELETE("/delete-all", messageHandler.DeleteAllMessages)
+
+	aiGroup := apiGroup.Group("/ai")
+	aiGroup.POST("/polish", aiHandler.AIPolish)
+	aiGroup.POST("/chat", aiHandler.AIChat)
+
+	oidcGroup := apiGroup.Group("/oidc")
+		oidcGroup.POST("/config", oidcHandler.GetOIDCConfig)
+		apiGroup.GET("/oidc/callback", oidcHandler.GetOIDCCallback)
 
 	if cfg.EnableSwagger {
 		e.GET("/swagger/*", echoSwagger.WrapHandler)

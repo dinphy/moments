@@ -219,8 +219,27 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 	comment.CreatedAt = &now
 	comment.UpdatedAt = &now
 	comment.ReplyTo = req.ReplyTo
-	comment.ReplyEmail = req.ReplyEmail
 	comment.MemoId = req.MemoID
+
+	// 如果是回复评论，需要获取被回复评论的邮箱
+	if req.ReplyTo != "" {
+		// 从数据库中查找被回复的评论
+		var parentComment db.Comment
+		// 通过用户名和memoId查找被回复的评论
+		if err := c.base.db.Where("username = ? AND memoId = ?", req.ReplyTo, req.MemoID).First(&parentComment).Error; err == nil {
+			// 仅在被回复评论的邮箱非空时使用，否则回退到前端传入的邮箱
+			if parentComment.Email != "" {
+				comment.ReplyEmail = parentComment.Email
+			} else {
+				comment.ReplyEmail = req.ReplyEmail
+			}
+		} else {
+			// 如果找不到，使用前端传递的邮箱
+			comment.ReplyEmail = req.ReplyEmail
+		}
+	} else {
+		comment.ReplyEmail = req.ReplyEmail
+	}
 
 	if err = c.base.db.Save(&comment).Error; err == nil {
 		// 创建消息通知
@@ -241,26 +260,53 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 				}
 			}
 
-			// 只有当评论者不是动态发布者时才创建消息
-			if (fromUserId > 0 && fromUserId != memo.UserId) || (fromGuestId != "") {
-				// 创建消息
-				message := db.Message{
-					UserId:      memo.UserId,
-					Type:        "comment",
-					Content:     comment.Content,
-					RelatedId:   comment.Id,
-					MemoId:      comment.MemoId,
-					IsRead:      false,
-					CreatedAt:   &now,
-					FromUserId:  fromUserId,
-					FromGuestId: fromGuestId,
-					FromName:    fromName,
-					ReplyTo:     comment.ReplyTo,
+			// 设置消息接收者
+			if comment.ReplyTo != "" {
+				var parentComment db.Comment
+				if err := c.base.db.Where("username = ? AND memoId = ?", comment.ReplyTo, comment.MemoId).First(&parentComment).Error; err == nil {
+					// 如果被回复的评论属于注册用户，则向该用户发送消息
+					if parentComment.Author != "" {
+						parentAuthorId, _ := strconv.ParseInt(parentComment.Author, 10, 32)
+						// 避免给自己发消息
+						if int32(parentAuthorId) != fromUserId {
+							message := db.Message{
+								UserId:      int32(parentAuthorId),
+								Type:        "comment",
+								Content:     comment.Content,
+								RelatedId:   comment.Id,
+								MemoId:      comment.MemoId,
+								IsRead:      false,
+								CreatedAt:   &now,
+								FromUserId:  fromUserId,
+								FromGuestId: fromGuestId,
+								FromName:    fromName,
+								ReplyTo:     comment.ReplyTo,
+							}
+							if err := c.base.db.Save(&message).Error; err != nil {
+								c.base.log.Error().Err(err).Msg("保存消息失败")
+							}
+						}
+					}
 				}
-
-				// 保存消息
-				if err := c.base.db.Save(&message).Error; err != nil {
-					c.base.log.Error().Err(err).Msg("保存消息失败")
+			} else {
+				// 非回复：只有当评论者不是动态发布者时才创建消息给动态发布者
+				if (fromUserId > 0 && fromUserId != memo.UserId) || (fromGuestId != "") {
+					message := db.Message{
+						UserId:      memo.UserId,
+						Type:        "comment",
+						Content:     comment.Content,
+						RelatedId:   comment.Id,
+						MemoId:      comment.MemoId,
+						IsRead:      false,
+						CreatedAt:   &now,
+						FromUserId:  fromUserId,
+						FromGuestId: fromGuestId,
+						FromName:    fromName,
+						ReplyTo:     comment.ReplyTo,
+					}
+					if err := c.base.db.Save(&message).Error; err != nil {
+						c.base.log.Error().Err(err).Msg("保存消息失败")
+					}
 				}
 			}
 		}
@@ -270,7 +316,7 @@ func (c CommentHandler) AddComment(ctx echo.Context) error {
 			if err = c.commentEmailNotification(comment, frontendHost); err != nil {
 				c.base.log.Error().Msgf("邮件通知失败,原因:%s", err)
 			}
-			
+
 			// 发送企业微信通知
 			if err = c.sendWechatNotify(comment, frontendHost); err != nil {
 				c.base.log.Error().Msgf("企业微信通知失败,原因:%s", err)
@@ -298,24 +344,38 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 		return nil
 	}
 
-	// 检查评论者是否是动态发布者
+	// 检查评论者ID（若已登录）
 	var commenterUserId int32
 	if comment.Author != "" {
 		authorId, _ := strconv.ParseInt(comment.Author, 10, 32)
 		commenterUserId = int32(authorId)
 	}
 
-	// 如果评论者是动态发布者，则不发送邮件通知
-	if commenterUserId > 0 && commenterUserId == memo.UserId {
+	// 确定邮件接收者与目标用户ID
+	var targetEmail string
+	var targetUserId int32
+	if comment.ReplyTo != "" { // 回复评论
+		targetEmail = comment.ReplyEmail
+		var parentComment db.Comment
+		if err := c.base.db.Where("username = ? AND memoId = ?", comment.ReplyTo, comment.MemoId).First(&parentComment).Error; err == nil {
+			if parentComment.Author != "" {
+				pid, _ := strconv.ParseInt(parentComment.Author, 10, 32)
+				targetUserId = int32(pid)
+			}
+		}
+	} else { // 直接评论，通知动态发布者
+		targetEmail = user.Email
+		targetUserId = memo.UserId
+	}
+
+	// 如果邮件为空则直接返回
+	if targetEmail == "" {
 		return nil
 	}
 
-	// 验证邮箱是否为空
-	var targetEmail string
-	if comment.ReplyTo != "" { // 回复评论
-		targetEmail = comment.ReplyEmail
-	} else { // 直接评论
-		targetEmail = user.Email
+	// 如果发送者与接收者是同一已注册用户，则不发送（避免自发通知）
+	if commenterUserId > 0 && targetUserId > 0 && commenterUserId == targetUserId {
+		return nil
 	}
 	if targetEmail == "" {
 		return nil
@@ -359,6 +419,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 	// 附加头部字段
 	from := sysConfigVO.SmtpUsername
 	to := []string{targetEmail}
+	toHeader := strings.Join(to, ", ")
 	subject := sysConfigVO.Title
 	domain := getDomain(sysConfigVO.SmtpUsername)
 	email := fmt.Sprintf(
@@ -371,7 +432,7 @@ func (c CommentHandler) commentEmailNotification(comment db.Comment, host string
 			"Content-Type: text/html; charset=utf-8\r\n"+
 			"\r\n"+
 			"%s",
-		from, to, subject, domain, emailbody)
+		from, toHeader, subject, domain, emailbody)
 
 	// 发送邮件
 	if err := client.SendMail(from, to, strings.NewReader(email)); err != nil {

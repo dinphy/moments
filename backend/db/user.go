@@ -28,6 +28,7 @@ type User struct {
 	BeianNo         string     `gorm:"column:beianNo" json:"beianNo,omitempty"`
 	Css             string     `gorm:"column:css" json:"css,omitempty"`
 	Js              string     `gorm:"column:js" json:"js,omitempty"`
+	OidcSub         string     `gorm:"column:oidcSub" json:"oidcSub,omitempty"`
 	Memos           []Memo     `json:"memos,omitempty"`
 }
 
